@@ -1,0 +1,25 @@
+[project]
+name = "zhihu-k-search"
+version = "0.1.0"
+description = "知乎搜索与数据采集工具，基于 Playwright 实现浏览器自动化"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "playwright>=1.58.0",
+    "playwright-stealth>=2.0.2",
+    "pydantic>=2.12.5",
+]
+
+[project.scripts]
+zhihu-search = "main:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
