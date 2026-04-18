@@ -1,0 +1,11 @@
+[project]
+name = "xhs-k-search"
+version = "0.1.0"
+description = "小红书搜索脚本，通过浏览器自动化技术获取搜索结果、帖子内容及评论数据"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "playwright>=1.58.0",
+    "playwright-stealth>=2.0.2",
+    "pydantic>=2.12.5",
+]

@@ -16,18 +16,56 @@ opencode-skills/
 └── README.md
 ```
 
+## 资源清单
+
+### Skills - Common（通用，已链接到全局）
+
+| Skill | 来源 | 说明 |
+|-------|------|------|
+| `agent-creator` | unknown | 创建 OpenCode Agent 的交互式工具 |
+| `baoyu-xhs-images` | [baoyu-skills](https://github.com/JimLiu/baoyu-skills) | 小红书图片生成 |
+| `code-review-fix` | unknown | 代码审查并修复问题 |
+| `code-reviewer` | [anthropics/skills](https://github.com/anthropics/skills) | 代码审查 |
+| `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
+| `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | 前端界面设计 |
+| `network-proxy` | unknown | 网络代理配置工具 |
+| `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
+| `skillify` | unknown | 将会话过程捕获为 skill |
+
+### Skills - Shared（共享，项目按需链接）
+
+| Skill | 来源 | 说明 |
+|-------|------|------|
+| `images-k-generation` | self-developed | 图像生成 |
+| `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
+| `xhs-k-search` | self-developed | 小红书数据搜索 |
+| `zhihu-k-search` | self-developed | 知乎数据搜索 |
+
+### Agents - Common（通用，已链接到全局）
+
+| Agent | 说明 |
+|-------|------|
+| `general-purpose.md` | 通用 agent |
+| `verification.md` | 验证 agent |
+
+### Agents - Shared（共享，项目按需链接）
+
+| Agent | 说明 |
+|-------|------|
+| `ProductResearch.md` | 产品调研 agent |
+
 ## 使用方式
 
 ### 通用 Skill/Agent
 
-链接到全局目录，所有项目自动可用：
+已链接到全局目录，所有项目自动可用：
 
 ```bash
-# Skill
-ln -s ~/Code/opencode-skills/skills/common/xxx-skill ~/.config/opencode/skills/xxx-skill
+# 查看全局 skills
+ls ~/.config/opencode/skills/
 
-# Agent
-ln -s ~/Code/opencode-skills/agents/common/xxx-agent.md ~/.config/opencode/agents/xxx-agent.md
+# 查看全局 agents
+ls ~/.config/opencode/agents/
 ```
 
 ### 共享 Skill/Agent
@@ -35,9 +73,17 @@ ln -s ~/Code/opencode-skills/agents/common/xxx-agent.md ~/.config/opencode/agent
 在需要的项目中链接：
 
 ```bash
+# 链接 skill
 cd /path/to/project
 mkdir -p .opencode/skills
 ln -s ~/Code/opencode-skills/skills/shared/xxx-skill .opencode/skills/xxx-skill
+
+# 链接 agent
+mkdir -p .opencode/agents
+ln -s ~/Code/opencode-skills/agents/shared/xxx-agent.md .opencode/agents/xxx-agent.md
+
+# 或使用脚本
+~/Code/opencode-skills/scripts/link-skills.sh shared xxx-skill /path/to/project
 ```
 
 ## 外部 Skill 更新
@@ -48,7 +94,7 @@ ln -s ~/Code/opencode-skills/skills/shared/xxx-skill .opencode/skills/xxx-skill
 {
   "source": "https://github.com/xxx/some-repo.git",
   "path": "skills/xxx-skill",
-  "last_update": "2026-04-17",
+  "last_update": "2026-04-18",
   "tracking_dir": "~/Code/GitHub-Skills/common/some-repo"
 }
 ```
@@ -56,12 +102,18 @@ ln -s ~/Code/opencode-skills/skills/shared/xxx-skill .opencode/skills/xxx-skill
 更新方式：
 
 ```bash
-# 手动更新
+# 批量更新所有外部 skill
 ./scripts/update-external-skills.sh
 
 # 或告诉 AI
 # "请帮我更新 xxx-skill"
 ```
+
+## 相关目录
+
+- **统一仓库**：`~/Code/opencode-skills/`
+- **上游追踪**：`~/Code/GitHub-Skills/`
+- **全局配置**：`~/.config/opencode/`
 
 ## 相关文档
 
