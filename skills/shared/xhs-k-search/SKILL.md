@@ -20,6 +20,49 @@ description: |
 cd scripts && uv sync && uv run playwright install chromium
 ```
 
+## 工作流程
+
+### 0. 环境检测与初始化
+
+执行任何操作前，先检测环境是否就绪：
+
+```bash
+ls scripts/.venv 2>/dev/null && ls scripts/.venv/lib/*/site-packages/playwright 2>/dev/null
+```
+
+若检测失败（目录不存在），执行自动初始化：
+
+```bash
+cd scripts && uv sync && uv run playwright install chromium
+```
+
+**处理策略**：
+- 自动初始化成功 → 继续执行后续步骤
+- 自动初始化失败 → 提示用户手动执行上述命令，等待用户确认完成后再继续
+
+### 1. 检查并确保登录状态
+
+小红书需要登录才能获取数据。登录状态存储在 `scripts/auth.json`。
+
+**检测步骤**：
+
+```bash
+# 检查认证文件是否存在
+ls scripts/auth.json
+```
+
+**处理策略**：
+- 认证文件不存在 → 提示用户"需要完成小红书登录认证"，然后执行登录命令
+- 认证已失效（执行操作时检测到未登录）→ 提示用户"认证已失效，需要重新登录"，然后执行登录命令
+
+**登录命令**：
+
+```bash
+cd scripts && uv run python main.py --login
+```
+
+浏览器窗口会打开，提示用户在浏览器中完成登录，登录成功后按回车保存状态。
+
 ## 核心功能
 
 ### 1. 关键词搜索
