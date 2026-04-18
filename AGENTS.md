@@ -4,10 +4,10 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 
 ## 目录结构
 
-- `skills/common/` - 通用 skills，已链接到全局 `~/.config/opencode/skills/`
-- `skills/shared/` - 共享 skills，项目按需链接
-- `agents/common/` - 通用 agents，已链接到全局 `~/.config/opencode/agents/`
-- `agents/shared/` - 共享 agents，项目按需链接
+- `skills/common/` - 通用 skills，链接到全局 `~/.config/opencode/skills/`
+- `skills/shared/` - 共享 skills，部分已链接到全局，部分按需链接到项目
+- `agents/common/` - 通用 agents，链接到全局 `~/.config/opencode/agents/`
+- `agents/shared/` - 共享 agents，按需链接到项目
 - `scripts/` - 辅助脚本
 
 ## 关键命令

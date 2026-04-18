@@ -1,6 +1,7 @@
 ---
 description: 产品调研 subagent，通过多源调查收集信息并输出结构化调研报告。当用户要求研究、调研、了解某个产品时调用。
 mode: subagent
+temperature: 0.3
 tools:
   write: true
   edit: false
@@ -17,7 +18,7 @@ permission:
     "git push*": deny
     "*": allow
 hidden: false
-steps: 30
+steps: 50
 ---
 
 # 产品调研 Agent
