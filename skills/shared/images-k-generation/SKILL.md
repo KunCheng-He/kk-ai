@@ -65,4 +65,22 @@ uv run python generate.py --provider aliyun --list-sizes
 
 ## API Keys
 
-API Key 存储在项目根目录 `.env` 文件中，脚本会自动读取。
+API Key 存储在 skill 根目录（`scripts/../.env`）的 `.env` 文件中，脚本会自动读取。
+
+```bash
+# .env 文件示例（放在 images-k-generation/ 目录下）
+VOLCENGINE_API_KEY=your_key
+ZHIPU_API_KEY=your_key
+ALIYUN_API_KEY=your_key
+```
+
+## 代理配置
+
+如遇网络问题，可通过环境变量配置代理：
+
+```bash
+export HTTP_PROXY=http://127.0.0.1:7890
+export HTTPS_PROXY=http://127.0.0.1:7890
+```
+
+或使用 `network-proxy` skill 获取代理配置帮助。

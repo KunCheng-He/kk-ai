@@ -30,6 +30,8 @@ cd scripts && uv sync && uv run playwright install chromium
 cd scripts && uv run python main.py --keyword "搜索关键词" --headless
 ```
 
+**分页说明**：当前版本通过自动滚动加载更多结果，返回结果中的 `has_more` 字段指示是否有更多数据。如需更多结果，可多次执行搜索命令。
+
 ### 2. 帖子详情与评论
 
 获取指定帖子的正文、图片、标签及评论列表。
