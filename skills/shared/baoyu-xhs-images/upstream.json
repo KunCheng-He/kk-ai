@@ -1,0 +1,9 @@
+{
+  "source": "https://github.com/JimLiu/baoyu-skills.git",
+  "path": "skills/baoyu-xhs-images",
+  "last_update": "2026-04-18",
+  "tracking_dir": "~/Code/GitHub-Skills/common/baoyu-skills",
+  "archived": true,
+  "archived_date": "2026-04-18",
+  "archive_reason": "Moved from common to shared - no longer needed as global skill"
+}

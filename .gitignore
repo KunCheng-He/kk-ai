@@ -48,3 +48,4 @@ yarn-error.log*
 *.temp
 .cache/
 .ruff_cache/
+test/
