@@ -37,6 +37,10 @@ opencode-skills/
 | Skill | 来源 | 说明 |
 |-------|------|------|
 | `images-k-generation` | self-developed | 图像生成 |
+| `ob_architect_structure` | self-developed | 整理思路、构建大纲（kk-brain） |
+| `ob_capture_insight` | self-developed | 捕捉洞察、结晶知识卡片（kk-brain） |
+| `ob_compile_manuscript` | self-developed | 整合内容、输出文章（kk-brain） |
+| `ob_polish_prose` | self-developed | 扩写大纲、优化文字（kk-brain） |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
 | `zhihu-k-search` | self-developed | 知乎数据搜索 |
@@ -52,6 +56,7 @@ opencode-skills/
 
 | Agent | 说明 |
 |-------|------|
+| `Knowledge Co-Creator.md` | 知识共建者主 agent（kk-brain） |
 | `ProductResearch.md` | 产品调研 agent |
 
 ## 使用方式
