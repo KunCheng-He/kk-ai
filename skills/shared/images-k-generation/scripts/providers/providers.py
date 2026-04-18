@@ -9,6 +9,12 @@ import httpx
 from .base import BaseProvider, GenerateParams, ImageResult
 
 
+def _sanitize_error_message(text: str, api_key: str) -> str:
+    if api_key and api_key in text:
+        text = text.replace(api_key, "***API_KEY***")
+    return text
+
+
 class VolcengineProvider(BaseProvider):
     """火山引擎图像生成提供商
 
@@ -20,6 +26,7 @@ class VolcengineProvider(BaseProvider):
     api_key_env = "volcengine_api_key"
     api_url = "https://ark.cn-beijing.volces.com/api/v3/images/generations"
     model = "doubao-seedream-5-0-260128"
+    supports_base64 = False
 
     def generate(self, params: GenerateParams, api_key: str) -> list[ImageResult]:
         payload = {
@@ -41,7 +48,8 @@ class VolcengineProvider(BaseProvider):
 
         with httpx.Client(timeout=120) as client:
             response = client.post(self.api_url, json=payload, headers=headers)
-            response.raise_for_status()
+            if response.status_code != 200:
+                raise RuntimeError(f"API error {response.status_code}: {_sanitize_error_message(response.text, api_key)}")
             data = response.json()
 
         results = []
@@ -102,7 +110,8 @@ class ZhipuProvider(BaseProvider):
 
         with httpx.Client(timeout=120) as client:
             response = client.post(self.api_url, json=payload, headers=headers)
-            response.raise_for_status()
+            if response.status_code != 200:
+                raise RuntimeError(f"API error {response.status_code}: {_sanitize_error_message(response.text, api_key)}")
             data = response.json()
 
         results = []
@@ -175,7 +184,8 @@ class AliyunProvider(BaseProvider):
 
         with httpx.Client(timeout=120) as client:
             response = client.post(self.api_url, json=payload, headers=headers)
-            response.raise_for_status()
+            if response.status_code != 200:
+                raise RuntimeError(f"API error {response.status_code}: {_sanitize_error_message(response.text, api_key)}")
             data = response.json()
 
         results = []

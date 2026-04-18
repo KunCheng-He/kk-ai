@@ -113,6 +113,17 @@ def generate(
     provider_cls = PROVIDERS[provider]
     provider_instance = provider_cls()
 
+    supported_sizes = provider_instance.get_supported_sizes()
+    if size not in supported_sizes:
+        raise ValueError(
+            f"Size '{size}' not supported by {provider}. "
+            f"Supported sizes: {', '.join(supported_sizes)}"
+        )
+
+    if response_format == "base64" and not provider_cls.supports_base64:
+        print(f"Warning: {provider} does not support base64 format, using url instead")
+        response_format = "url"
+
     params = GenerateParams(
         prompt=prompt,
         size=size,

@@ -49,6 +49,7 @@ class BaseProvider(ABC):
 
     name: str
     api_key_env: str
+    supports_base64: bool = True
 
     @abstractmethod
     def generate(self, params: GenerateParams, api_key: str) -> list[ImageResult]:
