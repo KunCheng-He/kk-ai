@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Visual Blueprint",
+  "description": "视觉蓝图 JSON 结构定义",
+  "type": "object",
+  "required": ["core_conclusion", "data_points", "visual_metaphor", "emotional_tone", "validation"],
+  "properties": {
+    "core_conclusion": {
+      "type": "object",
+      "description": "核心结论",
+      "required": ["summary", "key_insights"],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "一句话总结核心结论"
+        },
+        "key_insights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["insight", "source_line"],
+            "properties": {
+              "insight": { "type": "string" },
+              "source_line": { "type": "integer", "description": "report.md 中的行号" }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "data_points": {
+      "type": "array",
+      "description": "关键数据点",
+      "items": {
+        "type": "object",
+        "required": ["label", "value", "type", "source_line"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "数据标签，如 '用户增长率'"
+          },
+          "value": {
+            "type": "string",
+            "description": "数据值，如 '80%'"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["percentage", "absolute", "ratio", "currency", "count", "time_range"],
+            "description": "数据类型"
+          },
+          "unit": {
+            "type": "string",
+            "description": "单位，如 '万'、'亿元'"
+          },
+          "context": {
+            "type": "string",
+            "description": "数据上下文说明"
+          },
+          "source_line": {
+            "type": "integer",
+            "description": "report.md 中的行号"
+          },
+          "uncertain": {
+            "type": "boolean",
+            "description": "是否为不确定的提取"
+          }
+        }
+      }
+    },
+    "visual_metaphor": {
+      "type": "object",
+      "description": "视觉联想",
+      "required": ["primary", "suggestions"],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "description": "主要视觉隐喻，如 '上升趋势曲线'"
+        },
+        "suggestions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "description"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["chart", "diagram", "illustration", "icon", "layout"]
+              },
+              "description": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "emotional_tone": {
+      "type": "object",
+      "description": "情绪基调",
+      "required": ["primary", "confidence"],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "enum": ["positive", "negative", "neutral", "urgent"]
+        },
+        "secondary": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "判断置信度"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "校验结果",
+      "required": ["status", "timestamp"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["passed", "corrected", "failed"]
+        },
+        "corrections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field", "original", "corrected", "source"],
+            "properties": {
+              "field": { "type": "string" },
+              "original": { "type": "string" },
+              "corrected": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "source_file": { "type": "string" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "version": { "type": "string" }
+      }
+    }
+  }
+}
