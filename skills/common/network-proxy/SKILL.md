@@ -28,7 +28,26 @@ source ~/.my_proxy/proxyrc
 1. **检测网络问题**：当网络请求超时或失败时
 2. **加载本技能**：通过关键词触发或主动调用
 3. **设置代理**：执行 `source ~/.my_proxy/proxyrc`
-4. **重试请求**：使用代理重新执行网络请求
+4. **验证代理**：运行 `curl -I --max-time 10 https://www.google.com` 确认代理可用
+5. **重试请求**：使用代理重新执行网络请求
+
+## 验证命令
+
+```bash
+# 验证代理是否生效
+source ~/.my_proxy/proxyrc && curl -I --max-time 10 https://www.google.com
+
+# 查看当前代理设置
+echo "HTTP_PROXY: $HTTP_PROXY"
+echo "HTTPS_PROXY: $HTTPS_PROXY"
+```
+
+## 故障排查
+
+如果代理不可用：
+1. 检查 `~/.my_proxy/proxyrc` 配置是否正确
+2. 确认代理服务是否运行
+3. 尝试其他代理端口或服务器
 
 ## 注意事项
 
