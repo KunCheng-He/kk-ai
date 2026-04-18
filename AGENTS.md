@@ -13,14 +13,21 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 ## 关键命令
 
 ```bash
-# 链接所有通用 skills/agents 到全局
-~/Code/opencode-skills/scripts/link-skills.sh common
-
 # 链接共享 skill 到指定项目
 ~/Code/opencode-skills/scripts/link-skills.sh shared <skill-name> /path/to/project
 
 # 更新所有外部 skill（从上游仓库拉取）
 ~/Code/opencode-skills/scripts/update-external-skills.sh
+```
+
+## 全局链接
+
+通用 skills/agents 通过目录级符号链接到全局：
+
+```bash
+# 一次性设置（已完成）
+ln -s ~/Code/opencode-skills/skills/common ~/.config/opencode/skills
+ln -s ~/Code/opencode-skills/agents/common ~/.config/opencode/agents
 ```
 
 ## Skill 结构规范
@@ -39,7 +46,7 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 
 ## 新增 Skill/Agent
 
-- 通用 skill/agent 放入 `skills/common/` 或 `agents/common/`，然后运行 `scripts/link-skills.sh common`
+- 通用 skill/agent 放入 `skills/common/` 或 `agents/common/`，自动生效（全局目录已链接）
 - 共享 skill/agent 放入 `skills/shared/` 或 `agents/shared/`，按需链接到项目
 
 ## Python 项目约定

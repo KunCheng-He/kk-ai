@@ -22,15 +22,11 @@ opencode-skills/
 
 | Skill | 来源 | 说明 |
 |-------|------|------|
-| `agent-creator` | unknown | 创建 OpenCode Agent 的交互式工具 |
-| `baoyu-xhs-images` | [baoyu-skills](https://github.com/JimLiu/baoyu-skills) | 小红书图片生成 |
-| `code-review-fix` | unknown | 代码审查并修复问题 |
-| `code-reviewer` | [anthropics/skills](https://github.com/anthropics/skills) | 代码审查 |
+| `agent-creator` | self-developed | 创建 OpenCode Agent 的交互式工具 |
 | `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
-| `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | 前端界面设计 |
-| `network-proxy` | unknown | 网络代理配置工具 |
+| `network-proxy` | self-developed | 网络代理配置工具 |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
-| `skillify` | unknown | 将会话过程捕获为 skill |
+| `skillify` | self-developed | 将会话过程捕获为 skill |
 
 ### Skills - Shared（共享，项目按需链接）
 
@@ -63,13 +59,15 @@ opencode-skills/
 
 ### 通用 Skill/Agent
 
-已链接到全局目录，所有项目自动可用：
+通过目录级符号链接到全局，所有项目自动可用：
 
 ```bash
-# 查看全局 skills
-ls ~/.config/opencode/skills/
+# 已完成的设置
+ln -s ~/Code/opencode-skills/skills/common ~/.config/opencode/skills
+ln -s ~/Code/opencode-skills/agents/common ~/.config/opencode/agents
 
-# 查看全局 agents
+# 查看
+ls ~/.config/opencode/skills/
 ls ~/.config/opencode/agents/
 ```
 
