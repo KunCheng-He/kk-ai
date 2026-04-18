@@ -49,3 +49,10 @@ yarn-error.log*
 .cache/
 .ruff_cache/
 test/
+
+# Sensitive files
+.env
+auth.json
+*.pem
+*.key
+credentials.json
