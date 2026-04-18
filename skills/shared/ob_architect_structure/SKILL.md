@@ -1,8 +1,6 @@
 ---
 name: ob_architect_structure
 description: 当用户需要整理思路、寻找逻辑关系或构建大纲时调用。扫描现有卡片，提供结构化建议。
-version: 1.0.0
-author: Knowledge Co-Creator
 ---
 
 # 构建结构技能 (Architect Structure)
@@ -15,8 +13,9 @@ author: Knowledge Co-Creator
 ### 步骤一：资产扫描 (Scan)
 *   **动作**：
     1.  确定当前项目路径：`./06-AI共建/[项目名称]/知识卡片/`。
-    2.  调用 `List` 工具获取文件列表。
-    3.  调用 `Read` 工具（批量）读取卡片内容。
+    2.  调用 `glob` 工具获取文件列表。
+    3.  调用 `read` 工具（批量）读取卡片内容。
+    4.  **异常处理**：若目录不存在，提示用户先创建卡片或指定正确路径。
     4.  **思考**：提取每张卡片的核心论点（Claim）和关键证据（Evidence）。
 
 ### 步骤二：结构涌现 (Emergence)

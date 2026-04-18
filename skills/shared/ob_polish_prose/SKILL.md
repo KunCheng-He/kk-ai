@@ -1,8 +1,6 @@
 ---
 name: ob_polish_prose
-description: 当用户需要扩写大纲、优化文字或消除“AI味”时调用。专注于将逻辑骨架转化为高质感的正文。
-version: 1.0.0
-author: Knowledge Co-Creator
+description: 当用户需要扩写大纲、优化文字或消除"AI味"时调用。专注于将逻辑骨架转化为高质感的正文。
 ---
 
 # 润色文字技能 (Polish Prose)
@@ -14,8 +12,9 @@ author: Knowledge Co-Creator
 
 ### 步骤一：加载约束 (Load Context)
 *   **动作**：
-    1.  读取指定的“输出卡片”或用户提供的文本。
+    1.  读取指定的"输出卡片"或用户提供的文本。
     2.  加载 `assets/style_guide.md`，将风格约束注入上下文。
+    3.  **异常处理**：若文件不存在，提示用户确认路径或直接使用默认风格。
 
 ### 步骤二：逻辑扩写 (Expand)
 *   **核心原则**：**忠实于骨架，自由予表达**。
