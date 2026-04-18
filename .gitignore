@@ -56,3 +56,6 @@ auth.json
 *.pem
 *.key
 credentials.json
+
+# Playwright CLI
+.playwright/

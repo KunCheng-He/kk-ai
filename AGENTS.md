@@ -44,6 +44,12 @@ ln -s ~/Code/opencode-skills/agents/common ~/.config/opencode/agents
 3. 更新 `upstream.json` 中的 `last_update`
 4. 手动检查并提交变更
 
+**例外**：`playwright-cli` skill 通过 `playwright-cli install --skills` 直接安装到全局目录 `~/.config/opencode/skills/`，不通过本仓库管理。更新方式：
+```bash
+npm install -g @playwright/cli@latest
+playwright-cli install --skills
+```
+
 ## 新增 Skill/Agent
 
 - 通用 skill/agent 放入 `skills/common/` 或 `agents/common/`，自动生效（全局目录已链接）
