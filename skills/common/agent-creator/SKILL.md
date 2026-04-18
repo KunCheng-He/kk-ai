@@ -87,15 +87,20 @@ description: 创建 OpenCode Agent 的交互式工具。当用户想要创建新
 #### 工具权限（tools）
 
 ```
-控制代理可访问的工具：
+控制代理可访问工具：
 - write：文件写入
 - edit：文件编辑
 - bash：执行命令
 - read：文件读取
 - glob：文件搜索
 - grep：内容搜索
-- webfetch：网络请求
-- task：调用其他子代理
+- webfetch：获取网页内容
+- websearch：网络搜索
+- skill：加载技能
+- todowrite：管理待办事项
+- question：向用户提问
+- lsp：LSP 交互（实验性）
+- patch：应用补丁
 
 可设置为 true（启用）或 false（禁用）
 ```
@@ -187,11 +192,9 @@ permission:
   edit: <ask/allow/deny>
   bash:
     "*": <ask/allow/deny>
-steps: <可选，最大步数>
-color: <可选，颜色>
-permission:
   task:
     "*": <ask/allow/deny>
+steps: <可选，最大步数>
 ---
 <系统提示词内容>
 ```
@@ -212,6 +215,7 @@ permission:
   edit: <ask/allow/deny>
   bash:
     "*": <ask/allow/deny>
+  webfetch: <ask/allow/deny>
 hidden: <可选，true/false>
 steps: <可选，最大步数>
 ---
@@ -240,6 +244,7 @@ steps: <可选，最大步数>
         "bash": {
           "*": "<ask/allow/deny>"
         },
+        "webfetch": "<ask/allow/deny>",
         "task": {
           "*": "<ask/allow/deny>"
         }
