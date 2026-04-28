@@ -34,9 +34,10 @@ opencode-skills/
 
 | Skill | 来源 | 说明 |
 |-------|------|------|
-| `baoyu-xhs-images` | self-developed | 小红书图片生成 |
+| `baoyu-xhs-images` | [baoyu-skills](https://github.com/JimLiu/baoyu-skills) | 小红书图片生成 |
 | `douban-k-search` | self-developed | 豆瓣数据搜索 |
-| `frontend-design` | self-developed | 前端界面设计 |
+| `external-skills-updater` | self-developed | 更新外部 skill |
+| `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | 前端界面设计 |
 | `images-k-generation` | self-developed | 图像生成 |
 | `ob_architect_structure` | self-developed | 整理思路、构建大纲（kk-brain） |
 | `ob_capture_insight` | self-developed | 捕捉洞察、结晶知识卡片（kk-brain） |
@@ -95,26 +96,9 @@ ln -s ~/Code/opencode-skills/agents/shared/xxx-agent.md .opencode/agents/xxx-age
 
 ## 外部 Skill 更新
 
-外部来源的 skill 包含 `upstream.json` 文件，记录上游信息：
+外部来源的 skill 通过 `external-skills-updater` skill 进行更新，详见资源清单中标记为外部来源的 skill。
 
-```json
-{
-  "source": "https://github.com/xxx/some-repo.git",
-  "path": "skills/xxx-skill",
-  "last_update": "2026-04-18",
-  "tracking_dir": "~/Code/GitHub-Skills/common/some-repo"
-}
-```
-
-更新方式：
-
-```bash
-# 批量更新所有外部 skill
-./scripts/update-external-skills.sh
-
-# 或告诉 AI
-# "请帮我更新 xxx-skill"
-```
+更新方式：告诉 AI "请更新外部 skill"，AI 将自动执行更新流程。
 
 ## 相关目录
 

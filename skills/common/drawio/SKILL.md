@@ -11,8 +11,9 @@ Generate draw.io diagrams as native `.drawio` files. Optionally export to PNG, S
 
 1. **Generate draw.io XML** in mxGraphModel format for the requested diagram
 2. **Write the XML** to a `.drawio` file in the current working directory using the Write tool
-3. **If the user requested an export format** (png, svg, pdf), locate the draw.io CLI (see below), export with `--embed-diagram`, then delete the source `.drawio` file. If the CLI is not found, keep the `.drawio` file and tell the user they can install the draw.io desktop app to enable export, or open the `.drawio` file directly
-4. **Open the result** — the exported file if exported, or the `.drawio` file otherwise. If the open command fails, print the file path so the user can open it manually
+3. **Post-process edge routing** (optional): If `npx @drawio/postprocess` is available, run it on the `.drawio` file to optimize edge routing (simplify waypoints, fix edge-vertex collisions, straighten approach angles). Skip silently if not available — do not install it or ask the user about it
+4. **If the user requested an export format** (png, svg, pdf), locate the draw.io CLI (see below), export with `--embed-diagram`, then delete the source `.drawio` file. If the CLI is not found, keep the `.drawio` file and tell the user they can install the draw.io desktop app to enable export, or open the `.drawio` file directly
+5. **Open the result** — the exported file if exported, or the `.drawio` file otherwise. If the open command fails, print the file path so the user can open it manually
 
 ## Choosing the output format
 
@@ -162,47 +163,10 @@ Every diagram must have this structure:
 - Cell `id="1"` is the default parent layer
 - All diagram elements use `parent="1"` unless using multiple layers
 
-Consult `references/xml-reference.md` for common styles, style properties, edge routing details (including waypoints), and container/group examples.
+## XML reference
 
-## Edge routing
-
-**CRITICAL: Every edge `mxCell` must contain a `<mxGeometry relative="1" as="geometry" />` child element**, even when there are no waypoints. Self-closing edge cells (e.g. `<mxCell ... edge="1" ... />`) are invalid and will not render correctly. Always use the expanded form:
-```xml
-<mxCell id="e1" edge="1" parent="1" source="a" target="b" style="...">
-  <mxGeometry relative="1" as="geometry" />
-</mxCell>
-```
-
-- Use `edgeStyle=orthogonalEdgeStyle` for right-angle connectors (most common)
-- **Space nodes generously** — prefer 200px horizontal / 120px vertical gaps
-- **Leave room for arrowheads** — at least 20px of straight segment before the target
-- Add explicit **waypoints** when edges would overlap
-- Align all nodes to a grid (multiples of 10)
-- **Edge labels**: Do NOT wrap edge labels in HTML markup to reduce font size. The default font size for edge labels is already 11px (vs 12px for vertices), so they are already smaller. Just set the `value` attribute directly.
-
-See `references/xml-reference.md` for full edge routing and container guidance.
-
-## Containers and groups
-
-Use parent-child containment (`parent="containerId"`) for nested elements — do **not** just stack shapes. Children use **relative coordinates** within the container. See `references/xml-reference.md` for container types, rules, and examples.
-
-## Dark mode colors
-
-draw.io supports automatic dark mode rendering. How colors behave depends on the property:
-
-- **`strokeColor`, `fillColor`, `fontColor`** default to `"default"`, which renders as black in light theme and white in dark theme. When no explicit color is set, colors adapt automatically.
-- **Explicit colors** (e.g. `fillColor=#DAE8FC`) specify the light-mode color. The dark-mode color is computed automatically by inverting the RGB values (blending toward the inverse at 93%) and rotating the hue by 180° (via `mxUtils.getInverseColor`).
-- **`light-dark()` function** — To specify both colors explicitly, use `light-dark(lightColor,darkColor)` in the style string, e.g. `fontColor=light-dark(#7EA6E0,#FF0000)`. The first argument is used in light mode, the second in dark mode.
-
-To enable dark mode color adaptation, the `mxGraphModel` element must include `adaptiveColors="auto"`.
-
-When generating diagrams, you generally do not need to specify dark-mode colors — the automatic inversion handles most cases. Use `light-dark()` only when the automatic inverse color is unsatisfactory.
-
-## Style reference
-
-For the complete draw.io style reference: https://www.drawio.com/doc/faq/drawio-style-reference.html
-
-For the XML Schema Definition (XSD): https://www.drawio.com/assets/mxfile.xsd
+For the complete draw.io XML reference including common styles, edge routing, containers, layers, tags, metadata, dark mode colors, and XML well-formedness rules, fetch and follow the instructions at:
+https://raw.githubusercontent.com/jgraph/drawio-mcp/main/shared/xml-reference.md
 
 ## Troubleshooting
 
@@ -216,6 +180,6 @@ For the XML Schema Definition (XSD): https://www.drawio.com/assets/mxfile.xsd
 
 ## CRITICAL: XML well-formedness
 
-- **NEVER use double hyphens (`--`) inside XML comments.** `--` is illegal inside `<!-- -->` per the XML spec and causes parse errors. Use single hyphens or rephrase.
+- **NEVER include ANY XML comments (`<!-- -->`) in the output.** XML comments are strictly forbidden — they waste tokens, can cause parse errors, and serve no purpose in diagram XML.
 - Escape special characters in attribute values: `&amp;`, `&lt;`, `&gt;`, `&quot;`
 - Always use unique `id` values for each `mxCell`
