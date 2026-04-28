@@ -1,0 +1,5 @@
+{
+  "source": "self-developed",
+  "created_at": "2026-04-28",
+  "description": "OpenCode 项目初始化工具，根据需求智能推荐并配置 agent 和 skill"
+}

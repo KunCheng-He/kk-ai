@@ -26,6 +26,7 @@ opencode-skills/
 | `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
 | `network-proxy` | self-developed | 网络代理配置工具 |
 | `playwright-cli` | [playwright-cli](https://github.com/microsoft/playwright-cli) | 浏览器自动化 CLI |
+| `project-init` | self-developed | OpenCode 项目初始化工具 |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
 
@@ -33,6 +34,9 @@ opencode-skills/
 
 | Skill | 来源 | 说明 |
 |-------|------|------|
+| `baoyu-xhs-images` | self-developed | 小红书图片生成 |
+| `douban-k-search` | self-developed | 豆瓣数据搜索 |
+| `frontend-design` | self-developed | 前端界面设计 |
 | `images-k-generation` | self-developed | 图像生成 |
 | `ob_architect_structure` | self-developed | 整理思路、构建大纲（kk-brain） |
 | `ob_capture_insight` | self-developed | 捕捉洞察、结晶知识卡片（kk-brain） |
@@ -46,7 +50,6 @@ opencode-skills/
 
 | Agent | 说明 |
 |-------|------|
-| `general-purpose.md` | 通用 agent |
 | `verification.md` | 验证 agent |
 
 ### Agents - Shared（共享，项目按需链接）
