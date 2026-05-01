@@ -64,36 +64,56 @@ cd scripts && uv run python main.py login
 
 ### 2. 执行搜索
 
+**直接查看结果（不保存）**：
 ```bash
 cd scripts && uv run python main.py search "关键词" --limit 10
+```
+
+**保存结果到文件**：
+```bash
+# 保存到 /tmp/zhihu-cache/（自动命名）
+cd scripts && uv run python main.py search "关键词" --save
+
+# 保存到指定路径
+cd scripts && uv run python main.py search "关键词" -o /path/to/output.json
 ```
 
 **参数说明**：
 - `query`: 搜索关键词（必需）
 - `--type, -t`: 类型过滤 - `all`(默认)、`question`、`answer`、`article`、`people`
 - `--limit, -l`: 返回数量，默认 10
-- `--output, -o`: 保存为 JSON 文件
+- `--save, -s`: 保存结果到 `/tmp/zhihu-cache/`（自动命名）
+- `--output, -o`: 指定输出文件路径（JSON）
 
 脚本会拦截知乎 API 响应，返回结构化的搜索结果。
 
 ### 3. 获取详情
 
-**问题及回答**：
+**直接查看详情（不保存）**：
 ```bash
+# 问题及回答
 cd scripts && uv run python main.py detail "https://www.zhihu.com/question/123456" --answer-limit 5
-```
 
-**单篇回答**：
-```bash
+# 单篇回答
 cd scripts && uv run python main.py detail "https://www.zhihu.com/question/123456/answer/789012"
-```
 
-**文章**：
-```bash
+# 文章
 cd scripts && uv run python main.py detail "https://zhuanlan.zhihu.com/p/123456"
 ```
 
-**参数**：`--answer-limit, -a` 控制获取回答数量，`--output, -o` 保存为 Markdown。
+**保存详情到文件**：
+```bash
+# 保存到 /tmp/zhihu-cache/（自动命名）
+cd scripts && uv run python main.py detail "https://www.zhihu.com/question/123456" --save
+
+# 保存到指定路径
+cd scripts && uv run python main.py detail "https://www.zhihu.com/question/123456" -o /path/to/output.md
+```
+
+**参数**：
+- `--answer-limit, -a`: 获取回答数量
+- `--save, -s`: 保存结果到 `/tmp/zhihu-cache/`（Markdown 格式）
+- `--output, -o`: 指定输出文件路径（Markdown）
 
 ## 数据结构
 

@@ -5,7 +5,9 @@
 """
 
 import json
+import os
 import re
+import tempfile
 
 from zhihu_utils.data_models import (
     SearchResult,
@@ -75,17 +77,40 @@ def print_search_results(response: SearchResponse) -> None:
         print()
 
 
-def save_search_json(response: SearchResponse, output: str) -> None:
+def _get_cache_dir() -> str:
+    """
+    获取缓存目录路径。
+
+    Returns:
+        缓存目录路径（/tmp/zhihu-cache）。
+    """
+    cache_dir = os.path.join(tempfile.gettempdir(), "zhihu-cache")
+    os.makedirs(cache_dir, exist_ok=True)
+    return cache_dir
+
+
+def save_search_json(response: SearchResponse, output: str | None = None) -> str:
     """
     将搜索结果保存为 JSON 文件。
 
     Args:
         response: 搜索响应对象。
-        output: 输出文件路径。
+        output: 输出文件路径（可选，默认存入 /tmp/zhihu-cache）。
+
+    Returns:
+        保存的文件路径。
     """
+    if output is None:
+        from datetime import datetime
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_query = re.sub(r'[\\/:*?"<>|]', "_", response.query)[:30]
+        output = os.path.join(_get_cache_dir(), f"{safe_query}_{timestamp}.json")
+
     with open(output, "w", encoding="utf-8") as f:
         json.dump(response.model_dump(), f, ensure_ascii=False, indent=2)
     print(f"结果已保存至: {output}")
+    return output
 
 
 def print_answer(answer: Answer) -> None:
@@ -209,14 +234,23 @@ def format_article_markdown(article: Article) -> str:
     return md
 
 
-def save_markdown(content: str, output: str) -> None:
+def save_markdown(content: str, output: str | None = None) -> str:
     """
     将 Markdown 内容保存到文件。
 
     Args:
         content: Markdown 文本。
-        output: 输出文件路径。
+        output: 输出文件路径（可选，默认存入 /tmp/zhihu-cache）。
+
+    Returns:
+        保存的文件路径。
     """
+    if output is None:
+        from datetime import datetime
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output = os.path.join(_get_cache_dir(), f"detail_{timestamp}.md")
     with open(output, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"\n结果已保存至: {output}")
+    return output

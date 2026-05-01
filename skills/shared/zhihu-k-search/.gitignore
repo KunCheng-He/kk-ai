@@ -172,3 +172,7 @@ browser_data/
 # 调试文件
 debug.png
 *.png
+
+# 查询结果缓存
+scripts/*.json
+!scripts/pyproject.json

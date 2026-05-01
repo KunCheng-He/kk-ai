@@ -21,7 +21,9 @@ from zhihu_utils.formatters import (
 )
 
 
-async def search_command(query: str, search_type: str, limit: int, output: str | None):
+async def search_command(
+    query: str, search_type: str, limit: int, output: str | None, save: bool = False
+):
     """
     执行搜索命令。
 
@@ -30,6 +32,7 @@ async def search_command(query: str, search_type: str, limit: int, output: str |
         search_type: 搜索类型。
         limit: 结果数量限制。
         output: 输出文件路径（可选）。
+        save: 是否保存结果到缓存目录。
     """
     try:
         browser, context, page = await ensure_authenticated(headless=True)
@@ -44,14 +47,16 @@ async def search_command(query: str, search_type: str, limit: int, output: str |
 
         print_search_results(response)
 
-        if output:
+        if output or save:
             save_search_json(response, output)
 
     finally:
         await browser.close()
 
 
-async def detail_command(url: str, answer_limit: int, output: str | None):
+async def detail_command(
+    url: str, answer_limit: int, output: str | None, save: bool = False
+):
     """
     执行详情获取命令。
 
@@ -59,6 +64,7 @@ async def detail_command(url: str, answer_limit: int, output: str | None):
         url: 知乎链接。
         answer_limit: 获取回答数量（仅问题）。
         output: 输出文件路径（可选）。
+        save: 是否保存结果到缓存目录。
     """
     try:
         browser, context, page = await ensure_authenticated(headless=True)
@@ -75,17 +81,19 @@ async def detail_command(url: str, answer_limit: int, output: str | None):
             return
 
         if parsed["type"] == "answer":
-            await _handle_answer(handler, parsed, output)
+            await _handle_answer(handler, parsed, output, save)
         elif parsed["type"] == "question":
-            await _handle_question(handler, parsed, answer_limit, output)
+            await _handle_question(handler, parsed, answer_limit, output, save)
         elif parsed["type"] == "article":
-            await _handle_article(handler, parsed, output)
+            await _handle_article(handler, parsed, output, save)
 
     finally:
         await browser.close()
 
 
-async def _handle_answer(handler: APIHandler, parsed: dict, output: str | None) -> None:
+async def _handle_answer(
+    handler: APIHandler, parsed: dict, output: str | None, save: bool = False
+) -> None:
     """处理回答详情获取。"""
     answer_id = parsed["id"]
     question_id = parsed["question_id"]
@@ -100,13 +108,17 @@ async def _handle_answer(handler: APIHandler, parsed: dict, output: str | None) 
 
     print_answer(answer)
 
-    if output:
+    if output or save:
         md_content = format_answer_markdown(answer)
         save_markdown(md_content, output)
 
 
 async def _handle_question(
-    handler: APIHandler, parsed: dict, answer_limit: int, output: str | None
+    handler: APIHandler,
+    parsed: dict,
+    answer_limit: int,
+    output: str | None,
+    save: bool = False,
 ) -> None:
     """处理问题详情获取。"""
     question_id = parsed["id"]
@@ -126,13 +138,13 @@ async def _handle_question(
 
     print_question(question, answers)
 
-    if output:
+    if output or save:
         md_content = format_question_markdown(question, answers)
         save_markdown(md_content, output)
 
 
 async def _handle_article(
-    handler: APIHandler, parsed: dict, output: str | None
+    handler: APIHandler, parsed: dict, output: str | None, save: bool = False
 ) -> None:
     """处理文章详情获取。"""
     article_id = parsed["id"]
@@ -147,7 +159,7 @@ async def _handle_article(
 
     print_article(article)
 
-    if output:
+    if output or save:
         md_content = format_article_markdown(article)
         save_markdown(md_content, output)
 

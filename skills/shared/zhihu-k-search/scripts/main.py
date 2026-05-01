@@ -24,9 +24,11 @@ async def main():
     if args.command == "login":
         await login_command(check=getattr(args, "check", False))
     elif args.command == "search":
-        await search_command(args.query, args.type, args.limit, args.output)
+        await search_command(
+            args.query, args.type, args.limit, args.output, args.save
+        )
     elif args.command == "detail":
-        await detail_command(args.url, args.answer_limit, args.output)
+        await detail_command(args.url, args.answer_limit, args.output, args.save)
     else:
         parser.print_help()
 
@@ -49,7 +51,12 @@ def _setup_search_parser(subparsers) -> None:
         help="搜索类型",
     )
     search_parser.add_argument("--limit", "-l", type=int, default=10, help="结果数量")
-    search_parser.add_argument("--output", "-o", help="输出文件路径 (JSON)")
+    search_parser.add_argument(
+        "--output", "-o", help="输出文件路径 (JSON)，不指定则使用 --save 存入 /tmp"
+    )
+    search_parser.add_argument(
+        "--save", "-s", action="store_true", help="保存结果到 /tmp/zhihu-cache"
+    )
 
 
 def _setup_detail_parser(subparsers) -> None:
@@ -59,7 +66,12 @@ def _setup_detail_parser(subparsers) -> None:
     detail_parser.add_argument(
         "--answer-limit", "-a", type=int, default=5, help="获取回答数量 (仅问题)"
     )
-    detail_parser.add_argument("--output", "-o", help="输出文件路径 (Markdown)")
+    detail_parser.add_argument(
+        "--output", "-o", help="输出文件路径 (Markdown)，不指定则使用 --save 存入 /tmp"
+    )
+    detail_parser.add_argument(
+        "--save", "-s", action="store_true", help="保存结果到 /tmp/zhihu-cache"
+    )
 
 
 if __name__ == "__main__":
