@@ -1,8 +1,8 @@
 ---
-name: project-init
+name: opencode-project-init
 description: |
   OpenCode 项目初始化工具。当用户需要创建新项目、初始化项目、设置项目结构时使用此技能。根据项目需求智能推荐 shared 目录下的 agent 和 skill，并自动创建项目目录和 .opencode 配置。触发关键词："初始化项目"、"创建项目"、"新建项目"、"项目初始化"、"设置项目"、"init project"。即使用户未明确提及，但上下文暗示需要开始一个新项目时，也应主动使用。
-version: 1.0.0
+version: 1.1.0
 ---
 
 # OpenCode 项目初始化
@@ -92,6 +92,46 @@ ln -s ~/Code/opencode-skills/agents/shared/{agent-name}.md {项目路径}/.openc
 
 # 链接 skills
 ln -s ~/Code/opencode-skills/skills/shared/{skill-name} {项目路径}/.opencode/skills/
+
+# 初始化 git 仓库
+cd {项目路径} && git init
+
+# 创建 .gitignore 文件
+# 根据项目类型生成相应的 .gitignore，必须包含：
+# - .opencode/ （链接目录不需要纳入版本控制）
+# - 其他根据项目技术栈的忽略规则
+
+# 提交初始化
+cd {项目路径} && git add . && git commit -m "chore: OpenCode 项目初始化完成"
+```
+
+### 6. 生成 .gitignore
+
+根据项目类型智能生成 `.gitignore` 文件：
+
+**基础规则（所有项目必须包含）**：
+```
+# OpenCode 配置目录（符号链接）
+.opencode/
+```
+
+**根据项目类型追加规则**：
+
+| 项目类型 | 追加规则 |
+|----------|----------|
+| Node.js | `node_modules/`, `dist/`, `.env`, `*.log` |
+| Python | `__pycache__/`, `*.pyc`, `.venv/`, `.env` |
+| Go | `*.exe`, `*.test`, `vendor/` |
+| Rust | `target/`, `Cargo.lock` |
+| Java | `*.class`, `*.jar`, `target/` |
+| 通用 | `.DS_Store`, `.idea/`, `.vscode/` |
+
+### 7. 完成提交
+
+初始化完成后，自动创建首次提交：
+
+```bash
+git commit -m "chore: OpenCode 项目初始化完成"
 ```
 
 ## 输出格式
@@ -117,3 +157,6 @@ ln -s ~/Code/opencode-skills/skills/shared/{skill-name} {项目路径}/.opencode
 3. **符号链接**：使用 ln -s 便于统一更新
 4. **路径验证**：创建前检查目标路径是否已存在
 5. **增量添加**：.opencode 已存在时增量添加而非覆盖
+6. **Git 初始化**：项目初始化后自动执行 git init
+7. **.gitignore**：必须包含 `.opencode/` 目录，链接配置不纳入版本控制
+8. **首次提交**：初始化完成后自动创建 git commit

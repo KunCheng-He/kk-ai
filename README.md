@@ -26,7 +26,7 @@ opencode-skills/
 | `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
 | `network-proxy` | self-developed | 网络代理配置工具 |
 | `playwright-cli` | [playwright-cli](https://github.com/microsoft/playwright-cli) | 浏览器自动化 CLI |
-| `project-init` | self-developed | OpenCode 项目初始化工具 |
+| `opencode-project-init` | self-developed | OpenCode 项目初始化工具 |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
 
