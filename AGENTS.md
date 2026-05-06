@@ -55,6 +55,16 @@ playwright-cli install --skills
 - 通用 skill/agent 放入 `skills/common/` 或 `agents/common/`，自动生效（全局目录已链接）
 - 共享 skill/agent 放入 `skills/shared/` 或 `agents/shared/`，按需链接到项目
 
+## 完成后自动更新文档
+
+**重要**：新增或修改 Skill/Agent 后，必须在用户确认开发完成后自动执行以下操作：
+
+1. 更新 `README.md` 中的技能列表和描述
+2. 更新本文件（`AGENTS.md`）中的相关章节（如有必要）
+3. 更新对应的 `upstream.json` 文件中的相关信息（如有必要）
+
+这是强制性步骤，确保文档与实际代码保持同步。
+
 ## Python 项目约定
 
 部分 skill（如 `xhs-k-search`、`zhihu-k-search`、`images-k-generation`）包含 Python 脚本：
