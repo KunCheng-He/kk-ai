@@ -22,7 +22,6 @@ opencode-skills/
 
 | Skill | 来源 | 说明 |
 |-------|------|------|
-| `agent-creator` | self-developed | 创建 OpenCode Agent 的交互式工具 |
 | `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
 | `network-proxy` | self-developed | 网络代理配置工具 |
 | `playwright-cli` | [playwright-cli](https://github.com/microsoft/playwright-cli) | 浏览器自动化 CLI |
