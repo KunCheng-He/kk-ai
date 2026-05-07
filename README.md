@@ -59,6 +59,7 @@ opencode-skills/
 |-------|------|
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（kk-brain） |
 | `ProductResearch.md` | 产品调研 agent |
+| `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
 
 ## 使用方式
 
