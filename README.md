@@ -23,6 +23,7 @@ opencode-skills/
 | Skill | 来源 | 说明 |
 |-------|------|------|
 | `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
+| `markdown-to-image` | self-developed | Markdown/代码片段转图片 |
 | `network-proxy` | self-developed | 网络代理配置工具 |
 | `playwright-cli` | [playwright-cli](https://github.com/microsoft/playwright-cli) | 浏览器自动化 CLI |
 | `opencode-project-init` | self-developed | OpenCode 项目初始化工具 |
@@ -37,6 +38,7 @@ opencode-skills/
 | `douban-k-search` | self-developed | 豆瓣数据搜索 |
 | `external-skills-updater` | self-developed | 更新外部 skill |
 | `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | 前端界面设计 |
+| `html-ppt` | [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) | HTML 演示文稿生成 |
 | `images-k-generation` | self-developed | 图像生成 |
 | `ob_architect_structure` | self-developed | 整理思路、构建大纲（kk-brain） |
 | `ob_capture_insight` | self-developed | 捕捉洞察、结晶知识卡片（kk-brain） |
