@@ -1,0 +1,71 @@
+.theme-github-dark {
+  --bg-color: #0d1117;
+  --text-color: #c9d1d9;
+  --heading-color: #c9d1d9;
+  --link-color: #58a6ff;
+  --border-color: #30363d;
+  --code-bg: #161b22;
+  --code-color: #c9d1d9;
+  --blockquote-color: #8b949e;
+  --blockquote-border: #30363d;
+  --table-border: #30363d;
+  --table-stripe-bg: #161b22;
+  --hr-bg: #21262d;
+}
+
+.theme-github-dark body,
+.theme-github-dark .container {
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.theme-github-dark h1, .theme-github-dark h2, .theme-github-dark h3,
+.theme-github-dark h4, .theme-github-dark h5, .theme-github-dark h6 {
+  color: var(--heading-color);
+}
+
+.theme-github-dark a {
+  color: var(--link-color);
+}
+
+.theme-github-dark a:hover {
+  text-decoration: underline;
+}
+
+.theme-github-dark blockquote {
+  color: var(--blockquote-color);
+  border-color: var(--blockquote-border);
+}
+
+.theme-github-dark code {
+  background: var(--code-bg);
+  color: var(--code-color);
+}
+
+.theme-github-dark pre {
+  background: var(--code-bg);
+}
+
+.theme-github-dark table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.theme-github-dark table th,
+.theme-github-dark table td {
+  border: 1px solid var(--table-border);
+  padding: 10px 14px;
+}
+
+.theme-github-dark table th {
+  background: var(--code-bg);
+  font-weight: 600;
+}
+
+.theme-github-dark table tr:nth-child(2n) {
+  background: var(--table-stripe-bg);
+}
+
+.theme-github-dark hr {
+  background: var(--hr-bg);
+}

@@ -1,0 +1,71 @@
+.theme-github {
+  --bg-color: #ffffff;
+  --text-color: #24292f;
+  --heading-color: #24292f;
+  --link-color: #0969da;
+  --border-color: #d0d7de;
+  --code-bg: #f6f8fa;
+  --code-color: #24292f;
+  --blockquote-color: #57606a;
+  --blockquote-border: #d0d7de;
+  --table-border: #d0d7de;
+  --table-stripe-bg: #f6f8fa;
+  --hr-bg: #d0d7de;
+}
+
+.theme-github body,
+.theme-github .container {
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.theme-github h1, .theme-github h2, .theme-github h3,
+.theme-github h4, .theme-github h5, .theme-github h6 {
+  color: var(--heading-color);
+}
+
+.theme-github a {
+  color: var(--link-color);
+}
+
+.theme-github a:hover {
+  text-decoration: underline;
+}
+
+.theme-github blockquote {
+  color: var(--blockquote-color);
+  border-color: var(--blockquote-border);
+}
+
+.theme-github code {
+  background: var(--code-bg);
+  color: var(--code-color);
+}
+
+.theme-github pre {
+  background: var(--code-bg);
+}
+
+.theme-github table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.theme-github table th,
+.theme-github table td {
+  border: 1px solid var(--table-border);
+  padding: 10px 14px;
+}
+
+.theme-github table th {
+  background: var(--code-bg);
+  font-weight: 600;
+}
+
+.theme-github table tr:nth-child(2n) {
+  background: var(--table-stripe-bg);
+}
+
+.theme-github hr {
+  background: var(--hr-bg);
+}

@@ -1,0 +1,147 @@
+.theme-carbon {
+  --bg-gradient-start: #29323c;
+  --bg-gradient-end: #485563;
+  --text-color: #ffffff;
+  --heading-color: #ffffff;
+  --link-color: #61dafb;
+  --code-bg: #282c34;
+  --code-color: #abb2bf;
+  --window-bg: #282c34;
+  --dot-red: #ff5f56;
+  --dot-yellow: #ffbd2e;
+  --dot-green: #27c93f;
+}
+
+.theme-carbon body {
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  min-height: 100vh;
+}
+
+.theme-carbon .container {
+  background: transparent;
+  color: var(--text-color);
+  padding: 32px;
+}
+
+.theme-carbon h1, .theme-carbon h2, .theme-carbon h3,
+.theme-carbon h4, .theme-carbon h5, .theme-carbon h6 {
+  color: var(--heading-color);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.theme-carbon a {
+  color: var(--link-color);
+}
+
+.theme-carbon blockquote {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.theme-carbon code {
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-color);
+}
+
+.theme-carbon pre {
+  background: var(--code-bg) !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.theme-carbon pre,
+.theme-carbon pre code {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.theme-carbon .shiki {
+  background: transparent !important;
+  background-color: transparent !important;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.theme-carbon .line-number {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.theme-carbon .code-window {
+  background: var(--window-bg);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  padding: 0;
+}
+
+.theme-carbon .code-window-header {
+  background: #21252b;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+}
+
+.theme-carbon .code-window-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.theme-carbon .code-window-dot.red { background: var(--dot-red); }
+.theme-carbon .code-window-dot.yellow { background: var(--dot-yellow); }
+.theme-carbon .code-window-dot.green { background: var(--dot-green); }
+
+.theme-carbon .code-window-body {
+  background: var(--code-bg) !important;
+  padding: 20px;
+}
+
+.theme-carbon .code-window-body pre {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  box-shadow: none;
+}
+
+.theme-carbon .code-window-body pre,
+.theme-carbon .code-window-body code {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.theme-carbon table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.theme-carbon table th,
+.theme-carbon table td {
+  border: none;
+  padding: 12px 16px;
+}
+
+.theme-carbon table th {
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 0.5px;
+}
+
+.theme-carbon table tr:nth-child(2n) td {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.theme-carbon table tr:hover td {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-carbon hr {
+  background: rgba(255, 255, 255, 0.2);
+}

@@ -1,0 +1,6 @@
+scripts/node_modules/
+*.png
+*.svg
+test-*.png
+test-*.svg
+.DS_Store

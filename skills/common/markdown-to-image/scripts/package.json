@@ -1,0 +1,30 @@
+{
+  "name": "markdown-to-image",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Convert Markdown text to beautiful images with multiple themes",
+  "bin": {
+    "markdown-to-image": "./cli.mjs"
+  },
+  "scripts": {
+    "test": "node cli.mjs --text '# Test\\n\\nHello **world**' -o test-output.png"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "glob": "^10.5.0",
+    "marked": "^12.0.0",
+    "puppeteer": "^22.0.0",
+    "shiki": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "markdown",
+    "image",
+    "screenshot",
+    "code",
+    "snippet"
+  ],
+  "license": "MIT"
+}
