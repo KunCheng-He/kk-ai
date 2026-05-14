@@ -45,6 +45,7 @@ opencode-skills/
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
 | `zhihu-k-search` | self-developed | 知乎数据搜索 |
+| `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
 
 ### Agents - Common（通用，已链接到全局）
 

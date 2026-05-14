@@ -1,0 +1,19 @@
+[project]
+name = "wechat-gzh-skill"
+version = "0.1.0"
+description = "微信公众号草稿发布工具 - Markdown 转公众号格式并发布到草稿箱"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31.0",
+    "markdown>=3.5.0",
+    "beautifulsoup4>=4.12.0",
+    "pyyaml>=6.0.0",
+    "matplotlib>=3.8.0",
+    "pillow>=10.0.0",
+]
+
+[project.scripts]
+wechat-gzh = "main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
