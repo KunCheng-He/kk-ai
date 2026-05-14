@@ -1,6 +1,8 @@
 from pathlib import Path
 from playwright.async_api import async_playwright
 
+from xhs_utils.browser import AUTH_FILE, _ensure_cache_dir
+
 
 class LoginHelper:
     def __init__(self):
@@ -17,11 +19,13 @@ class LoginHelper:
 
         input()
 
-        await context.storage_state(path="auth.json")
+        _ensure_cache_dir()
+        await context.storage_state(path=str(AUTH_FILE))
         await browser.close()
-        print("登录状态已保存到 auth.json")
+        print(f"登录状态已保存到 {AUTH_FILE}")
 
-    async def login_and_save(self, auth_file: Path):
+    async def login_and_save(self, auth_file: Path | None = None):
+        save_path = auth_file or AUTH_FILE
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(headless=False)
             context = await browser.new_context()
@@ -38,6 +42,7 @@ class LoginHelper:
             except Exception:
                 await page.wait_for_timeout(300000)
 
-            await context.storage_state(path=auth_file)
+            _ensure_cache_dir()
+            await context.storage_state(path=str(save_path))
             await browser.close()
-            print(f"登录状态已保存到 {auth_file}")
+            print(f"登录状态已保存到 {save_path}")

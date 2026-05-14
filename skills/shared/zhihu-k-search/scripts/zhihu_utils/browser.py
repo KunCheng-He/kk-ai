@@ -10,8 +10,13 @@ from playwright.async_api import async_playwright, Browser, BrowserContext, Page
 from playwright_stealth import Stealth
 
 
-AUTH_FILE = Path(__file__).parent.parent / "auth.json"
+CACHE_DIR = Path.home() / ".cache" / "zhihu-k-search"
+AUTH_FILE = CACHE_DIR / "auth.json"
 ZHIHU_HOME = "https://www.zhihu.com"
+
+
+def _ensure_cache_dir() -> None:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 async def create_browser_context(
@@ -46,6 +51,7 @@ async def create_browser_context(
 
     state_path = storage_state or AUTH_FILE
     if Path(state_path).exists():
+        _ensure_cache_dir()
         await _load_storage_state(context, state_path)
 
     return browser, context
@@ -91,14 +97,8 @@ async def apply_stealth(page: Page) -> None:
 async def save_auth_state(
     context: BrowserContext, path: str | Path | None = None
 ) -> None:
-    """
-    保存认证状态到文件。
-
-    Args:
-        context: 浏览器上下文。
-        path: 保存路径，默认使用 AUTH_FILE。
-    """
     save_path = path or AUTH_FILE
+    _ensure_cache_dir()
     await context.storage_state(path=str(save_path))
 
 

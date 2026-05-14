@@ -32,7 +32,6 @@ xhs-k-search/
     ├── pyproject.toml       # 项目依赖配置
     ├── main.py              # CLI 入口
     ├── login_helper.py      # 登录逻辑
-    ├── auth.json            # 登录状态存储（gitignore）
     └── xhs_utils/           # 核心业务逻辑模块
         ├── __init__.py
         ├── browser.py       # Playwright 启动与反爬配置
@@ -112,13 +111,13 @@ def get_note_detail(note_id: str, xsec_token: str | None = None) -> NoteDetailWi
 
 ## 敏感信息处理
 
-- `auth.json`：存储登录状态，已在 .gitignore 中排除
+- 认证状态存储在 `~/.cache/xhs-k-search/auth.json`
 - 不要在代码中硬编码任何凭证
 - 使用环境变量或配置文件管理敏感信息
 
 ## 注意事项
 
-1. **身份认证**：首次运行需要手动登录，登录状态保存在 `auth.json`
+1. **身份认证**：首次运行需要手动登录，登录状态保存在 `~/.cache/xhs-k-search/auth.json`
 2. **反爬策略**：使用 `playwright-stealth` 隐藏自动化特征
 3. **API 优先**：优先拦截 API 响应获取数据，DOM 提取作为备用方案
 4. **无头模式**：搜索支持无头模式，帖子详情强制有头模式（反爬限制）

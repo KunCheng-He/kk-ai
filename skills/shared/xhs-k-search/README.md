@@ -32,7 +32,7 @@ uv run playwright install chromium
 cd scripts && uv run python main.py --login
 ```
 
-打开浏览器窗口，完成扫码登录。登录状态保存到 `auth.json`。
+打开浏览器窗口，完成扫码登录。登录状态保存到 `~/.cache/xhs-k-search/auth.json`。
 
 ### 搜索
 

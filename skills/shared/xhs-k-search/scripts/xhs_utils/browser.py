@@ -5,9 +5,17 @@ from playwright.async_api import async_playwright, Browser, BrowserContext, Play
 from playwright_stealth import Stealth
 
 
+CACHE_DIR = Path.home() / ".cache" / "xhs-k-search"
+AUTH_FILE = CACHE_DIR / "auth.json"
+
+
+def _ensure_cache_dir() -> None:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+
 class XHSBrowser:
     def __init__(self, auth_file: Optional[Path] = None, headless: bool = True):
-        self.auth_file = auth_file or Path(__file__).parent.parent / "auth.json"
+        self.auth_file = auth_file or AUTH_FILE
         self.headless = headless
         self.browser: Optional[Browser] = None
         self.context: Optional[BrowserContext] = None
@@ -24,6 +32,7 @@ class XHSBrowser:
         if self.auth_file.exists():
             context = await browser.new_context(storage_state=str(self.auth_file))
         else:
+            _ensure_cache_dir()
             context = await browser.new_context()
 
         page = await context.new_page()

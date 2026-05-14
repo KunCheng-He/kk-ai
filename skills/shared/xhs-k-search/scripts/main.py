@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from login_helper import LoginHelper
-from xhs_utils.browser import XHSBrowser
+from xhs_utils.browser import XHSBrowser, AUTH_FILE
 from xhs_utils.api_handler import XHSApiHandler
 
 
@@ -17,12 +17,10 @@ async def async_main():
     parser.add_argument("--headless", action="store_true", help="无头模式运行")
     args = parser.parse_args()
 
-    auth_file = Path(__file__).parent / "auth.json"
-
-    if args.login or not auth_file.exists():
+    if args.login or not AUTH_FILE.exists():
         print("请先登录...")
         helper = LoginHelper()
-        await helper.login_and_save(auth_file)
+        await helper.login_and_save()
 
     if args.note_id:
         async with XHSBrowser(headless=False) as browser:

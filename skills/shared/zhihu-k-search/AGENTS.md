@@ -291,14 +291,14 @@ python_files = ["test_*.py"]
 
 ## 敏感信息处理
 
-- `auth.json`：存储登录状态，已在 .gitignore 中排除
+- 认证状态存储在 `~/.cache/zhihu-k-search/auth.json`
 - `.env`：环境变量文件，已在 .gitignore 中排除
 - 不要在代码中硬编码任何凭证或密钥
 - 使用环境变量或配置文件管理敏感信息
 
 ## 注意事项
 
-1. **身份认证**：首次运行需要手动登录，登录状态保存在 `auth.json`
+1. **身份认证**：首次运行需要手动登录，登录状态保存在 `~/.cache/zhihu-k-search/auth.json`
 2. **反爬策略**：使用 `playwright-stealth` 隐藏自动化特征
 3. **API 优先**：优先拦截 API 响应获取数据，DOM 提取作为备用方案
 4. **无头模式**：生产环境使用 headless 模式，调试时可使用有头模式

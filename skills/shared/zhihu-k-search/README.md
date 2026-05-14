@@ -85,7 +85,7 @@ zhihu-k-search/
 - **API 拦截优先**：通过拦截浏览器网络请求获取知乎 API 响应
 - **DOM 提取备用**：当 API 拦截失败时，从页面 DOM 提取数据
 - **反爬虫配置**：使用 playwright-stealth 隐藏自动化特征
-- **状态持久化**：登录状态保存在 `auth.json` 文件中
+- **状态持久化**：登录状态保存在 `~/.cache/zhihu-k-search/auth.json`
 
 ## 作为 Skill 使用
 
@@ -96,7 +96,7 @@ zhihu-k-search/
 ## 注意事项
 
 - 首次运行需要手动登录
-- `auth.json` 包含敏感信息，请勿提交到版本控制
+- 登录状态存储在 `~/.cache/zhihu-k-search/auth.json`，请勿提交到版本控制
 - 建议合理控制请求频率，避免触发反爬机制
 
 ---
