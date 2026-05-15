@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup, Tag
 
 from markdown_parser import ImageRef, ParsedArticle
 from themes import get_theme
-from table_to_image import convert_tables_to_images
 
 
 WECHAT_MAX_CONTENT_LENGTH = 20000
@@ -22,7 +21,7 @@ class ContentTooLongError(Exception):
 class MarkdownConverter:
     def __init__(self, theme_name: str = "default"):
         self.theme = get_theme(theme_name)
-        self.table_images: List[str] = []
+        self.has_tables: bool = False
 
     def convert(self, article: ParsedArticle) -> str:
         md = markdown.Markdown(extensions=[
@@ -37,7 +36,7 @@ class MarkdownConverter:
 
         soup = BeautifulSoup(html, "html.parser")
 
-        self.table_images = convert_tables_to_images(soup, self.theme.colors)
+        self.has_tables = len(soup.find_all("table")) > 0
 
         self._apply_styles(soup)
 
@@ -84,8 +83,8 @@ class MarkdownConverter:
                 self._style_list(tag)
             elif tag_name == "li":
                 self._style_list_item(tag)
-            elif tag_name == "li":
-                self._style_list_item(tag)
+            elif tag_name == "table":
+                self._style_table(tag)
             elif tag_name == "hr":
                 self._style_hr(tag)
             elif tag_name == "strong":
@@ -168,11 +167,8 @@ def replace_image_placeholders(html: str, images: List[ImageRef]) -> str:
     return result
 
 
-def get_table_images(converter: MarkdownConverter) -> List[str]:
-    return converter.table_images
-
-
-def convert_article(article: ParsedArticle, theme_name: Optional[str] = None) -> str:
+def convert_article(article: ParsedArticle, theme_name: Optional[str] = None) -> tuple[str, MarkdownConverter]:
     theme = theme_name or article.metadata.theme
     converter = MarkdownConverter(theme)
-    return converter.convert(article)
+    html = converter.convert(article)
+    return html, converter

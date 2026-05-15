@@ -1,6 +1,5 @@
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -23,6 +22,7 @@ def main():
     publish_parser.add_argument("--theme", default="default", help="主题名称")
     publish_parser.add_argument("--cover", help="封面图路径（可选）")
     publish_parser.add_argument("--dry-run", action="store_true", help="仅转换不发布")
+    publish_parser.add_argument("--force", action="store_true", help="跳过表格确认，直接发布")
 
     convert_parser = subparsers.add_parser("convert", help="仅转换 Markdown 为 HTML")
     convert_parser.add_argument("file", help="Markdown 文件路径")
@@ -60,25 +60,34 @@ def main():
         try:
             article = parse_markdown(args.file)
             theme = args.theme or article.metadata.theme
-            html = convert_article(article, theme)
+            html, converter = convert_article(article, theme)
 
-            if args.output:
-                Path(args.output).write_text(html, encoding="utf-8")
+            if converter.has_tables:
                 result = {
                     "success": True,
-                    "output": args.output,
+                    "warning": "文档包含表格，在手机端可能显示不全。建议先将表格转换为图片再发布。",
                     "title": article.metadata.title,
                     "theme": theme,
                     "content_length": len(html),
                 }
             else:
-                result = {
-                    "success": True,
-                    "html": html,
-                    "title": article.metadata.title,
-                    "theme": theme,
-                    "content_length": len(html),
-                }
+                if args.output:
+                    Path(args.output).write_text(html, encoding="utf-8")
+                    result = {
+                        "success": True,
+                        "output": args.output,
+                        "title": article.metadata.title,
+                        "theme": theme,
+                        "content_length": len(html),
+                    }
+                else:
+                    result = {
+                        "success": True,
+                        "html": html,
+                        "title": article.metadata.title,
+                        "theme": theme,
+                        "content_length": len(html),
+                    }
 
             print(json.dumps(result, ensure_ascii=False, indent=2))
         except FileNotFoundError as e:
@@ -98,11 +107,21 @@ def main():
 
             article = parse_markdown(args.file)
             theme = args.theme or article.metadata.theme
-            
+
             converter = MarkdownConverter(theme)
             html = converter.convert(article)
-            
-            table_images = converter.table_images
+
+            if converter.has_tables and not args.force:
+                result = {
+                    "success": False,
+                    "needs_confirmation": True,
+                    "warning": "文档包含表格，在手机端可能显示不全。建议先将表格转换为图片再发布。如确认直接发布，请使用 --force 参数。",
+                    "title": article.metadata.title,
+                    "theme": theme,
+                    "content_length": len(html),
+                }
+                print(json.dumps(result, ensure_ascii=False, indent=2))
+                sys.exit(1)
 
             if args.dry_run:
                 result = {
@@ -112,7 +131,7 @@ def main():
                     "theme": theme,
                     "content_length": len(html),
                     "images": len(article.images),
-                    "tables": len(table_images),
+                    "has_tables": converter.has_tables,
                 }
                 print(json.dumps(result, ensure_ascii=False, indent=2))
                 return
@@ -126,15 +145,6 @@ def main():
                         "original": img.original,
                         "wechat_url": upload_result.url,
                     })
-
-            for idx, table_img_path in enumerate(table_images):
-                upload_result = api.upload_image(table_img_path)
-                placeholder = f"TABLE_IMG_PLACEHOLDER_{idx}"
-                html = html.replace(placeholder, upload_result.url)
-                uploaded_images.append({
-                    "original": f"table_{idx}",
-                    "wechat_url": upload_result.url,
-                })
 
             cover_path = args.cover or article.metadata.cover
             if not cover_path and article.images:
@@ -166,7 +176,7 @@ def main():
                 "title": article.metadata.title,
                 "theme": theme,
                 "images_uploaded": len(uploaded_images),
-                "tables_converted": len(table_images),
+                "has_tables": converter.has_tables,
                 "content_length": len(html),
             }
             print(json.dumps(result, ensure_ascii=False, indent=2))

@@ -10,11 +10,13 @@ description: |
   
   支持的功能：
   - Markdown 转公众号风格 HTML（5 种主题）
-  - 表格自动转图片（解决手机端显示不全问题）
   - 自动上传图片到微信 CDN
   - 自动提取标题、摘要、封面图
   - 支持 YAML frontmatter 元信息
+  - 表格检测与发布确认提醒
   - 发布到公众号草稿箱
+  
+  注意：本工具不提供表格转图片功能。如文档包含表格，会提醒用户确认后再发布。
 ---
 
 # 微信公众号草稿发布工具
@@ -44,6 +46,12 @@ export WECHAT_GZH_SECRET="你的公众号Secret"
 cd scripts && uv run main.py publish article.md
 ```
 
+如果文档包含表格，发布会被拦截并返回提醒。确认后使用 `--force` 强制发布：
+
+```bash
+uv run main.py publish article.md --force
+```
+
 ### 指定主题
 
 ```bash
@@ -60,6 +68,13 @@ uv run main.py publish article.md --cover cover.jpg
 
 ```bash
 uv run main.py publish article.md --dry-run
+```
+
+### 仅转换为 HTML
+
+```bash
+uv run main.py convert article.md
+uv run main.py convert article.md --output output.html
 ```
 
 ### 列出可用主题
@@ -104,9 +119,9 @@ theme: elegant-gold
 
 1. 读取环境变量配置
 2. 解析 Markdown 文件（提取 frontmatter、标题、摘要、图片）
-3. 上传本地图片到微信 CDN
-4. 转换 Markdown 为公众号风格 HTML
-5. 表格自动转换为图片（避免手机端显示不全、减少字符占用）
+3. 转换 Markdown 为公众号风格 HTML
+4. 检测文档是否包含表格，如有则提醒用户确认
+5. 上传本地图片到微信 CDN
 6. 上传封面图到微信永久素材库
 7. 调用微信 API 创建草稿
 8. 返回草稿 media_id
@@ -115,6 +130,8 @@ theme: elegant-gold
 
 所有命令返回 JSON 格式：
 
+### 正常发布
+
 ```json
 {
   "success": true,
@@ -122,7 +139,20 @@ theme: elegant-gold
   "title": "文章标题",
   "theme": "elegant-gold",
   "images_uploaded": 3,
-  "tables_converted": 2,
+  "has_tables": false,
+  "content_length": 5000
+}
+```
+
+### 包含表格时（未使用 --force）
+
+```json
+{
+  "success": false,
+  "needs_confirmation": true,
+  "warning": "文档包含表格，在手机端可能显示不全。建议先将表格转换为图片再发布。如确认直接发布，请使用 --force 参数。",
+  "title": "文章标题",
+  "theme": "elegant-gold",
   "content_length": 5000
 }
 ```
@@ -131,23 +161,22 @@ theme: elegant-gold
 
 ## 注意事项
 
-### 1. 内容长度限制
+### 1. 表格显示问题
+
+表格在手机端可能显示不全。本工具会检测文档中的表格并提醒用户，但**不提供表格转图片功能**。
+
+**建议**：
+- 发布前使用其他工具（如 markdown-to-image skill）将表格转换为图片
+- 在 Markdown 中直接使用图片替代表格
+- 确认表格在手机端可接受后，使用 `--force` 参数强制发布
+
+### 2. 内容长度限制
 
 微信草稿 API 限制 **content < 20,000 字符**。
 
 **建议**：
 - 长文章拆分为多篇发布
 - 使用简洁主题（如 `minimal-blue`）可减少样式体积
-- 表格会自动转为图片，大幅减少字符占用
-
-### 2. 表格自动转图片
-
-表格在手机端显示不全，本工具自动将表格转换为图片。
-
-**效果**：
-- 解决手机端表格显示不全问题
-- 大幅减少内容字符数（表格 HTML 转为一张图片）
-- 图片自动上传到微信 CDN
 
 ### 3. IP 白名单配置
 
