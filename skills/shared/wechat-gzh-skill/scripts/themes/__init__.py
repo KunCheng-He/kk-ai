@@ -9,6 +9,7 @@ from themes.spring_fresh import SpringFreshTheme
 from themes.wenxin_crimson import WenxinCrimsonTheme
 from themes.xuanfei_sunshine import XuanfeiSunshineTheme
 from themes.juanran_pastel import JuanranPastelTheme
+from themes.xiumi_style import XiumiStyleTheme
 
 
 _THEMES: Dict[str, Type[BaseTheme]] = {
@@ -20,6 +21,7 @@ _THEMES: Dict[str, Type[BaseTheme]] = {
     "wenxin-crimson": WenxinCrimsonTheme,
     "xuanfei-sunshine": XuanfeiSunshineTheme,
     "juanran-pastel": JuanranPastelTheme,
+    "xiumi-style": XiumiStyleTheme,
 }
 
 

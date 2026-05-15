@@ -6,9 +6,29 @@ from bs4 import BeautifulSoup, Tag
 
 from markdown_parser import ImageRef, ParsedArticle
 from themes import get_theme
+from stickers.stickers import get_sticker_html, get_section_divider
 
 
 WECHAT_MAX_CONTENT_LENGTH = 20000
+
+STICKER_PATTERNS = {
+    ":star:": "star",
+    ":heart:": "heart",
+    ":sparkle:": "sparkle",
+    ":flower:": "flower",
+    ":leaf:": "leaf",
+    ":arrow:": "arrow_right",
+    ":tag:": "tag",
+    ":bookmark:": "bookmark",
+    ":flag:": "flag",
+    ":crown:": "crown",
+    ":lightning:": "lightning",
+    ":gift:": "gift",
+    ":music:": "music_note",
+    ":ribbon:": "ribbon",
+    ":diamond:": "diamond",
+    "::divider::": "__divider__",
+}
 
 
 class ContentTooLongError(Exception):
@@ -32,6 +52,7 @@ class MarkdownConverter:
         ])
 
         body = self._replace_images_with_placeholders(article.body, article.images)
+        body = self._replace_stickers(body)
         html = md.convert(body)
 
         soup = BeautifulSoup(html, "html.parser")
@@ -48,6 +69,21 @@ class MarkdownConverter:
             raise ContentTooLongError(len(final_html))
 
         return final_html
+
+    def _replace_stickers(self, body: str) -> str:
+        result = body
+        primary_color = self.theme.colors.get("primary", "#e07a5f")
+        secondary_color = self.theme.colors.get("secondary", "#81b29a")
+        
+        for pattern, sticker_id in STICKER_PATTERNS.items():
+            if sticker_id == "__divider__":
+                divider_html = get_section_divider(secondary_color)
+                result = result.replace(pattern, divider_html)
+            else:
+                sticker_html = get_sticker_html(sticker_id, primary_color, 18)
+                result = result.replace(pattern, sticker_html)
+        
+        return result
 
     def _replace_images_with_placeholders(self, body: str, images: List[ImageRef]) -> str:
         result = body

@@ -117,6 +117,7 @@ theme: elegant-gold
 | wenxin-crimson | 温心深红，品牌色高亮标题 + 深灰正文，简洁克制 | 写作笔记、深度分享 |
 | xuanfei-sunshine | 轩飞阳光，金黄标题 + 蓝色点缀，活泼温暖 | 运营分享、生活随笔 |
 | juanran-pastel | 娟然粉彩，柔和暖色卡片 + 圆角贴图感 | 新手教程、轻松分享 |
+| **xiumi-style** | **秀米风格，SVG贴图装饰 + 卡片式布局** | **教程、分享、笔记** |
 
 ## 工作流程
 
@@ -159,6 +160,45 @@ theme: elegant-gold
   "content_length": 5000
 }
 ```
+
+---
+
+## SVG 贴图素材库
+
+本工具内置丰富的 SVG 贴图素材，可用于装饰文章。贴图以代码形式嵌入，无需本地存储文件。
+
+### 可用贴图分类
+
+| 分类 | 贴图 | 说明 |
+|------|------|------|
+| **装饰** | star, heart, sparkle, flower, leaf | 星星、爱心、闪光、花朵、叶子 |
+| **箭头** | arrow_right, arrow_down, arrow_curved | 右箭头、下箭头、弯曲箭头 |
+| **标签** | tag, bookmark, flag | 标签、书签、旗帜 |
+| **形状** | circle_ring, diamond, hexagon | 圆环、菱形、六边形 |
+| **特殊** | ribbon, crown, lightning, chat_bubble, music_note, gift | 丝带、皇冠、闪电、对话气泡、音符、礼物 |
+
+### 在 Markdown 中使用贴图
+
+在 Markdown 中使用特殊语法插入贴图：
+
+```markdown
+# :star: 标题前加星星
+
+正文内容 :heart: 可以在行内插入
+
+::divider::  # 插入分隔线装饰
+
+::tip:: 这是提示框内容
+
+::important:: 这是重要标记
+```
+
+### 贴图主题
+
+`xiumi-style` 主题自动使用贴图装饰：
+- 标题前自动添加旗帜图标
+- 章节间自动添加叶子分隔线
+- 顶部自动添加花朵装饰
 
 ---
 
