@@ -44,6 +44,7 @@ opencode-skills/
 | `ob_capture_insight` | self-developed | 捕捉洞察、结晶知识卡片（kk-brain） |
 | `ob_compile_manuscript` | self-developed | 整合内容、输出文章（kk-brain） |
 | `ob_polish_prose` | self-developed | 扩写大纲、优化文字（kk-brain） |
+| `gzh-article-creator` | self-developed | 公众号文章创作工具 |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
 | `zhihu-k-search` | self-developed | 知乎数据搜索 |
@@ -62,6 +63,7 @@ opencode-skills/
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（kk-brain） |
 | `ProductResearch.md` | 产品调研 agent |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
+| `WeChat-GZH-Operator.md` | 公众号运营 agent（调研→写作→发布全流程） |
 
 ## 使用方式
 
