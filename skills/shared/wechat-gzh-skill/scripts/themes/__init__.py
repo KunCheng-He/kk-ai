@@ -6,6 +6,9 @@ from themes.elegant_gold import ElegantGoldTheme
 from themes.autumn_warm import AutumnWarmTheme
 from themes.minimal_blue import MinimalBlueTheme
 from themes.spring_fresh import SpringFreshTheme
+from themes.wenxin_crimson import WenxinCrimsonTheme
+from themes.xuanfei_sunshine import XuanfeiSunshineTheme
+from themes.juanran_pastel import JuanranPastelTheme
 
 
 _THEMES: Dict[str, Type[BaseTheme]] = {
@@ -14,6 +17,9 @@ _THEMES: Dict[str, Type[BaseTheme]] = {
     "autumn-warm": AutumnWarmTheme,
     "minimal-blue": MinimalBlueTheme,
     "spring-fresh": SpringFreshTheme,
+    "wenxin-crimson": WenxinCrimsonTheme,
+    "xuanfei-sunshine": XuanfeiSunshineTheme,
+    "juanran-pastel": JuanranPastelTheme,
 }
 
 

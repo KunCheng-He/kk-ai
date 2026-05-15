@@ -9,7 +9,7 @@ description: |
   - 用户需要 Markdown 转微信公众号格式
   
   支持的功能：
-  - Markdown 转公众号风格 HTML（5 种主题）
+  - Markdown 转公众号风格 HTML（8 种主题）
   - 自动上传图片到微信 CDN
   - 自动提取标题、摘要、封面图
   - 支持 YAML frontmatter 元信息
@@ -114,6 +114,9 @@ theme: elegant-gold
 | autumn-warm | 秋日暖光，橙色调 | 生活随笔 |
 | minimal-blue | 极简蓝，简洁专业 | 技术文章 |
 | spring-fresh | 春日清新，绿色调 | 科技、教程 |
+| wenxin-crimson | 温心深红，品牌色高亮标题 + 深灰正文，简洁克制 | 写作笔记、深度分享 |
+| xuanfei-sunshine | 轩飞阳光，金黄标题 + 蓝色点缀，活泼温暖 | 运营分享、生活随笔 |
+| juanran-pastel | 娟然粉彩，柔和暖色卡片 + 圆角贴图感 | 新手教程、轻松分享 |
 
 ## 工作流程
 
