@@ -183,10 +183,33 @@ sticker:
 Markdown → Python-markdown → HTML (无样式)
     → 添加 .article-content 容器
     → premailer 将 CSS 内联化
+    → 列表标记转换（<ul>/<ol>/<li> → <section>）
+    → 代码块转换（<pre><code> → <section>）
     → 提取容器样式、移除包装 div
     → wrap_content 添加卡片/贴图装饰
     → 最终公众号 HTML
 ```
+
+### 列表标记转换
+
+微信公众号后台编辑器会破坏 `<ul>/<ol>/<li>` 的内联样式，导致分点叙述内容在编辑后格式错乱。本工具在 premailer 内联化之后，自动将列表标记转换为 `<section>` 结构：
+
+- `<ul>/<li>` → `<section>` 容器 + 带 `• ` 前缀的 `<section>` 项
+- `<ol>/<li>` → `<section>` 容器 + 带 `1. 2. 3.` 前缀的 `<section>` 项
+- 每个列表项使用 `padding-left` + `text-indent` 实现悬挂缩进
+- 自动继承 `line-height`、`color`、`letter-spacing` 等排版属性
+- 支持嵌套列表（自底向上逐层转换）
+- 保留 `<li>` 内的 `<strong>`、`<code>`、`<a>` 等行内元素
+
+### 代码块转换
+
+微信公众号后台编辑器会剥离 `white-space` 属性并破坏 `<pre><code>` 结构，导致代码缩进和换行全部丢失。本工具自动将代码块转换为逐行 `<section>` 结构：
+
+- `<pre><code>` → 容器 `<section>`（保留背景色、字体、圆角等样式）+ 逐行 `<section>`
+- 缩进空格转为 `\u00a0`（不换行空格），防止编辑器压缩
+- 空行用 `\u00a0` 占位，防止被编辑器折叠
+- 每行只带 `line-height` 样式，其余样式由容器继承，减少 HTML 体积
+- 行内 `<code>` 标签保持不变
 
 ## 工作流程
 

@@ -2,7 +2,7 @@ import re
 from typing import Dict, List, Optional
 
 import markdown
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup, NavigableString, Tag
 from premailer import Premailer
 
 from markdown_parser import ImageRef, ParsedArticle
@@ -141,6 +141,9 @@ class MarkdownConverter:
             container_style_str = "; ".join(f"{k}: {v}" for k, v in container_styles.items())
             self.has_tables = len(soup_result.find_all("table")) > 0
             self._cleanup_attributes(soup_result)
+            base_styles = self._extract_base_styles(container_style_str or container_styles)
+            self._wechat_safe_lists(soup_result, base_styles)
+            self._wechat_safe_code_blocks(soup_result)
             return str(soup_result), container_style_str
 
         container_style_str = content_div.get("style", "")
@@ -156,6 +159,9 @@ class MarkdownConverter:
 
         soup_out = BeautifulSoup(inner, "html.parser")
         self._cleanup_attributes(soup_out)
+        base_styles = self._extract_base_styles(container_style_str)
+        self._wechat_safe_lists(soup_out, base_styles)
+        self._wechat_safe_code_blocks(soup_out)
         self.has_tables = len(soup_out.find_all("table")) > 0
 
         if not container_style_str:
@@ -168,6 +174,237 @@ class MarkdownConverter:
         for tag in container.find_all(True):
             if tag.has_attr("id"):
                 del tag["id"]
+
+    def _wechat_safe_code_blocks(self, soup: BeautifulSoup) -> None:
+        """Convert <pre><code> blocks to WeChat-safe <section> markup.
+
+        WeChat's backend editor strips white-space:pre-wrap and corrupts <pre>
+        blocks, losing indentation and line breaks. This method converts each
+        line of code into a separate <section> element with &nbsp; for spaces,
+        ensuring formatting survives WeChat's editor.
+        """
+        for pre in soup.find_all('pre'):
+            code_tag = pre.find('code')
+            if code_tag:
+                code_text = code_tag.get_text()
+                code_styles = self._parse_inline_styles(code_tag.get('style', ''))
+            else:
+                code_text = pre.get_text()
+                code_styles = {}
+
+            pre_styles = self._parse_inline_styles(pre.get('style', ''))
+
+            merged = dict(pre_styles)
+            for prop in ('background-color', 'border-radius',
+                         'font-family', 'font-size', 'color'):
+                if prop in code_styles and prop not in merged:
+                    merged[prop] = code_styles[prop]
+            if 'padding' not in merged:
+                merged['padding'] = '15px'
+
+            container = soup.new_tag('section')
+            container['style'] = self._build_style_string(merged)
+
+            line_style_keys = ('line-height',)
+            line_styles = {k: v for k, v in merged.items() if k in line_style_keys}
+            if 'line-height' not in line_styles:
+                line_styles['line-height'] = '1.6'
+            line_style_str = self._build_style_string(line_styles)
+
+            lines = code_text.split('\n')
+            if lines and lines[-1] == '':
+                lines = lines[:-1]
+
+            for line in lines:
+                line_section = soup.new_tag('section')
+                line_section['style'] = line_style_str
+                safe = self._preserve_indentation(line)
+                if safe == '':
+                    safe = '\u00a0'
+                line_section.append(NavigableString(safe))
+                container.append(line_section)
+
+            pre.replace_with(container)
+
+    @staticmethod
+    def _preserve_indentation(line: str) -> str:
+        """Replace leading spaces/tabs with non-breaking spaces for WeChat compatibility.
+
+        Only leading whitespace (indentation) is replaced; mid-line spaces are
+        preserved as normal spaces so word-wrapping still works.
+        """
+        stripped = line.lstrip(' ')
+        leading_count = len(line) - len(stripped)
+        result = '\u00a0' * leading_count + stripped
+        result = result.replace('\t', '\u00a0\u00a0\u00a0\u00a0')
+        return result
+
+    def _wechat_safe_lists(self, soup: BeautifulSoup, base_styles: dict = None) -> None:
+        """Convert <ul>/<ol>/<li> to <section> markup for WeChat editor compatibility.
+
+        WeChat's backend editor strips/corrupts <ul>/<ol>/<li> inline styles
+        when editing drafts. Converting to <section>-based markup with explicit
+        bullet/number prefixes ensures formatting survives WeChat's editor.
+        """
+        if base_styles is None:
+            base_styles = {}
+        while True:
+            lists = list(soup.find_all(['ul', 'ol']))
+            if not lists:
+                break
+            processed_any = False
+            for list_tag in lists:
+                if not list_tag.find(['ul', 'ol']):
+                    self._convert_single_list(soup, list_tag, base_styles)
+                    processed_any = True
+            if not processed_any:
+                for list_tag in list(soup.find_all(['ul', 'ol'])):
+                    self._convert_single_list(soup, list_tag, base_styles)
+                break
+
+    def _convert_single_list(self, soup: BeautifulSoup, list_tag: Tag, base_styles: dict) -> None:
+        """Convert a single <ul> or <ol> element to <section> markup."""
+        is_ordered = list_tag.name == 'ol'
+        is_nested = list_tag.parent and list_tag.parent.name == 'li'
+        list_styles = self._parse_inline_styles(list_tag.get('style', ''))
+
+        _LIST_PROPS = ('list-style-type', 'list-style-position', 'list-style-image', 'display')
+        _INHERITED_PROPS = ('font-size', 'line-height', 'font-family', 'letter-spacing', 'text-align')
+
+        container = soup.new_tag('section')
+        container_style = {}
+        for prop, val in list_styles.items():
+            if prop not in _LIST_PROPS and prop not in ('padding-left', 'padding'):
+                container_style[prop] = val
+        if not any(k.startswith('margin') for k in container_style):
+            container_style['margin'] = '10px 0'
+        container['style'] = self._build_style_string(container_style)
+
+        padding_left = list_styles.get('padding-left', '25px')
+        if 'padding' in list_styles:
+            parts = list_styles['padding'].split()
+            if len(parts) == 4:
+                padding_left = parts[3]
+            elif len(parts) == 2:
+                padding_left = parts[1]
+
+        if is_nested:
+            padding_left = self._increase_padding(padding_left, 20)
+
+        inherited_from_list = {}
+        for prop in _INHERITED_PROPS:
+            if prop in list_styles and prop not in container_style:
+                inherited_from_list[prop] = list_styles[prop]
+
+        item_num = 1
+        start_attr = list_tag.get('start')
+        if start_attr:
+            try:
+                item_num = int(start_attr)
+            except (ValueError, TypeError):
+                pass
+
+        for li in list_tag.find_all('li', recursive=False):
+            li_styles = self._parse_inline_styles(li.get('style', ''))
+
+            item = soup.new_tag('section')
+            item_style = {}
+            for prop, val in base_styles.items():
+                if prop in _INHERITED_PROPS and prop not in li_styles:
+                    item_style[prop] = val
+            for prop, val in inherited_from_list.items():
+                if prop not in li_styles:
+                    item_style[prop] = val
+            for prop, val in li_styles.items():
+                if prop not in _LIST_PROPS:
+                    item_style[prop] = val
+            if not any(k.startswith('margin') for k in item_style):
+                item_style['margin'] = '5px 0'
+            item_style['padding-left'] = padding_left
+            item_style['text-indent'] = f'-{padding_left}'
+            item['style'] = self._build_style_string(item_style)
+
+            for p in li.find_all('p'):
+                p.unwrap()
+
+            prefix = f'{item_num}. ' if is_ordered else '• '
+            item.append(NavigableString(prefix))
+
+            for child in list(li.children):
+                item.append(child.extract())
+
+            self._strip_item_whitespace(item)
+
+            container.append(item)
+            if is_ordered:
+                item_num += 1
+
+        list_tag.replace_with(container)
+
+    @staticmethod
+    def _increase_padding(padding: str, amount: int) -> str:
+        """Increase a CSS padding value by a given amount (px)."""
+        match = re.match(r'(\d+)(px|em|rem)', padding)
+        if match:
+            value = int(match.group(1))
+            unit = match.group(2)
+            return f'{value + amount}{unit}'
+        return padding
+
+    @staticmethod
+    def _extract_base_styles(container_style) -> dict:
+        """Extract base styles (line-height, color) from container styles.
+        
+        Accepts either a style string or a dict, returns a dict of
+        layout-critical inherited properties for WeChat compatibility.
+        """
+        _BASE_PROPS = ('line-height', 'color', 'letter-spacing')
+        if isinstance(container_style, str):
+            styles = MarkdownConverter._parse_inline_styles(container_style)
+        else:
+            styles = container_style
+        return {k: v for k, v in styles.items() if k in _BASE_PROPS}
+
+    @staticmethod
+    def _strip_item_whitespace(item: Tag) -> None:
+        """Strip leading/trailing whitespace NavigableStrings from list item section."""
+        children = list(item.children)
+        if not children:
+            return
+        first = children[0]
+        if isinstance(first, NavigableString):
+            first.replace_with(NavigableString(first.lstrip(' \n\t')))
+        if len(children) > 1:
+            last = children[-1]
+            if isinstance(last, NavigableString):
+                stripped = last.rstrip(' \n\t')
+                if stripped:
+                    last.replace_with(NavigableString(stripped))
+                else:
+                    last.extract()
+        # Remove whitespace-only NavigableStrings between prefix and first element
+        if len(children) > 1:
+            second = children[1]
+            if isinstance(second, NavigableString) and not second.strip():
+                second.extract()
+
+    @staticmethod
+    def _parse_inline_styles(style_str: str) -> dict:
+        """Parse an inline style string into a dictionary."""
+        styles = {}
+        if not style_str:
+            return styles
+        for prop in style_str.split(';'):
+            prop = prop.strip()
+            if ':' in prop:
+                key, val = prop.split(':', 1)
+                styles[key.strip()] = val.strip()
+        return styles
+
+    @staticmethod
+    def _build_style_string(styles: dict) -> str:
+        """Build an inline style string from a dictionary."""
+        return '; '.join(f'{k}: {v}' for k, v in styles.items())
 
 
 def replace_image_placeholders(html: str, images: List[ImageRef]) -> str:
