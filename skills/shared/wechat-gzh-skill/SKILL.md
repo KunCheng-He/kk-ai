@@ -110,20 +110,89 @@ theme: elegant-gold
 | 主题名 | 描述 | 适用场景 |
 |--------|------|----------|
 | default | 微信默认风格 | 通用 |
-| elegant-gold | 金色系，层次丰富 | 深度文章、情感故事 |
 | autumn-warm | 秋日暖光，橙色调 | 生活随笔 |
-| minimal-blue | 极简蓝，简洁专业 | 技术文章 |
 | spring-fresh | 春日清新，绿色调 | 科技、教程 |
 | wenxin-crimson | 温心深红，品牌色高亮标题 + 深灰正文，简洁克制 | 写作笔记、深度分享 |
 | xuanfei-sunshine | 轩飞阳光，金黄标题 + 蓝色点缀，活泼温暖 | 运营分享、生活随笔 |
 | juanran-pastel | 娟然粉彩，柔和暖色卡片 + 圆角贴图感 | 新手教程、轻松分享 |
 | **xiumi-style** | **秀米风格，SVG贴图装饰 + 卡片式布局** | **教程、分享、笔记** |
 
+## 主题系统
+
+主题样式通过 CSS 文件定义（`scripts/themes/css/` 目录），辅以 YAML 配置文件描述卡片、贴图等元信息。
+
+### 主题文件结构
+
+```
+themes/css/
+├── default.css          # 主题 CSS 样式
+├── default.yaml         # 主题元信息（名称、描述、卡片配置、贴图配置）
+├── elegant-gold.css
+├── elegant-gold.yaml
+└── ...
+```
+
+### CSS 文件规范
+
+所有元素样式通过 `.article-content` 选择器定义，转换时由 `premailer` 库自动将 CSS class 内联化为 inline style：
+
+```css
+.article-content { /* 容器样式 */ }
+.article-content h1 { /* 一级标题 */ }
+.article-content h2 { /* 二级标题 */ }
+.article-content p { /* 段落 */ }
+.article-content blockquote { /* 引用块 */ }
+.article-content pre { /* 代码块 */ }
+.article-content code { /* 行内代码 */ }
+/* ... 其他元素 */
+```
+
+### YAML 配置项
+
+```yaml
+name: elegant-gold
+description: 金色系，层次丰富的描述
+card:
+  enabled: true
+  max-width: "800px"
+  margin: "0 auto"
+  padding: "25px"
+  background-color: "#ffffff"
+  border-radius: "18px"
+  border: "1px solid rgba(0, 0, 0, 0.05)"
+  box-shadow: "..."
+sticker:
+  top_decoration: flower      # 顶部装饰贴图
+  top_decoration_color: "#8bc99a"
+  top_decoration_size: 32
+  bottom_divider: true        # 底部分隔线
+  bottom_divider_color: "#5a9b6b"
+```
+
+### 新增主题
+
+创建新主题只需在 `themes/css/` 下添加两个文件：
+1. `主题名.css` — 定义所有元素的样式
+2. `主题名.yaml` — 填写名称、描述，可选配置卡片和贴图
+
+无需编写任何 Python 代码。
+
+### 转换流程
+
+```
+Markdown → Python-markdown → HTML (无样式)
+    → 添加 .article-content 容器
+    → premailer 将 CSS 内联化
+    → 提取容器样式、移除包装 div
+    → wrap_content 添加卡片/贴图装饰
+    → 最终公众号 HTML
+```
+
 ## 工作流程
 
 1. 读取环境变量配置
 2. 解析 Markdown 文件（提取 frontmatter、标题、摘要、图片）
-3. 转换 Markdown 为公众号风格 HTML
+3. 转换 Markdown 为公众号风格 HTML（CSS 模板 → premailer 内联化）
 4. 检测文档是否包含表格，如有则提醒用户确认
 5. 上传本地图片到微信 CDN
 6. 上传封面图到微信永久素材库

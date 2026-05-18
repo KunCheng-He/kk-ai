@@ -1,0 +1,160 @@
+/*
+ * Theme: wenxin-crimson
+ * Description: 温心深红，简洁克制，品牌色高亮标题 + 深灰正文，适合写作笔记、深度分享
+ */
+
+.article-content {
+    padding: 20px 8px;
+    background-color: #ffffff;
+    color: #3e3e3e;
+    font-family: 'PingFang SC', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 2;
+    letter-spacing: 0.5px;
+}
+
+.article-content h1 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #7b0c00;
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 20px 0 12px;
+    line-height: 1.8;
+}
+
+.article-content h2 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #7b0c00;
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 20px 0 12px;
+    line-height: 1.8;
+}
+
+.article-content h3 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #3e3e3e;
+    margin: 15px 0 8px;
+}
+
+.article-content h4 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #3e3e3e;
+    margin: 15px 0 8px;
+}
+
+.article-content h5 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #3e3e3e;
+    margin: 15px 0 8px;
+}
+
+.article-content h6 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #3e3e3e;
+    margin: 15px 0 8px;
+}
+
+.article-content p {
+    margin: 10px 8px;
+    text-align: justify;
+    color: #3e3e3e;
+    line-height: 2em;
+}
+
+.article-content blockquote {
+    margin: 15px 8px;
+    padding: 12px 16px;
+    background-color: #fef5f4;
+    border-left: 4px solid #7b0c00;
+    color: #888888;
+    font-size: 14px;
+    line-height: 1.8em;
+}
+
+.article-content pre {
+    margin: 15px 8px;
+    padding: 15px;
+    background-color: #f8f5f5;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 14px;
+    border: 1px solid rgba(123, 12, 0, 0.1);
+}
+
+.article-content code {
+    padding: 2px 6px;
+    background-color: #f8f5f5;
+    border-radius: 3px;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 14px;
+    color: #7b0c00;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 15px auto;
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 10px 8px;
+    padding-left: 25px;
+    line-height: 2em;
+}
+
+.article-content li {
+    margin: 5px 0;
+    color: #3e3e3e;
+}
+
+.article-content table {
+    width: 100%;
+    margin: 15px 8px;
+    border-collapse: collapse;
+}
+
+.article-content td {
+    padding: 10px;
+    border: 1px solid rgba(123, 12, 0, 0.15);
+}
+
+.article-content th {
+    padding: 10px;
+    border: 1px solid rgba(123, 12, 0, 0.15);
+    background-color: #fef5f4;
+    font-weight: bold;
+    color: #7b0c00;
+}
+
+.article-content hr {
+    border: none;
+    border-top: 1px dashed #3a528f;
+    margin: 20px 8px;
+}
+
+.article-content strong {
+    font-weight: bold;
+    color: #7b0c00;
+}
+
+.article-content em {
+    font-style: italic;
+    color: #888888;
+}
+
+.article-content a {
+    color: #5f9cef;
+    text-decoration: none;
+}

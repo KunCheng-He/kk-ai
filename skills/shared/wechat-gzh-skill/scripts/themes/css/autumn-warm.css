@@ -1,0 +1,154 @@
+/*
+ * Theme: autumn-warm
+ * Description: 秋日暖光，温暖治愈，橙色调
+ */
+
+.article-content {
+    padding: 40px 10px;
+    background-color: #faf9f5;
+    color: #4a413d;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    letter-spacing: 0.5px;
+}
+
+.article-content h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #d97758;
+    margin: 25px 0 15px;
+    border-bottom: 1px dashed rgba(74, 65, 61, 0.3);
+    padding-bottom: 8px;
+}
+
+.article-content h2 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #d97758;
+    margin: 25px 0 15px;
+    border-bottom: 1px dashed rgba(74, 65, 61, 0.3);
+    padding-bottom: 8px;
+}
+
+.article-content h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #d97758;
+    margin: 25px 0 15px;
+}
+
+.article-content h4 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #d97758;
+    margin: 25px 0 15px;
+}
+
+.article-content h5 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #d97758;
+    margin: 25px 0 15px;
+}
+
+.article-content h6 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #d97758;
+    margin: 25px 0 15px;
+}
+
+.article-content p {
+    margin: 15px 0;
+    text-align: justify;
+    color: #4a413d;
+}
+
+.article-content blockquote {
+    margin: 15px 0;
+    padding: 15px 20px;
+    background-color: #fef4e7;
+    border-left: 5px solid #d97758;
+    box-shadow: inset 0 0 15px rgba(217, 119, 88, 0.1);
+    color: #4a413d;
+}
+
+.article-content pre {
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #f5f2ed;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.article-content code {
+    padding: 2px 6px;
+    background-color: #fef4e7;
+    border-radius: 3px;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 14px;
+    color: #d97758;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border-radius: 8px;
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 15px 0;
+    padding-left: 25px;
+}
+
+.article-content li {
+    margin: 8px 0;
+    color: #4a413d;
+}
+
+.article-content table {
+    width: 100%;
+    margin: 15px 0;
+    border-collapse: collapse;
+}
+
+.article-content td {
+    padding: 10px;
+    border: 1px solid rgba(74, 65, 61, 0.2);
+}
+
+.article-content th {
+    padding: 10px;
+    border: 1px solid rgba(74, 65, 61, 0.2);
+    background-color: #fef4e7;
+    font-weight: bold;
+    color: #d97758;
+}
+
+.article-content hr {
+    border: none;
+    height: 1px;
+    background-color: rgba(74, 65, 61, 0.1);
+    margin: 20px 0;
+}
+
+.article-content strong {
+    font-weight: bold;
+    color: #c06b4d;
+}
+
+.article-content em {
+    font-style: italic;
+    color: #d97758;
+}
+
+.article-content a {
+    color: #d97758;
+    text-decoration: none;
+}

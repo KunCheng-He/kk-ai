@@ -1,0 +1,185 @@
+/*
+ * Theme: xiumi-style
+ * Description: 秀米风格，丰富 SVG 贴图装饰 + 卡片式布局 + 柔和配色，适合教程、分享、笔记
+ */
+
+.article-content {
+    padding: 25px 10px;
+    background-color: #f8faf8;
+    color: #2d3a2e;
+    font-family: 'PingFang SC', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    letter-spacing: 0.3px;
+}
+
+.article-content .article-card {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px 16px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(61, 122, 74, 0.12);
+    box-shadow: 0 4px 20px rgba(61, 122, 74, 0.05);
+}
+
+.article-content h1 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #3d7a4a;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f7f1 100%);
+    display: block;
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin: 25px 0 15px;
+    border-left: 4px solid #3d7a4a;
+    box-shadow: 0 2px 8px rgba(61, 122, 74, 0.05);
+}
+
+.article-content h2 {
+    font-size: 19px;
+    font-weight: bold;
+    color: #5a9b6b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0 12px;
+    padding: 8px 0;
+    border-bottom: 2px dashed #8bc99a;
+}
+
+.article-content h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #2e6b3a;
+    margin: 15px 0 10px;
+    padding-left: 12px;
+    border-left: 3px solid #8bc99a;
+}
+
+.article-content h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3a2e;
+    margin: 12px 0 8px;
+}
+
+.article-content h5 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2d3a2e;
+    margin: 12px 0 8px;
+}
+
+.article-content h6 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3a2e;
+    margin: 12px 0 8px;
+}
+
+.article-content p {
+    margin: 12px 8px;
+    text-align: justify;
+    color: #2d3a2e;
+    line-height: 1.8em;
+}
+
+.article-content blockquote {
+    margin: 18px 8px;
+    padding: 16px 20px;
+    background-color: #f0f7f1;
+    border-radius: 12px;
+    border: 1px solid rgba(61, 122, 74, 0.12);
+    color: #5a6b5c;
+    font-size: 14px;
+    line-height: 1.7em;
+    position: relative;
+}
+
+.article-content pre {
+    margin: 15px 8px;
+    padding: 16px;
+    background-color: #f4f8f4;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+    font-size: 13px;
+    border: 1px solid rgba(61, 122, 74, 0.12);
+}
+
+.article-content code {
+    padding: 2px 8px;
+    background-color: #f0f7f1;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+    font-size: 13px;
+    color: #3d7a4a;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 15px auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(61, 122, 74, 0.05);
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 12px 8px;
+    padding-left: 20px;
+    line-height: 1.8em;
+}
+
+.article-content li {
+    margin: 6px 0;
+    color: #2d3a2e;
+}
+
+.article-content table {
+    width: 100%;
+    margin: 15px 8px;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(61, 122, 74, 0.05);
+}
+
+.article-content td {
+    padding: 10px 14px;
+    border: 1px solid rgba(61, 122, 74, 0.12);
+}
+
+.article-content th {
+    padding: 10px 14px;
+    border: 1px solid rgba(61, 122, 74, 0.12);
+    background-color: #f0f7f1;
+    font-weight: bold;
+    color: #3d7a4a;
+}
+
+.article-content hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #8bc99a, transparent);
+    margin: 25px 8px;
+}
+
+.article-content strong {
+    font-weight: bold;
+    color: #3d7a4a;
+}
+
+.article-content em {
+    font-style: italic;
+    color: #5a9b6b;
+}
+
+.article-content a {
+    color: #2e6b3a;
+    text-decoration: none;
+    border-bottom: 1px dotted #2e6b3a;
+}

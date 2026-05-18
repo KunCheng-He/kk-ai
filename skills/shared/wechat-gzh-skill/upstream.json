@@ -2,5 +2,7 @@
   "source": "self-developed",
   "description": "微信公众号草稿发布工具，自开发 skill",
   "created_at": "2026-05-14",
-  "version": "0.3.0"
+  "version": "0.4.0",
+  "last_update": "2026-05-18",
+  "changes": ["主题系统重构：CSS文件 + premailer内联化替代Python字典样式"]
 }

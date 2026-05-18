@@ -1,0 +1,11 @@
+name: juanran-pastel
+description: 娟然粉彩，柔和暖色卡片 + 圆角贴图感，适合新手教程、轻松分享
+card:
+  enabled: true
+  max-width: "100%"
+  margin: "0 auto"
+  padding: "20px 16px"
+  background-color: "#ffffff"
+  border-radius: "16px"
+  border: "1px solid rgba(232, 131, 107, 0.2)"
+  box-shadow: "0 6px 20px rgba(232, 131, 107, 0.08)"

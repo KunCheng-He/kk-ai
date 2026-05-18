@@ -3,10 +3,11 @@ from typing import Dict, List, Optional
 
 import markdown
 from bs4 import BeautifulSoup, Tag
+from premailer import Premailer
 
 from markdown_parser import ImageRef, ParsedArticle
-from themes import get_theme
 from stickers.stickers import get_sticker_html, get_section_divider
+from themes import Theme, get_theme
 
 
 WECHAT_MAX_CONTENT_LENGTH = 20000
@@ -40,8 +41,25 @@ class ContentTooLongError(Exception):
 
 class MarkdownConverter:
     def __init__(self, theme_name: str = "default"):
-        self.theme = get_theme(theme_name)
+        self.theme: Theme = get_theme(theme_name)
         self.has_tables: bool = False
+        self._primary_color: str = self._extract_primary_color()
+        self._secondary_color: str = self._extract_secondary_color()
+
+    def _extract_primary_color(self) -> str:
+        for line in self.theme.css.splitlines():
+            if "color:" in line and ".article-content h" in line:
+                match = re.search(r'color:\s*(#[0-9a-fA-F]{3,8})', line)
+                if match:
+                    return match.group(1)
+        return "#333333"
+
+    def _extract_secondary_color(self) -> str:
+        css = self.theme.css
+        match = re.search(r'\.article-content\s+strong\s*\{[^}]*color:\s*(#[0-9a-fA-F]{3,8})', css, re.DOTALL)
+        if match:
+            return match.group(1)
+        return self._primary_color
 
     def convert(self, article: ParsedArticle) -> str:
         md = markdown.Markdown(extensions=[
@@ -56,14 +74,11 @@ class MarkdownConverter:
         html = md.convert(body)
 
         soup = BeautifulSoup(html, "html.parser")
-
         self.has_tables = len(soup.find_all("table")) > 0
 
-        self._apply_styles(soup)
+        inner_html, container_style_str = self._apply_css(str(soup))
 
-        styled_html = str(soup)
-
-        final_html = self.theme.wrap_content(styled_html)
+        final_html = self.theme.wrap_content(inner_html, container_style_str)
 
         if len(final_html) > WECHAT_MAX_CONTENT_LENGTH:
             raise ContentTooLongError(len(final_html))
@@ -72,9 +87,9 @@ class MarkdownConverter:
 
     def _replace_stickers(self, body: str) -> str:
         result = body
-        primary_color = self.theme.colors.get("primary", "#e07a5f")
-        secondary_color = self.theme.colors.get("secondary", "#81b29a")
-        
+        primary_color = self._primary_color
+        secondary_color = self._secondary_color
+
         for pattern, sticker_id in STICKER_PATTERNS.items():
             if sticker_id == "__divider__":
                 divider_html = get_section_divider(secondary_color)
@@ -82,7 +97,7 @@ class MarkdownConverter:
             else:
                 sticker_html = get_sticker_html(sticker_id, primary_color, 18)
                 result = result.replace(pattern, sticker_html)
-        
+
         return result
 
     def _replace_images_with_placeholders(self, body: str, images: List[ImageRef]) -> str:
@@ -96,101 +111,63 @@ class MarkdownConverter:
             )
         return result
 
-    def _apply_styles(self, soup: BeautifulSoup):
-        for tag in soup.find_all(True):
-            if not isinstance(tag, Tag):
-                continue
+    def _apply_css(self, html_content: str) -> tuple[str, str]:
+        html_with_class = f'<div class="article-content">{html_content}</div>'
 
-            tag_name = tag.name
+        p = Premailer(
+            html=html_with_class,
+            css_text=self.theme.css,
+            remove_classes=True,
+            strip_important=False,
+            keep_style_tags=False,
+            disable_validation=True,
+            disable_basic_attributes=["bgcolor"],
+        )
+        inline_html = p.transform()
 
-            if tag_name in ["h1", "h2", "h3", "h4", "h5", "h6"]:
-                self._style_heading(tag)
-            elif tag_name == "p":
-                self._style_paragraph(tag)
-            elif tag_name == "blockquote":
-                self._style_blockquote(tag)
-            elif tag_name == "pre":
-                self._style_code_block(tag)
-            elif tag_name == "code":
-                self._style_inline_code(tag)
-            elif tag_name == "img":
-                self._style_image(tag)
-            elif tag_name == "ul" or tag_name == "ol":
-                self._style_list(tag)
-            elif tag_name == "li":
-                self._style_list_item(tag)
-            elif tag_name == "table":
-                self._style_table(tag)
-            elif tag_name == "hr":
-                self._style_hr(tag)
-            elif tag_name == "strong":
-                self._style_strong(tag)
-            elif tag_name == "em":
-                self._style_em(tag)
-            elif tag_name == "a":
-                self._style_link(tag)
+        soup_result = BeautifulSoup(inline_html, "html.parser")
 
-    def _style_heading(self, tag: Tag):
-        level = int(tag.name[1])
-        styles = self.theme.get_heading_style(level)
-        tag["style"] = self._dict_to_style(styles)
+        content_div = None
+        body = soup_result.find("body")
+        if body:
+            content_div = body.find("div", class_="article-content")
+        if not content_div:
+            content_div = soup_result.find("div", class_="article-content")
+        if not content_div:
+            content_div = soup_result.find("div")
 
-    def _style_paragraph(self, tag: Tag):
-        styles = self.theme.get_paragraph_style()
-        tag["style"] = self._dict_to_style(styles)
+        if not content_div:
+            container_styles = self.theme._extract_container_styles()
+            container_style_str = "; ".join(f"{k}: {v}" for k, v in container_styles.items())
+            self.has_tables = len(soup_result.find_all("table")) > 0
+            self._cleanup_attributes(soup_result)
+            return str(soup_result), container_style_str
 
-    def _style_blockquote(self, tag: Tag):
-        styles = self.theme.get_blockquote_style()
-        tag["style"] = self._dict_to_style(styles)
+        container_style_str = content_div.get("style", "")
+        if isinstance(container_style_str, list):
+            container_style_str = "; ".join(container_style_str)
 
-    def _style_code_block(self, tag: Tag):
-        styles = self.theme.get_code_block_style()
-        tag["style"] = self._dict_to_style(styles)
+        del content_div["class"]
+        del content_div["style"]
 
-    def _style_inline_code(self, tag: Tag):
-        if tag.parent and tag.parent.name == "pre":
-            return
-        styles = self.theme.get_inline_code_style()
-        tag["style"] = self._dict_to_style(styles)
+        inner = str(content_div)
+        inner = re.sub(r'^<div>\s*', '', inner)
+        inner = re.sub(r'\s*</div>$', '', inner)
 
-    def _style_image(self, tag: Tag):
-        styles = self.theme.get_image_style()
-        tag["style"] = self._dict_to_style(styles)
+        soup_out = BeautifulSoup(inner, "html.parser")
+        self._cleanup_attributes(soup_out)
+        self.has_tables = len(soup_out.find_all("table")) > 0
 
-    def _style_list(self, tag: Tag):
-        styles = self.theme.get_list_style()
-        tag["style"] = self._dict_to_style(styles)
+        if not container_style_str:
+            container_styles = self.theme._extract_container_styles()
+            container_style_str = "; ".join(f"{k}: {v}" for k, v in container_styles.items())
 
-    def _style_list_item(self, tag: Tag):
-        styles = self.theme.get_list_item_style()
-        tag["style"] = self._dict_to_style(styles)
+        return str(soup_out), container_style_str
 
-    def _style_table(self, tag: Tag):
-        styles = self.theme.get_table_style()
-        tag["style"] = self._dict_to_style(styles)
-        for td in tag.find_all("td"):
-            td["style"] = self._dict_to_style(self.theme.get_table_cell_style())
-        for th in tag.find_all("th"):
-            th["style"] = self._dict_to_style(self.theme.get_table_header_style())
-
-    def _style_hr(self, tag: Tag):
-        styles = self.theme.get_hr_style()
-        tag["style"] = self._dict_to_style(styles)
-
-    def _style_strong(self, tag: Tag):
-        styles = self.theme.get_strong_style()
-        tag["style"] = self._dict_to_style(styles)
-
-    def _style_em(self, tag: Tag):
-        styles = self.theme.get_em_style()
-        tag["style"] = self._dict_to_style(styles)
-
-    def _style_link(self, tag: Tag):
-        styles = self.theme.get_link_style()
-        tag["style"] = self._dict_to_style(styles)
-
-    def _dict_to_style(self, styles: Dict[str, str]) -> str:
-        return "; ".join(f"{k}: {v}" for k, v in styles.items())
+    def _cleanup_attributes(self, container):
+        for tag in container.find_all(True):
+            if tag.has_attr("id"):
+                del tag["id"]
 
 
 def replace_image_placeholders(html: str, images: List[ImageRef]) -> str:

@@ -1,0 +1,17 @@
+name: xiumi-style
+description: 秀米风格，丰富 SVG 贴图装饰 + 卡片式布局 + 柔和配色，适合教程、分享、笔记
+card:
+  enabled: true
+  max-width: "100%"
+  margin: "0 auto"
+  padding: "20px 16px"
+  background-color: "#ffffff"
+  border-radius: "16px"
+  border: "1px solid rgba(61, 122, 74, 0.12)"
+  box-shadow: "0 4px 20px rgba(61, 122, 74, 0.05)"
+sticker:
+  top_decoration: flower
+  top_decoration_color: "#8bc99a"
+  top_decoration_size: 32
+  bottom_divider: true
+  bottom_divider_color: "#5a9b6b"

@@ -1,0 +1,152 @@
+/*
+ * Theme: spring-fresh
+ * Description: 春日清新，绿色调，适合科技、教程类文章
+ */
+
+.article-content {
+    padding: 30px 20px;
+    background-color: #fafffe;
+    color: #2c3e50;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+.article-content h1 {
+    font-size: 26px;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 22px 0 14px;
+}
+
+.article-content h2 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 22px 0 14px;
+}
+
+.article-content h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 22px 0 14px;
+}
+
+.article-content h4 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 22px 0 14px;
+}
+
+.article-content h5 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 22px 0 14px;
+}
+
+.article-content h6 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 22px 0 14px;
+}
+
+.article-content p {
+    margin: 14px 0;
+    text-align: justify;
+}
+
+.article-content blockquote {
+    margin: 14px 0;
+    padding: 12px 18px;
+    background-color: #e8f8f0;
+    border-left: 4px solid #27ae60;
+    border-radius: 0 8px 8px 0;
+    color: #34495e;
+}
+
+.article-content pre {
+    margin: 14px 0;
+    padding: 14px;
+    background-color: #f5f9f7;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 14px;
+    border: 1px solid #2ecc71;
+}
+
+.article-content code {
+    padding: 2px 6px;
+    background-color: #e8f8f0;
+    border-radius: 4px;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 14px;
+    color: #27ae60;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 18px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.15);
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 14px 0;
+    padding-left: 22px;
+}
+
+.article-content li {
+    margin: 6px 0;
+}
+
+.article-content table {
+    width: 100%;
+    margin: 14px 0;
+    border-collapse: collapse;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.article-content td {
+    padding: 10px 14px;
+    border: 1px solid #2ecc71;
+}
+
+.article-content th {
+    padding: 10px 14px;
+    border: 1px solid #2ecc71;
+    background-color: #e8f8f0;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+.article-content hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #2ecc71, transparent);
+    margin: 25px 0;
+}
+
+.article-content strong {
+    font-weight: bold;
+    color: #27ae60;
+}
+
+.article-content em {
+    font-style: italic;
+    color: #27ae60;
+}
+
+.article-content a {
+    color: #27ae60;
+    text-decoration: none;
+    border-bottom: 1px dashed #2ecc71;
+}

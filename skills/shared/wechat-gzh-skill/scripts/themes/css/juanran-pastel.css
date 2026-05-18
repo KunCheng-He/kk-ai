@@ -1,0 +1,188 @@
+/*
+ * Theme: juanran-pastel
+ * Description: 娟然粉彩，柔和暖色卡片 + 圆角贴图感，适合新手教程、轻松分享
+ */
+
+.article-content {
+    padding: 30px 12px;
+    background-color: #fff7f5;
+    color: #4a4a4a;
+    font-family: 'PingFang SC', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 2;
+    letter-spacing: 0.5px;
+}
+
+.article-content .article-card {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px 16px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(232, 131, 107, 0.2);
+    box-shadow: 0 6px 20px rgba(232, 131, 107, 0.08);
+}
+
+.article-content h1 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #e8836b;
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin: 22px 0 12px;
+    line-height: 1.6;
+    letter-spacing: 1px;
+}
+
+.article-content h2 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #7bc4a0;
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin: 22px 0 12px;
+    line-height: 1.6;
+    letter-spacing: 1px;
+}
+
+.article-content h3 {
+    font-size: 17px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #f0c96e;
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin: 22px 0 12px;
+    line-height: 1.6;
+    letter-spacing: 1px;
+}
+
+.article-content h4 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #e8836b;
+    margin: 15px 0 8px;
+}
+
+.article-content h5 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #e8836b;
+    margin: 15px 0 8px;
+}
+
+.article-content h6 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #e8836b;
+    margin: 15px 0 8px;
+}
+
+.article-content p {
+    margin: 10px 8px;
+    text-align: justify;
+    color: #4a4a4a;
+    line-height: 2em;
+}
+
+.article-content blockquote {
+    margin: 15px 8px;
+    padding: 14px 18px;
+    background-color: #fff0ed;
+    border-left: 4px solid #e8836b;
+    border-radius: 0 12px 12px 0;
+    color: #999999;
+    font-size: 14px;
+    line-height: 1.8em;
+}
+
+.article-content pre {
+    margin: 15px 8px;
+    padding: 15px;
+    background-color: #fdf5f3;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 14px;
+    border: 1px solid rgba(232, 131, 107, 0.2);
+}
+
+.article-content code {
+    padding: 2px 8px;
+    background-color: #fff0ed;
+    border-radius: 10px;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 14px;
+    color: #e8836b;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 15px auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(232, 131, 107, 0.08);
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 10px 8px;
+    padding-left: 25px;
+    line-height: 2em;
+}
+
+.article-content li {
+    margin: 6px 0;
+    color: #4a4a4a;
+}
+
+.article-content table {
+    width: 100%;
+    margin: 15px 8px;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.article-content td {
+    padding: 10px 14px;
+    border: 1px solid rgba(232, 131, 107, 0.2);
+}
+
+.article-content th {
+    padding: 10px 14px;
+    border: 1px solid rgba(232, 131, 107, 0.2);
+    background-color: #fff0ed;
+    font-weight: bold;
+    color: #e8836b;
+}
+
+.article-content hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(to right, #e8836b, #7bc4a0, #f0c96e);
+    margin: 25px 8px;
+    border-radius: 1px;
+}
+
+.article-content strong {
+    font-weight: bold;
+    color: #e8836b;
+}
+
+.article-content em {
+    font-style: italic;
+    color: #7bc4a0;
+}
+
+.article-content a {
+    color: #e8836b;
+    text-decoration: none;
+    border-bottom: 1px dashed #7bc4a0;
+}
