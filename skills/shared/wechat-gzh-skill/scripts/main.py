@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 from config import load_config
-from converter import convert_article, MarkdownConverter
+from converter import convert_article, MarkdownConverter, replace_image_placeholders
 from markdown_parser import parse_markdown
 from themes import list_themes
 from wechat_api import WechatAPI, WechatAPIError
@@ -145,6 +145,8 @@ def main():
                         "original": img.original,
                         "wechat_url": upload_result.url,
                     })
+
+            html = replace_image_placeholders(html, article.images)
 
             cover_path = args.cover or article.metadata.cover
             if not cover_path and article.images:

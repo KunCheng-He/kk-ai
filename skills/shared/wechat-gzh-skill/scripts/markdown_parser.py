@@ -86,7 +86,7 @@ def extract_images(body: str) -> List[ImageRef]:
         images.append(ImageRef(
             index=i,
             original=path,
-            placeholder=f"<!-- IMG:{i} -->",
+            placeholder=f"__WECHAT_IMG_PLACEHOLDER_{i}__",
             is_local=is_local
         ))
 
@@ -135,6 +135,13 @@ def parse_markdown(file_path: str) -> ParsedArticle:
     images = extract_images(body)
     for img in images:
         if img.is_local:
+            # Replace relative path with placeholder in body BEFORE resolving
+            pattern = re.escape(img.original)
+            body = re.sub(
+                r"!\[([^\]]*)\]\(" + pattern + r"\)",
+                f"![\\1]({img.placeholder})",
+                body
+            )
             img.original = resolve_image_path(img.original, file_path)
 
     return ParsedArticle(

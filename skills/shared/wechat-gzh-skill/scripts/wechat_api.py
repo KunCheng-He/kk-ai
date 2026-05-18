@@ -1,6 +1,8 @@
 import functools
+import io
 import json
 import os
+import struct
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -49,6 +51,55 @@ class DraftResult:
 class WechatAPI:
     BASE_URL = "https://api.weixin.qq.com/cgi-bin"
 
+    _PNG_SIGNATURE = b'\x89PNG\r\n\x1a\n'
+    _CRITICAL_CHUNKS = {b'IHDR', b'PLTE', b'IDAT', b'IEND'}
+    _MAX_CHUNK_SIZE = 50 * 1024 * 1024  # 50MB sanity limit
+
+    @classmethod
+    def _clean_png(cls, data: bytes) -> bytes:
+        if data[:8] != cls._PNG_SIGNATURE:
+            return data
+
+        cleaned = bytearray(data[:8])
+        pos = 8
+
+        while pos < len(data):
+            if pos + 12 > len(data):
+                break
+            length = struct.unpack(">I", data[pos:pos+4])[0]
+            chunk_type = data[pos+4:pos+8]
+
+            # Reject impossibly large chunks (corrupted data)
+            if length > cls._MAX_CHUNK_SIZE:
+                break
+            # Reject chunks that extend past EOF
+            if pos + 12 + length > len(data):
+                break
+
+            if chunk_type in cls._CRITICAL_CHUNKS:
+                cleaned.extend(data[pos:pos+12+length])
+            pos += 12 + length
+
+        # Ensure IEND terminator
+        if len(cleaned) < 12 or bytes(cleaned[-12:-8]) != b'IEND':
+            cleaned.extend(b'\x00\x00\x00\x00IEND\xae\x42\x60\x82')
+
+        return bytes(cleaned)
+
+    @classmethod
+    def _read_image(cls, file_path: str) -> tuple[bytes, str, str]:
+        with open(file_path, 'rb') as f:
+            data = f.read()
+
+        ext = Path(file_path).suffix.lower()
+        if ext == '.png':
+            cleaned = cls._clean_png(data)
+            return cleaned, Path(file_path).name, 'image/png'
+        elif ext in ('.jpg', '.jpeg'):
+            return data, Path(file_path).name, 'image/jpeg'
+        else:
+            return data, Path(file_path).name, 'application/octet-stream'
+
     def __init__(self, config: WechatConfig):
         self.config = config
         self.token_cache = TokenCache(config.appid)
@@ -84,9 +135,9 @@ class WechatAPI:
         url = f"{self.BASE_URL}/media/uploadimg"
         params = {"access_token": access_token}
 
-        with open(file_path, "rb") as f:
-            files = {"media": f}
-            resp = requests.post(url, params=params, files=files, timeout=30)
+        data, filename, mime = self._read_image(file_path)
+        files = {"media": (filename, io.BytesIO(data), mime)}
+        resp = requests.post(url, params=params, files=files, timeout=30)
 
         data = resp.json()
 
@@ -107,9 +158,9 @@ class WechatAPI:
             "type": "image"
         }
 
-        with open(file_path, "rb") as f:
-            files = {"media": f}
-            resp = requests.post(url, params=params, files=files, timeout=30)
+        data, filename, mime = self._read_image(file_path)
+        files = {"media": (filename, io.BytesIO(data), mime)}
+        resp = requests.post(url, params=params, files=files, timeout=30)
 
         data = resp.json()
 

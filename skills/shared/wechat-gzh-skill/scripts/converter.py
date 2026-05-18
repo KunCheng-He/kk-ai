@@ -197,9 +197,7 @@ def replace_image_placeholders(html: str, images: List[ImageRef]) -> str:
     result = html
     for img in images:
         if img.wechat_url:
-            placeholder_pattern = re.escape(img.placeholder)
-            img_tag = f'<img src="{img.wechat_url}" style="max-width:100%;height:auto;display:block;margin:20px auto;" />'
-            result = re.sub(placeholder_pattern, img.wechat_url, result)
+            result = result.replace(img.placeholder, img.wechat_url)
     return result
 
 
