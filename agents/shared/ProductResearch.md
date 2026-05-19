@@ -26,47 +26,64 @@ temperature: 0.3
 2. 如果目录已存在，添加后缀：`{主题}-2`、`{主题}-3` 等
 3. 在报告开头记录调研时间戳，格式：`YYYY-MM-DD HH:mm`
 
+---
+
 ## 调研工作流
 
 按顺序执行以下步骤：
 
-**1. 识别产品类型**
+### 1. 识别产品类型
 - 判断类别：技术软件、消费软件、硬件设备、AI/ML产品、云服务/基础设施
-- 根据类型选择优先社区策略（见下方"产品类型与社区策略"）
+- 根据类型选择优先社区策略（见下方产品类型与社区策略）
 
-**2. 收集官方信息**
+### 2. 收集官方信息
 - 查找并访问官方网站/文档
 - 提取：核心功能、目标用户、定价（如适用）、关键差异化特点
 - **收集关键图片**：产品截图、架构图、特性对比图、定价表等
   - 优先选择：官方产品图、功能演示图、架构图、数据图表
   - 下载图片到 `assets/` 目录，使用相对路径引用
-- 注意：部分网站可能屏蔽自动化访问；尝试替代性官方来源
+- **信息获取顺序（强制）**：
+  1. 先用 `webfetch` 尝试获取页面内容
+  2. 如 webfetch 返回内容为空、解析失败、或页面明显为动态渲染（React/Next.js/Vue）-> **立即使用 `playwright-cli` skill 获取**
+  3. 如 playwright-cli 也失败 -> 尝试替代 URL（移动版、精简版）
+  4. 如仍失败 -> 跳过该来源，在报告中注明未能访问的来源
 
-**3. 收集社区反馈**
+### 3. 收集社区反馈
 
-按照以下优先级策略：
+按照以下**分层 fallback 策略**执行：
 
-1. **优先调用专属 Skill 和 MCP 服务**
-   - 小红书：使用 `xhs-k-research` skill
-   - 知乎：使用 `zhihu-k-research` skill
-   
-2. **使用 webfetch 直接访问**
-   - Hacker News: `https://hn.algolia.com/?q={query}`
-   - V2EX: `https://www.v2ex.com/search?q={query}&t=topic`
-   - Reddit: `https://www.reddit.com/search/?q={query}`
-   - Bilibili: `https://search.bilibili.com/all?keyword={query}`
+**第一层：专属 Skill**
+- 小红书：使用 `xhs-k-research` skill
+- 知乎：使用 `zhihu-k-research` skill
 
-3. **搜索引擎补充**
-   - Bing: `https://cn.bing.com/search?q={query}`
-   - 百度: `https://www.baidu.com/s?wd={query}`
+**第二层：webfetch 直接访问**
+- Hacker News: `https://hn.algolia.com/?q={query}`
+- V2EX: `https://www.v2ex.com/search?q={query}&t=topic`
+- Reddit: `https://www.reddit.com/search/?q={query}`
+- Bilibili: `https://search.bilibili.com/all?keyword={query}`
 
-**4. 识别竞品**
-- 搜索"{产品名} vs"或"{产品名} alternatives/替代品"
+**第三层：webfetch 失败后的 playwright-cli fallback（关键）**
+- 当 webfetch 无法获取以下场景时，**必须**调用 `playwright-cli` skill：
+  - 页面返回空内容或仅返回标题
+  - 页面为 React/Next.js/Vue 等前端动态渲染
+  - 页面需要 JavaScript 执行后才能展示内容
+  - 反爬虫机制导致 webfetch 被拦截
+- 调用方式：加载 `playwright-cli` skill，使用其提供的浏览器自动化能力获取页面完整渲染后的内容
+- 优先用于：厂商官网、产品详情页、动态定价页、技术文档
+
+**第四层：搜索引擎补充**
+- Bing: `https://cn.bing.com/search?q={query}`
+- 百度: `https://www.baidu.com/s?wd={query}`
+
+### 4. 识别竞品
+- 搜索产品名 vs 或 产品名 alternatives/替代品
 - 确定 2-3 个主要竞品
 - 在关键维度上进行简要对比
 
-**5. 生成报告**
+### 5. 生成报告
 按照模板生成 `README.md`，保存到工作目录。
+
+---
 
 ## 产品类型与社区策略
 
@@ -89,6 +106,8 @@ temperature: 0.3
 ### 云服务/基础设施
 - 优先社区：Hacker News, Reddit (r/devops), V2EX
 - 官方来源：官方文档, 状态页, 案例研究
+
+---
 
 ## 报告模板
 
@@ -131,12 +150,31 @@ temperature: 0.3
   - {社区} - {标题}: {URL}
 ```
 
-## 访问失败处理
+---
 
-1. 尝试替代 URL（移动版、精简版）
-2. 使用搜索引擎站内搜索：`site:目标域名 {查询词}`
-3. 跳过该来源，继续下一个
-4. 在报告中注明未能访问的来源
+## 访问失败处理（完整 fallback 链）
+
+当信息获取受阻时，按以下顺序尝试，**不要直接跳过**：
+
+1. **webfetch 失败时** -> **立即使用 `playwright-cli` skill**
+   - playwright-cli 可执行 JavaScript，能获取动态渲染页面的完整内容
+   - 适用场景：React/Next.js/Vue 官网、需要登录但未完全拦截的页面、懒加载内容
+   - 调用方式：加载 playwright-cli skill，按 skill 指引执行浏览器自动化
+
+2. **playwright-cli 也失败时** -> 尝试替代 URL
+   - 移动版页面（m.example.com）
+   - 精简版/旧版页面
+   - 搜索引擎缓存版本
+
+3. **替代 URL 也失败时** -> 使用搜索引擎站内搜索
+   - `site:目标域名 {查询词}`
+   - 查看搜索引擎缓存快照
+
+4. **全部失败时** -> 跳过该来源
+   - 在报告中明确注明：未能访问的来源及尝试过的方法
+   - 继续其他来源的调研，不要因为单一来源失败而中断整体流程
+
+---
 
 ## 内容质量标准
 
@@ -145,6 +183,8 @@ temperature: 0.3
 - 时效性（近12个月内）
 - 深度分析优于简短提及
 - 可信来源（知名评测者、资深成员）
+
+---
 
 ## 输出要求
 
