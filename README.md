@@ -29,6 +29,7 @@ opencode-skills/
 | `opencode-project-init` | self-developed | OpenCode 项目初始化工具 |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
+| `kimi-webbridge` | [Kimi](https://cdn.kimi.com/webbridge) | AI 控制用户真实浏览器进行网页交互 |
 
 ### Skills - Shared（共享，项目按需链接）
 

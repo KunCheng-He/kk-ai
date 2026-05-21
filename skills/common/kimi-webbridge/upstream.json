@@ -1,0 +1,7 @@
+{
+  "source": "kimi",
+  "repo": "https://cdn.kimi.com/webbridge",
+  "install_command": "curl -fsSL https://cdn.kimi.com/webbridge/install.sh | bash",
+  "description": "Kimi WebBridge - AI 控制用户真实浏览器进行网页交互",
+  "last_update": "2026-05-21"
+}
