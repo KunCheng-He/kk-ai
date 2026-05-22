@@ -1,9 +1,0 @@
-{
-  "source": "https://github.com/microsoft/playwright-cli.git",
-  "path": "skills/playwright-cli",
-  "last_update": "2026-05-17",
-  "install_method": "playwright-cli install --skills",
-  "install_location": "~/.config/opencode/skills/playwright-cli/",
-  "cli_package": "@playwright/cli@latest",
-  "notes": "通过 playwright-cli install --skills 安装，skill 直接安装到全局目录，不通过符号链接"
-}

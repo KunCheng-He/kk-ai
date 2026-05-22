@@ -45,10 +45,3 @@ git diff
 }
 ```
 
-## 特殊情况
-
-`playwright-cli` 直接安装到 `~/.config/opencode/skills/`，更新方式：
-
-```bash
-npm install -g @playwright/cli@latest && playwright-cli install --skills
-```

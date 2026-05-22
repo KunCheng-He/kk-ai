@@ -25,7 +25,6 @@ opencode-skills/
 | `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
 | `markdown-to-image` | self-developed | Markdown/代码片段转图片 |
 | `network-proxy` | self-developed | 网络代理配置工具 |
-| `playwright-cli` | [playwright-cli](https://github.com/microsoft/playwright-cli) | 浏览器自动化 CLI |
 | `opencode-project-init` | self-developed | OpenCode 项目初始化工具 |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
@@ -63,7 +62,7 @@ opencode-skills/
 | Agent | 说明 |
 |-------|------|
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（kk-brain） |
-| `ProductResearch.md` | 产品调研 subagent（多源信息收集，webfetch → playwright-cli fallback） |
+| `ProductResearch.md` | 产品调研 subagent（多源信息收集，webfetch → 浏览器自动化 fallback） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
 | `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、drawio 架构图、nano-banana-prompt 提示词生成） |
 

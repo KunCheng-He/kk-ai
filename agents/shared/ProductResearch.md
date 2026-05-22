@@ -44,8 +44,8 @@ temperature: 0.3
   - 下载图片到 `assets/` 目录，使用相对路径引用
 - **信息获取顺序（强制）**：
   1. 先用 `webfetch` 尝试获取页面内容
-  2. 如 webfetch 返回内容为空、解析失败、或页面明显为动态渲染（React/Next.js/Vue）-> **立即使用 `playwright-cli` skill 获取**
-  3. 如 playwright-cli 也失败 -> 尝试替代 URL（移动版、精简版）
+   2. 如 webfetch 返回内容为空、解析失败、或页面明显为动态渲染（React/Next.js/Vue）-> **使用 `kimi-webbridge` skill 获取**
+   3. 如 `kimi-webbridge` 也失败 -> 尝试替代 URL（移动版、精简版）
   4. 如仍失败 -> 跳过该来源，在报告中注明未能访问的来源
 
 ### 3. 收集社区反馈
@@ -62,13 +62,13 @@ temperature: 0.3
 - Reddit: `https://www.reddit.com/search/?q={query}`
 - Bilibili: `https://search.bilibili.com/all?keyword={query}`
 
-**第三层：webfetch 失败后的 playwright-cli fallback（关键）**
-- 当 webfetch 无法获取以下场景时，**必须**调用 `playwright-cli` skill：
+**第三层：webfetch 失败后的浏览器自动化 fallback（关键）**
+- 当 webfetch 无法获取以下场景时，**必须**调用 `kimi-webbridge` skill：
   - 页面返回空内容或仅返回标题
   - 页面为 React/Next.js/Vue 等前端动态渲染
   - 页面需要 JavaScript 执行后才能展示内容
   - 反爬虫机制导致 webfetch 被拦截
-- 调用方式：加载 `playwright-cli` skill，使用其提供的浏览器自动化能力获取页面完整渲染后的内容
+- 调用方式：加载 `kimi-webbridge` skill，使用其提供的浏览器自动化能力获取页面完整渲染后的内容
 - 优先用于：厂商官网、产品详情页、动态定价页、技术文档
 
 **第四层：搜索引擎补充**
@@ -156,12 +156,12 @@ temperature: 0.3
 
 当信息获取受阻时，按以下顺序尝试，**不要直接跳过**：
 
-1. **webfetch 失败时** -> **立即使用 `playwright-cli` skill**
-   - playwright-cli 可执行 JavaScript，能获取动态渲染页面的完整内容
+1. **webfetch 失败时** -> **立即使用 `kimi-webbridge` skill**
+   - kimi-webbridge 可控制真实浏览器，能获取动态渲染页面的完整内容
    - 适用场景：React/Next.js/Vue 官网、需要登录但未完全拦截的页面、懒加载内容
-   - 调用方式：加载 playwright-cli skill，按 skill 指引执行浏览器自动化
+   - 调用方式：加载 kimi-webbridge skill，按 skill 指引执行浏览器自动化
 
-2. **playwright-cli 也失败时** -> 尝试替代 URL
+2. **kimi-webbridge 也失败时** -> 尝试替代 URL
    - 移动版页面（m.example.com）
    - 精简版/旧版页面
    - 搜索引擎缓存版本
