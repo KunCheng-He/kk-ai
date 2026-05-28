@@ -11,9 +11,8 @@ Generate draw.io diagrams as native `.drawio` files. Optionally export to PNG, S
 
 1. **Generate draw.io XML** in mxGraphModel format for the requested diagram
 2. **Write the XML** to a `.drawio` file in the current working directory using the Write tool
-3. **Post-process edge routing** (optional): If `npx @drawio/postprocess` is available, run it on the `.drawio` file to optimize edge routing (simplify waypoints, fix edge-vertex collisions, straighten approach angles). Skip silently if not available — do not install it or ask the user about it
-4. **If the user requested an export format** (png, svg, pdf), locate the draw.io CLI (see below), export with `--embed-diagram`, then delete the source `.drawio` file. If the CLI is not found, keep the `.drawio` file and tell the user they can install the draw.io desktop app to enable export, or open the `.drawio` file directly
-5. **Open the result** — the exported file if exported, or the `.drawio` file otherwise. If the open command fails, print the file path so the user can open it manually
+3. **If the user requested an export format** (png, svg, pdf), locate the draw.io CLI (see below), export with `--embed-diagram`, then delete the source `.drawio` file. If the CLI is not found, keep the `.drawio` file and tell the user they can install the draw.io desktop app to enable export, or open the `.drawio` file directly
+4. **Open the result** — the exported file if exported, or the `.drawio` file otherwise. If the open command fails, print the file path so the user can open it manually
 
 ## Choosing the output format
 
@@ -89,7 +88,7 @@ drawio   # typically on PATH via snap/apt/flatpak
 "C:\Program Files\draw.io\draw.io.exe"
 ```
 
-Use `which drawio` (or `where drawio` on Windows) to check if it's on PATH before falling back to the platform-specific path.
+Use `which drawio` (or `where draw.io` on Windows) to check if it's on PATH before falling back to the platform-specific path.
 
 ### Export command
 
