@@ -10,6 +10,7 @@ from playwright.async_api import Browser, BrowserContext, Page
 
 from zhihu_utils.browser import (
     create_browser_context,
+    create_cdp_context,
     apply_stealth,
     save_auth_state,
     check_login_status,
@@ -68,12 +69,16 @@ async def login_interactive(headless: bool = False) -> Path:
 
 async def ensure_authenticated(
     headless: bool = True,
+    use_cdp: bool = True,
+    cdp_url: str = "http://localhost:9222",
 ) -> tuple[Browser, BrowserContext, Page]:
     """
     确保已认证，如果认证失效则提示重新登录。
 
     Args:
-        headless: 是否使用无头模式。
+        headless: 是否使用无头模式（CDP 模式下忽略）。
+        use_cdp: 是否通过 CDP 连接到已有浏览器，复用其登录状态。默认 True。
+        cdp_url: CDP 调试端点 URL。
 
     Returns:
         (Browser, BrowserContext, Page) 元组。
@@ -81,6 +86,9 @@ async def ensure_authenticated(
     Raises:
         AuthenticationError: 认证失效且无法自动恢复时抛出。
     """
+    if use_cdp:
+        return await _ensure_cdp_connected(cdp_url)
+
     browser, context = await create_browser_context(headless=headless)
     page = await context.new_page()
     await apply_stealth(page)
@@ -111,6 +119,21 @@ async def ensure_authenticated(
     except Exception as e:
         await browser.close()
         raise
+
+
+async def _ensure_cdp_connected(
+    cdp_url: str = "http://localhost:9222",
+) -> tuple[Browser, BrowserContext, Page]:
+    """
+    通过 CDP 连接到已有浏览器，假设用户已登录。
+
+    Args:
+        cdp_url: CDP 调试端点 URL。
+
+    Returns:
+        (Browser, BrowserContext, Page) 元组。
+    """
+    return await create_cdp_context(cdp_url)
 
 
 async def main():

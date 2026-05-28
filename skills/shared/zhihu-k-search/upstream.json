@@ -1,7 +1,7 @@
 {
   "source": "self-developed",
   "path": "",
-  "last_update": "2026-04-18",
+  "last_update": "2026-05-28",
   "tracking_dir": "",
-  "notes": "自己开发的 skill，用于知乎数据搜索"
+  "notes": "自己开发的 skill，用于知乎数据搜索。支持 CDP 连接已有浏览器（默认）和 Launch 独立 Chromium 两种模式。"
 }

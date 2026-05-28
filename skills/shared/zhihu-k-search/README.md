@@ -9,7 +9,7 @@
 - 获取单个回答详情
 - 获取文章详情
 - 支持输出为 JSON 或 Markdown 格式
-- 登录状态持久化
+- 两种浏览器模式：Launch 模式（自启 Chromium + 独立登录）和 CDP 模式（连接已有浏览器复用登录状态）
 
 ## 环境要求
 
@@ -38,8 +38,11 @@ uv run python main.py login
 ### 搜索
 
 ```bash
-# 基本搜索
+# CDP 模式（默认，连接已有浏览器）
 uv run python main.py search "Python"
+
+# Launch 模式（自启 Chromium + 独立登录）
+uv run python main.py search "Python" --no-cdp
 
 # 指定类型和数量
 uv run python main.py search "Python" -t article -l 20
@@ -51,11 +54,33 @@ uv run python main.py search "Python" -o results.json
 ### 获取详情
 
 ```bash
-# 获取问题及回答
+# CDP 模式（默认）
 uv run python main.py detail "https://www.zhihu.com/question/123456"
+
+# Launch 模式
+uv run python main.py detail "https://www.zhihu.com/question/123456" --no-cdp
 
 # 获取文章
 uv run python main.py detail "https://zhuanlan.zhihu.com/p/123456"
+```
+
+### CDP 模式（默认）
+
+连接已有浏览器（Chrome / Brave / Edge 等），复用其登录状态：
+
+```bash
+# 1. 以调试模式启动浏览器（以 Chrome 为例）
+# macOS
+open -a "Google Chrome" --args --remote-debugging-port=9222
+# Linux
+google-chrome --remote-debugging-port=9222
+
+# 2. 直接搜索/获取详情
+uv run python main.py search "Python"
+uv run python main.py detail "https://www.zhihu.com/question/123456"
+
+# 切回 Launch 模式
+uv run python main.py search "Python" --no-cdp
 ```
 
 ## 项目结构
@@ -84,8 +109,10 @@ zhihu-k-search/
 
 - **API 拦截优先**：通过拦截浏览器网络请求获取知乎 API 响应
 - **DOM 提取备用**：当 API 拦截失败时，从页面 DOM 提取数据
-- **反爬虫配置**：使用 playwright-stealth 隐藏自动化特征
-- **状态持久化**：登录状态保存在 `~/.cache/zhihu-k-search/auth.json`
+- **两种浏览器模式**：
+  - Launch 模式：自启 Playwright Chromium + playwright-stealth 反检测
+  - CDP 模式：连接已有浏览器（Brave），复用真实浏览器指纹和登录状态
+- **状态持久化**：Launch 模式下登录状态保存在 `~/.cache/zhihu-k-search/auth.json`
 
 ## 作为 Skill 使用
 

@@ -5,6 +5,7 @@
 """
 
 import json
+import os
 from pathlib import Path
 from playwright.async_api import async_playwright, Browser, BrowserContext, Page
 from playwright_stealth import Stealth
@@ -81,6 +82,41 @@ async def _load_storage_state(context: BrowserContext, state_path: str | Path) -
                     f"localStorage.setItem('{item['name']}', '{item['value']}')"
                 )
             await page.close()
+
+
+async def create_cdp_context(
+    cdp_url: str = "http://localhost:9222",
+) -> tuple[Browser, BrowserContext, Page]:
+    """
+    通过 CDP 连接到已有浏览器实例（如 Brave）。
+
+    无需启动新浏览器、无需维护 auth.json，直接复用已有浏览器的
+    登录状态和 Cookie。
+
+    Args:
+        cdp_url: CDP 调试端点 URL，默认 localhost:9222。
+
+    Returns:
+        (Browser, BrowserContext, Page) 元组。
+    """
+    if "localhost" in cdp_url or "127.0.0.1" in cdp_url:
+        _save = {}
+        for key in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY",
+                     "http_proxy", "https_proxy", "all_proxy"):
+            if key in os.environ:
+                _save[key] = os.environ.pop(key)
+        try:
+            p = await async_playwright().start()
+            browser = await p.chromium.connect_over_cdp(cdp_url)
+        finally:
+            os.environ.update(_save)
+    else:
+        p = await async_playwright().start()
+        browser = await p.chromium.connect_over_cdp(cdp_url)
+
+    context = browser.contexts[0]
+    page = await context.new_page()
+    return browser, context, page
 
 
 async def apply_stealth(page: Page) -> None:

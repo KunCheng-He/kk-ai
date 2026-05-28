@@ -22,7 +22,13 @@ from zhihu_utils.formatters import (
 
 
 async def search_command(
-    query: str, search_type: str, limit: int, output: str | None, save: bool = False
+    query: str,
+    search_type: str,
+    limit: int,
+    output: str | None,
+    save: bool = False,
+    use_cdp: bool = True,
+    cdp_url: str = "http://localhost:9222",
 ):
     """
     执行搜索命令。
@@ -33,9 +39,13 @@ async def search_command(
         limit: 结果数量限制。
         output: 输出文件路径（可选）。
         save: 是否保存结果到缓存目录。
+        use_cdp: 是否通过 CDP 连接已有浏览器。
+        cdp_url: CDP 调试端点 URL。
     """
     try:
-        browser, context, page = await ensure_authenticated(headless=True)
+        browser, context, page = await ensure_authenticated(
+            headless=True, use_cdp=use_cdp, cdp_url=cdp_url
+        )
     except AuthenticationError as e:
         print(f"错误: {e}")
         return
@@ -51,11 +61,25 @@ async def search_command(
             save_search_json(response, output)
 
     finally:
+        if use_cdp:
+            await _close_page_safe(page)
         await browser.close()
 
 
+async def _close_page_safe(page) -> None:
+    try:
+        await page.close()
+    except Exception:
+        pass
+
+
 async def detail_command(
-    url: str, answer_limit: int, output: str | None, save: bool = False
+    url: str,
+    answer_limit: int,
+    output: str | None,
+    save: bool = False,
+    use_cdp: bool = True,
+    cdp_url: str = "http://localhost:9222",
 ):
     """
     执行详情获取命令。
@@ -65,9 +89,13 @@ async def detail_command(
         answer_limit: 获取回答数量（仅问题）。
         output: 输出文件路径（可选）。
         save: 是否保存结果到缓存目录。
+        use_cdp: 是否通过 CDP 连接已有浏览器。
+        cdp_url: CDP 调试端点 URL。
     """
     try:
-        browser, context, page = await ensure_authenticated(headless=True)
+        browser, context, page = await ensure_authenticated(
+            headless=True, use_cdp=use_cdp, cdp_url=cdp_url
+        )
     except AuthenticationError as e:
         print(f"错误: {e}")
         return
@@ -88,6 +116,8 @@ async def detail_command(
             await _handle_article(handler, parsed, output, save)
 
     finally:
+        if use_cdp:
+            await _close_page_safe(page)
         await browser.close()
 
 

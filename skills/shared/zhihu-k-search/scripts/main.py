@@ -21,16 +21,45 @@ async def main():
 
     args = parser.parse_args()
 
+    cdp_url = getattr(args, "cdp_url", "http://localhost:9222")
+
     if args.command == "login":
         await login_command(check=getattr(args, "check", False))
     elif args.command == "search":
         await search_command(
-            args.query, args.type, args.limit, args.output, args.save
+            args.query,
+            args.type,
+            args.limit,
+            args.output,
+            args.save,
+            use_cdp=not args.no_cdp,
+            cdp_url=cdp_url,
         )
     elif args.command == "detail":
-        await detail_command(args.url, args.answer_limit, args.output, args.save)
+        await detail_command(
+            args.url,
+            args.answer_limit,
+            args.output,
+            args.save,
+            use_cdp=not args.no_cdp,
+            cdp_url=cdp_url,
+        )
     else:
         parser.print_help()
+
+
+def _add_cdp_args(subparser) -> None:
+    """为子命令添加 CDP 连接参数。"""
+    subparser.add_argument(
+        "--no-cdp",
+        action="store_true",
+        help="使用 Launch 模式（自启 Chromium），而不是默认的 CDP 模式",
+    )
+    subparser.add_argument(
+        "--cdp-url",
+        default="http://localhost:9222",
+        help="CDP 调试端点 URL（默认: http://localhost:9222）",
+    )
 
 
 def _setup_login_parser(subparsers) -> None:
@@ -57,6 +86,7 @@ def _setup_search_parser(subparsers) -> None:
     search_parser.add_argument(
         "--save", "-s", action="store_true", help="保存结果到 /tmp/zhihu-cache"
     )
+    _add_cdp_args(search_parser)
 
 
 def _setup_detail_parser(subparsers) -> None:
@@ -72,6 +102,7 @@ def _setup_detail_parser(subparsers) -> None:
     detail_parser.add_argument(
         "--save", "-s", action="store_true", help="保存结果到 /tmp/zhihu-cache"
     )
+    _add_cdp_args(detail_parser)
 
 
 if __name__ == "__main__":

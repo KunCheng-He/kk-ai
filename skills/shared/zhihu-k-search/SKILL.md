@@ -10,42 +10,77 @@ description: |
 
 ## 环境准备
 
-首次使用需安装依赖：
+**CDP 模式（默认）**：只需 Python 依赖，无需安装 Chromium：
 
 ```bash
-cd scripts && uv sync && uv run playwright install chromium
+cd scripts && uv sync
+```
+
+**Launch 模式（仅 `--no-cdp` 时）**：额外需要 Chromium，且仅当未安装时才安装：
+
+```bash
+# 检测是否已安装
+uv run playwright install chromium --dry-run 2>&1 | grep -q "already" || uv run playwright install chromium
 ```
 
 ## 工作流程
 
 ### 0. 环境检测与初始化
 
-执行任何操作前，先检测环境是否就绪：
+**默认流程（CDP 模式）**：只需检测 Python 依赖：
 
 ```bash
-ls scripts/.venv 2>/dev/null && ls scripts/.venv/lib/*/site-packages/playwright 2>/dev/null
+ls scripts/.venv 2>/dev/null
 ```
 
-若检测失败（目录不存在），执行自动初始化：
+若检测失败，执行：
 
 ```bash
-cd scripts && uv sync && uv run playwright install chromium
+cd scripts && uv sync
+```
+
+**注意**：CDP 模式下 **绝不安装 Chromium**。只有用户显式使用 `--no-cdp` 切到 Launch 模式时，才检测并安装 Chromium。
+
+**Launch 模式流程**：除 Python 依赖外，还需检测 Chromium 浏览器：
+
+```bash
+uv run python -c "from playwright.sync_api import sync_playwright; p=sync_playwright().start(); print(p.chromium.executable_path); p.stop()" 2>/dev/null
+```
+
+若检测失败（Chromium 未安装），执行：
+
+```bash
+cd scripts && uv run playwright install chromium
+```
+
+### 1. 确保浏览器就绪（CDP 模式）
+
+默认使用 CDP 模式，连接已有浏览器，无需单独登录。
+
+**检测 CDP 端口**：
+
+```bash
+curl --noproxy '*' -s http://localhost:9222/json/version
 ```
 
 **处理策略**：
-- 自动初始化成功 → 继续执行后续步骤
-- 自动初始化失败 → 提示用户手动执行上述命令，等待用户确认完成后再继续
+- CDP 端口就绪 → 直接执行搜索/详情命令
+- CDP 端口未就绪 → 提示用户："需要启动浏览器的远程调试模式。请退出当前浏览器，然后以调试模式重新启动它。" 
+  - 若用户不知道如何操作，询问："你使用的是什么浏览器？（Chrome / Brave / Edge / ...）"
+  - 根据用户回答，给出对应启动命令：
+    - **Chrome**: `open -a "Google Chrome" --args --remote-debugging-port=9222`（macOS）或 `google-chrome --remote-debugging-port=9222`（Linux）
+    - **Brave**: `open -a "Brave Browser" --args --remote-debugging-port=9222`（macOS）
+    - **Edge**: `open -a "Microsoft Edge" --args --remote-debugging-port=9222`（macOS）或 `microsoft-edge --remote-debugging-port=9222`（Linux）
+  - 等待用户确认浏览器已启动后，重新检测端口
+- 无法使用 CDP → 使用 `--no-cdp` 切回 Launch 模式
 
-### 1. 检查并确保登录状态
+### 2. Launch 模式登录（仅 --no-cdp 时需要）
 
-知乎需要登录才能获取完整数据。登录状态存储在 `scripts/auth.json`。
-
-**检测步骤**：
+Launch 模式下需要单独登录知乎。登录状态存储在 `scripts/auth.json`。
 
 ```bash
-# 检查认证文件是否存在
+# 检查认证文件
 ls scripts/auth.json
-
 # 检查认证是否有效
 cd scripts && uv run python main.py login --check
 ```
@@ -62,11 +97,16 @@ cd scripts && uv run python main.py login
 
 浏览器窗口会打开，提示用户在浏览器中完成登录（扫码或账号密码），登录成功后自动保存状态。
 
-### 2. 执行搜索
+### 3. 执行搜索
 
-**直接查看结果（不保存）**：
+**CDP 模式（默认）**：
 ```bash
 cd scripts && uv run python main.py search "关键词" --limit 10
+```
+
+**Launch 模式**：
+```bash
+cd scripts && uv run python main.py search "关键词" --limit 10 --no-cdp
 ```
 
 **保存结果到文件**：
@@ -87,7 +127,18 @@ cd scripts && uv run python main.py search "关键词" -o /path/to/output.json
 
 脚本会拦截知乎 API 响应，返回结构化的搜索结果。
 
-### 3. 获取详情
+### 4. 获取详情
+
+**CDP 模式（默认）**：
+```bash
+# 问题及回答
+cd scripts && uv run python main.py detail "https://www.zhihu.com/question/123456" --answer-limit 5
+```
+
+**Launch 模式**：
+```bash
+cd scripts && uv run python main.py detail "https://www.zhihu.com/question/123456" --no-cdp
+```
 
 **直接查看详情（不保存）**：
 ```bash
@@ -160,6 +211,8 @@ cd scripts && uv run python main.py detail "https://www.zhihu.com/question/12345
 
 ## 注意事项
 
+- **CDP 模式**（默认）：连接到已有浏览器，无需单独登录，日常推荐使用
+- **Launch 模式**（`--no-cdp`）：启动独立 Chromium，需要先执行 `login` 命令保存认证状态
 - 登录状态有时效，失败时重新执行 `login` 命令
 - 内容为 HTML 格式，需转换为 Markdown 展示
 - 仅供个人学习研究使用，遵守知乎用户协议
