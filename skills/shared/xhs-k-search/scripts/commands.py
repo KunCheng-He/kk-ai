@@ -140,8 +140,15 @@ def _print_note_detail(result) -> None:
 
     if note.create_time:
         import datetime as dt
-        t = dt.datetime.fromtimestamp(note.create_time)
-        print(f"\n发布时间: {t.strftime('%Y-%m-%d %H:%M')}")
+        ts = note.create_time
+        if ts > 1000000000000:
+            ts = ts / 1000
+        try:
+            t = dt.datetime.fromtimestamp(ts)
+        except (ValueError, OSError):
+            t = None
+        if t:
+            print(f"\n发布时间: {t.strftime('%Y-%m-%d %H:%M')}")
 
     if result.comment_list:
         print(f"\n热门评论 ({len(result.comment_list)} 条):")
