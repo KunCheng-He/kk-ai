@@ -6,8 +6,9 @@
 
 - **关键词搜索**：搜索小红书关键词，获取帖子列表（标题、作者、互动数据、链接）
 - **帖子详情**：获取帖子的完整正文、图片列表、标签及评论
-- **登录持久化**：扫码登录后状态自动保存，无需重复登录
-- **无头模式**：搜索功能支持无头模式运行
+- **CDP 模式（默认）**：连接已有浏览器，无需安装 Chromium、无需单独登录
+- **Launch 模式**：自启 Chromium，支持登录持久化
+- **结果保存**：支持保存搜索结果和帖子详情到 JSON 文件
 
 ## 技术栈
 
@@ -18,36 +19,80 @@
 
 ## 安装
 
+### CDP 模式（默认，推荐）
+
+只需 Python 依赖，无需安装 Chromium：
+
 ```bash
-cd scripts
-uv sync
-uv run playwright install chromium
+cd scripts && uv sync
+```
+
+### Launch 模式（可选）
+
+额外需要 Chromium 浏览器：
+
+```bash
+cd scripts && uv sync && uv run playwright install chromium
 ```
 
 ## 使用方法
 
-### 登录
+### 前置条件：启动浏览器调试模式（CDP 模式）
+
+CDP 模式需要浏览器以远程调试模式运行：
 
 ```bash
-cd scripts && uv run python main.py --login
+# Chrome
+open -a "Google Chrome" --args --remote-debugging-port=9222
+
+# Brave
+open -a "Brave Browser" --args --remote-debugging-port=9222
+
+# Edge
+open -a "Microsoft Edge" --args --remote-debugging-port=9222
+```
+
+检测 CDP 端口是否就绪：
+
+```bash
+curl --noproxy '*' -s http://localhost:9222/json/version
+```
+
+### 登录（仅 Launch 模式需要）
+
+```bash
+cd scripts && uv run python main.py login
 ```
 
 打开浏览器窗口，完成扫码登录。登录状态保存到 `~/.cache/xhs-k-search/auth.json`。
 
+CDP 模式直接复用已有浏览器的登录状态，无需此步骤。
+
 ### 搜索
 
 ```bash
-# 无头模式
-cd scripts && uv run python main.py --keyword "Python" --headless
+# CDP 模式（默认）
+cd scripts && uv run python main.py search "Python" --limit 20
 
-# 有头模式
-cd scripts && uv run python main.py --keyword "Python"
+# Launch 模式
+cd scripts && uv run python main.py search "Python" --limit 20 --no-cdp
+
+# 保存结果
+cd scripts && uv run python main.py search "Python" --save
+cd scripts && uv run python main.py search "Python" -o /path/to/output.json
 ```
 
 ### 获取帖子详情
 
 ```bash
-cd scripts && uv run python main.py --note-id <帖子ID> --xsec-token <token>
+# CDP 模式（默认）
+cd scripts && uv run python main.py detail "帖子ID" --xsec-token "token值"
+
+# Launch 模式
+cd scripts && uv run python main.py detail "帖子ID" --xsec-token "token值" --no-cdp
+
+# 保存结果
+cd scripts && uv run python main.py detail "帖子ID" --save
 ```
 
 > 帖子详情功能因反爬限制，强制使用有头模式。
@@ -57,14 +102,18 @@ cd scripts && uv run python main.py --note-id <帖子ID> --xsec-token <token>
 ```
 xhs-k-search/
 ├── SKILL.md              # SKILL 定义文件
+├── README.md             # 项目说明
+├── AGENTS.md             # AI Agent 开发指南
+├── upstream.json         # 上游信息
 ├── references/           # 参考文档
 │   └── data-models.md    # 数据结构说明
 └── scripts/              # 脚本目录
-    ├── main.py           # 入口脚本
-    ├── login_helper.py   # 登录助手
     ├── pyproject.toml    # 依赖配置
+    ├── main.py           # CLI 入口（子命令式）
+    ├── commands.py       # 命令实现
+    ├── login_helper.py   # 认证管理
     └── xhs_utils/        # 核心模块
-        ├── browser.py    # 浏览器管理
+        ├── browser.py    # 浏览器管理（CDP/Launch）
         ├── api_handler.py # API 拦截与解析
         └── data_models.py # 数据模型
 ```
@@ -77,6 +126,13 @@ xhs-k-search/
 - 搜索小红书关键词
 - 获取某篇帖子的详细内容和评论
 - 进行产品调研或竞品分析
+
+## 运行模式
+
+| 模式 | 命令 | Chromium | 登录 | 适用场景 |
+|------|------|----------|------|----------|
+| CDP（默认） | 无额外参数 | 不需要 | 不需要 | 日常使用 |
+| Launch | `--no-cdp` | 需要 | 需要先 login | CDP 不可用时 |
 
 ---
 

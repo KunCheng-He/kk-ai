@@ -1,7 +1,7 @@
 {
   "source": "self-developed",
   "path": "",
-  "last_update": "2026-04-18",
+  "last_update": "2026-05-28",
   "tracking_dir": "",
-  "notes": "自己开发的 skill，用于小红书数据搜索"
+  "notes": "自己开发的 skill，用于小红书数据搜索。已支持 CDP 模式（默认）和 Launch 模式（--no-cdp）"
 }

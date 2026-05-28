@@ -8,122 +8,157 @@ description: |
 
 通过 Playwright 浏览器自动化获取小红书数据，支持关键词搜索和帖子详情获取。
 
-## 环境要求
+## 环境准备
 
-- Python 3.10+
-- uv 包管理器
-- Chromium 浏览器
-
-首次使用前需安装依赖：
+**CDP 模式（默认）**：只需 Python 依赖，无需安装 Chromium：
 
 ```bash
-cd scripts && uv sync && uv run playwright install chromium
+cd scripts && uv sync
+```
+
+**Launch 模式（仅 `--no-cdp` 时）**：额外需要 Chromium，且仅当未安装时才安装：
+
+```bash
+# 检测是否已安装
+uv run playwright install chromium --dry-run 2>&1 | grep -q "already" || uv run playwright install chromium
 ```
 
 ## 工作流程
 
 ### 0. 环境检测与初始化
 
-执行任何操作前，先检测环境是否就绪：
+**默认流程（CDP 模式）**：只需检测 Python 依赖：
 
 ```bash
-ls scripts/.venv 2>/dev/null && ls scripts/.venv/lib/*/site-packages/playwright 2>/dev/null
+ls scripts/.venv 2>/dev/null
 ```
 
-若检测失败（目录不存在），执行自动初始化：
+若检测失败，执行：
 
 ```bash
-cd scripts && uv sync && uv run playwright install chromium
+cd scripts && uv sync
+```
+
+**注意**：CDP 模式下 **绝不安装 Chromium**。只有用户显式使用 `--no-cdp` 切到 Launch 模式时，才检测并安装 Chromium。
+
+**Launch 模式流程**：除 Python 依赖外，还需检测 Chromium 浏览器：
+
+```bash
+uv run python -c "from playwright.sync_api import sync_playwright; p=sync_playwright().start(); print(p.chromium.executable_path); p.stop()" 2>/dev/null
+```
+
+若检测失败（Chromium 未安装），执行：
+
+```bash
+cd scripts && uv run playwright install chromium
+```
+
+### 1. 确保浏览器就绪（CDP 模式）
+
+默认使用 CDP 模式，连接已有浏览器，无需单独登录。
+
+**检测 CDP 端口**：
+
+```bash
+curl --noproxy '*' -s http://localhost:9222/json/version
 ```
 
 **处理策略**：
-- 自动初始化成功 → 继续执行后续步骤
-- 自动初始化失败 → 提示用户手动执行上述命令，等待用户确认完成后再继续
+- CDP 端口就绪 → 直接执行搜索/详情命令
+- CDP 端口未就绪 → 提示用户："需要启动浏览器的远程调试模式。请退出当前浏览器，然后以调试模式重新启动它。" 
+  - 若用户不知道如何操作，询问："你使用的是什么浏览器？（Chrome / Brave / Edge / ...）"
+  - 根据用户回答，给出对应启动命令：
+    - **Chrome**: `open -a "Google Chrome" --args --remote-debugging-port=9222`（macOS）或 `google-chrome --remote-debugging-port=9222`（Linux）
+    - **Brave**: `open -a "Brave Browser" --args --remote-debugging-port=9222`（macOS）
+    - **Edge**: `open -a "Microsoft Edge" --args --remote-debugging-port=9222`（macOS）或 `microsoft-edge --remote-debugging-port=9222`（Linux）
+  - 等待用户确认浏览器已启动后，重新检测端口
+- 无法使用 CDP → 使用 `--no-cdp` 切回 Launch 模式
 
-### 1. 检查并确保登录状态
+### 2. Launch 模式登录（仅 --no-cdp 时需要）
 
-小红书需要登录才能获取数据。登录状态存储在 `scripts/auth.json`。
-
-**检测步骤**：
+Launch 模式下需要单独登录小红书。登录状态存储在 `scripts/auth.json`。
 
 ```bash
-# 检查认证文件是否存在
+# 检查认证文件
 ls scripts/auth.json
+# 检查认证是否有效
+cd scripts && uv run python main.py login --check
 ```
 
 **处理策略**：
 - 认证文件不存在 → 提示用户"需要完成小红书登录认证"，然后执行登录命令
-- 认证已失效（执行操作时检测到未登录）→ 提示用户"认证已失效，需要重新登录"，然后执行登录命令
+- 认证已失效 → 提示用户"认证已失效，需要重新登录"，然后执行登录命令
 
 **登录命令**：
 
 ```bash
-cd scripts && uv run python main.py --login
+cd scripts && uv run python main.py login
 ```
 
-浏览器窗口会打开，提示用户在浏览器中完成登录，登录成功后按回车保存状态。
+浏览器窗口会打开，提示用户在浏览器中完成登录（扫码或账号密码），登录成功后自动保存状态。
 
-## 核心功能
+### 3. 执行搜索
 
-### 1. 关键词搜索
-
-搜索小红书帖子，返回帖子列表（标题、作者、互动数据等）。
-
+**CDP 模式（默认）**：
 ```bash
-cd scripts && uv run python main.py --keyword "搜索关键词" --headless
+cd scripts && uv run python main.py search "关键词" --limit 20
 ```
 
-**分页说明**：当前版本通过自动滚动加载更多结果，返回结果中的 `has_more` 字段指示是否有更多数据。如需更多结果，可多次执行搜索命令。
-
-### 2. 帖子详情与评论
-
-获取指定帖子的正文、图片、标签及评论列表。
-
+**Launch 模式**：
 ```bash
-cd scripts && uv run python main.py --note-id <帖子ID> --xsec-token <token>
+cd scripts && uv run python main.py search "关键词" --limit 20 --no-cdp
 ```
 
-**注意**：帖子详情功能不支持无头模式（反爬限制），会自动弹出浏览器窗口。
-
-### 3. 登录管理
-
+**保存结果到文件**：
 ```bash
-cd scripts && uv run python main.py --login
+# 保存到 /tmp/xhs-cache/（自动命名）
+cd scripts && uv run python main.py search "关键词" --save
+
+# 保存到指定路径
+cd scripts && uv run python main.py search "关键词" -o /path/to/output.json
 ```
 
-## 工作流程
+**参数说明**：
+- `keyword`: 搜索关键词（必需）
+- `--limit, -l`: 返回数量，默认 20
+- `--save, -s`: 保存结果到 `/tmp/xhs-cache/`（自动命名）
+- `--output, -o`: 指定输出文件路径（JSON）
 
-### 场景一：关键词调研
+### 4. 获取详情
 
-用户想了解某话题在小红书上的讨论情况：
+**CDP 模式（默认）**：
+```bash
+cd scripts && uv run python main.py detail "帖子ID" --xsec-token "token值"
+```
 
-1. 执行搜索命令获取帖子列表
-2. 解析 JSON 结果，提取关键信息
-3. 按互动数据（点赞、评论、收藏）排序筛选热门帖子
-4. 汇总呈现：标题、作者、互动数据、链接
+**Launch 模式**：
+```bash
+cd scripts && uv run python main.py detail "帖子ID" --xsec-token "token值" --no-cdp
+```
 
-### 场景二：深度分析
+**仅传入帖子 ID（无 xsec_token）**：
+```bash
+cd scripts && uv run python main.py detail "帖子ID"
+```
 
-用户需要深入了解某篇帖子：
+**保存详情到文件**：
+```bash
+# 保存到 /tmp/xhs-cache/（自动命名）
+cd scripts && uv run python main.py detail "帖子ID" --save
 
-1. 从搜索结果中获取 `note_id` 和 `xsec_token`
-2. 执行详情命令获取完整内容
-3. 提取正文、标签、热门评论
-4. 整理成结构化报告
+# 保存到指定路径
+cd scripts && uv run python main.py detail "帖子ID" -o /path/to/output.json
+```
 
-### 场景三：产品/竞品调研
-
-用户需要收集某产品的用户反馈：
-
-1. 搜索产品名称或相关关键词
-2. 筛选高互动帖子
-3. 逐个获取帖子详情和评论
-4. 提取用户评价、痛点、建议
-5. 生成调研摘要
+**参数**：
+- `note_id`: 帖子 ID（必需）
+- `--xsec-token`: 帖子 xsec_token
+- `--save, -s`: 保存结果到 `/tmp/xhs-cache/`（JSON 格式）
+- `--output, -o`: 指定输出文件路径（JSON）
 
 ## 数据结构
 
-### 搜索结果 (SearchResult)
+### SearchResult（搜索结果）
 
 | 字段 | 说明 |
 |------|------|
@@ -131,7 +166,7 @@ cd scripts && uv run python main.py --login
 | total | 总数 |
 | has_more | 是否有更多 |
 
-### 帖子摘要 (Note)
+### Note（帖子摘要）
 
 | 字段 | 说明 |
 |------|------|
@@ -145,7 +180,7 @@ cd scripts && uv run python main.py --login
 | collect_count | 收藏数 |
 | url | 帖子链接 |
 
-### 帖子详情 (NoteDetail)
+### NoteDetail（帖子详情）
 
 | 字段 | 说明 |
 |------|------|
@@ -154,7 +189,7 @@ cd scripts && uv run python main.py --login
 | tag_list | 标签列表 |
 | create_time | 创建时间戳 |
 
-### 评论 (Comment)
+### Comment（评论）
 
 | 字段 | 说明 |
 |------|------|
@@ -165,55 +200,19 @@ cd scripts && uv run python main.py --login
 
 完整数据模型见 `references/data-models.md`。
 
-## 输出规范
+## 输出处理
 
-### 搜索结果输出格式
+调用脚本后，解析输出并整理：
 
-```
-## 搜索结果：{关键词}
-
-共找到 {total} 篇相关帖子，以下为热门内容：
-
-| 标题 | 作者 | 点赞 | 评论 | 收藏 |
-|------|------|------|------|------|
-| ... | ... | ... | ... | ... |
-
-[帖子标题](帖子链接)
-```
-
-### 帖子详情输出格式
-
-```
-## 帖子详情：{标题}
-
-**作者**：{昵称}
-**发布时间**：{时间}
-**标签**：{标签列表}
-
-### 正文
-{正文内容}
-
-### 互动数据
-- 点赞：{liked_count}
-- 评论：{comment_count}
-- 收藏：{collect_count}
-
-### 热门评论
-1. {评论内容} - {昵称} ({点赞数}赞)
-```
-
-## 错误处理
-
-| 问题 | 解决方案 |
-|------|----------|
-| 登录过期 | 执行 `--login` 重新登录 |
-| 网络超时 | 检查网络连接，必要时配置代理 |
-| 帖子不存在 | 确认 note_id 正确，帖子可能已删除 |
-| 反爬限制 | 帖子详情必须使用有头模式，避免频繁请求 |
+1. **搜索结果**：汇总标题、作者、互动数据、链接
+2. **帖子详情**：展示正文、标签、互动数据、图片
+3. **评论分析**：整理热门评论和用户反馈
 
 ## 注意事项
 
-- 登录状态有效期有限，定期检查 `scripts/auth.json`
-- 帖子详情功能强制有头模式
-- 遵守小红书用户协议，仅供个人学习研究使用
-- 避免高频请求，建议间隔 2-3 秒
+- **CDP 模式**（默认）：连接到已有浏览器，无需单独登录，日常推荐使用
+- **Launch 模式**（`--no-cdp`）：启动独立 Chromium，需要先执行 `login` 命令保存认证状态
+- CDP 模式下帖子详情会自动弹出浏览器窗口（反爬限制），这是正常现象
+- 登录状态有时效，Launch 模式下失效时重新执行 `login` 命令
+- 帖子详情功能不支持无头模式，Launch 模式下会自动使用有头模式
+- 仅供个人学习研究使用，遵守小红书用户协议

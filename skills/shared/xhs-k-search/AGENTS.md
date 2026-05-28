@@ -6,6 +6,8 @@
 
 本项目是一个小红书搜索脚本，通过浏览器自动化技术（Playwright）模拟用户行为，获取搜索结果、帖子内容及评论数据。项目已封装为 OpenCode Skill (`xhs-k-research`)，可供 AI Agent 直接调用。
 
+**项目状态：已完成开发，可投入使用。**
+
 **技术栈**：
 - Python 3.10+
 - 包管理：`uv`
@@ -30,12 +32,13 @@ xhs-k-search/
 │   └── data-models.md       # 数据模型定义
 └── scripts/                 # 主要代码目录（所有代码在此）
     ├── pyproject.toml       # 项目依赖配置
-    ├── main.py              # CLI 入口
-    ├── login_helper.py      # 登录逻辑
+    ├── main.py              # CLI 入口（子命令式：login/search/detail）
+    ├── commands.py           # 命令实现（搜索/详情/登录业务逻辑）
+    ├── login_helper.py      # 认证管理（CDP/Launch 双模式）
     └── xhs_utils/           # 核心业务逻辑模块
         ├── __init__.py
-        ├── browser.py       # Playwright 启动与反爬配置
-        ├── api_handler.py   # API 请求处理
+        ├── browser.py       # Playwright 启动、CDP 连接与反爬配置
+        ├── api_handler.py   # API 请求拦截与解析
         └── data_models.py   # Pydantic 数据模型
 ```
 
@@ -43,28 +46,31 @@ xhs-k-search/
 
 ### 环境设置
 
+**CDP 模式（默认）**：只需 Python 依赖，无需安装 Chromium：
+
 ```bash
-# 进入项目目录
-cd scripts
+cd scripts && uv sync
+```
 
-# 安装依赖
-uv sync
+**Launch 模式（仅 `--no-cdp` 时）**：额外需要 Chromium：
 
-# 安装 Playwright 浏览器
-uv run playwright install chromium
+```bash
+cd scripts && uv sync && uv run playwright install chromium
 ```
 
 ### 运行脚本
 
 ```bash
-# 登录
-uv run python main.py --login
+# CDP 模式（默认）- 连接已有浏览器
+cd scripts && uv run python main.py search "搜索关键词" --limit 20
+cd scripts && uv run python main.py detail "帖子ID" --xsec-token "token值"
 
-# 搜索
-uv run python main.py --keyword "搜索关键词" --headless
+# Launch 模式 - 自启 Chromium
+cd scripts && uv run python main.py search "搜索关键词" --limit 20 --no-cdp
+cd scripts && uv run python main.py detail "帖子ID" --xsec-token "token值" --no-cdp
 
-# 获取帖子详情
-uv run python main.py --note-id <帖子ID> --xsec-token <token>
+# 登录（Launch 模式需要）
+cd scripts && uv run python main.py login
 ```
 
 ## 代码风格指南
@@ -82,7 +88,7 @@ from playwright.async_api import BrowserContext, Page
 from pydantic import BaseModel
 
 # 本地模块导入
-from xhs_utils.browser import XHSBrowser
+from xhs_utils.browser import XHSBrowser, create_cdp_context
 from xhs_utils.data_models import SearchResult, Note
 ```
 
@@ -107,18 +113,29 @@ def get_note_detail(note_id: str, xsec_token: str | None = None) -> NoteDetailWi
 | 模块/包 | snake_case | `api_handler.py` |
 | 函数 | snake_case | `get_search_results()` |
 | 类名 | PascalCase | `XHSBrowser`, `SearchResult` |
-| 常量 | UPPER_SNAKE_CASE | `DEFAULT_TIMEOUT` |
+| 常量 | UPPER_SNAKE_CASE | `CDP_URL`, `DEFAULT_TIMEOUT` |
 
 ## 敏感信息处理
 
-- 认证状态存储在 `~/.cache/xhs-k-search/auth.json`
+- 认证状态存储在 `~/.cache/xhs-k-search/auth.json`（仅 Launch 模式使用）
+- CDP 模式无需认证文件，直接复用用户浏览器的登录状态
 - 不要在代码中硬编码任何凭证
 - 使用环境变量或配置文件管理敏感信息
 
 ## 注意事项
 
-1. **身份认证**：首次运行需要手动登录，登录状态保存在 `~/.cache/xhs-k-search/auth.json`
-2. **反爬策略**：使用 `playwright-stealth` 隐藏自动化特征
-3. **API 优先**：优先拦截 API 响应获取数据，DOM 提取作为备用方案
-4. **无头模式**：搜索支持无头模式，帖子详情强制有头模式（反爬限制）
-5. **分页支持**：当前版本通过滚动加载更多结果，`has_more` 字段指示是否有更多数据
+1. **CDP 模式（默认）**：连接到已有浏览器，复用其登录状态，无需安装 Chromium，日常推荐使用
+2. **Launch 模式（`--no-cdp`）**：自启 Chromium，需要先执行 `login` 保存认证状态
+3. **反爬策略**：使用 `playwright-stealth` 隐藏自动化特征
+4. **API 优先**：优先拦截 API 响应获取数据，DOM 提取作为备用方案
+5. **无头模式**：搜索支持无头模式，帖子详情强制有头模式（反爬限制）。CDP 模式下浏览器本身是有头的
+6. **分页支持**：当前版本通过滚动加载更多结果，`has_more` 字段指示是否有更多数据
+
+## Skill 使用
+
+项目已封装为 OpenCode Skill，详细使用说明请参考 `SKILL.md`。
+
+**快速使用**：
+1. 将本项目目录添加到 OpenCode 的 skills 配置
+2. Skill 名称：`xhs-k-research`
+3. 触发关键词：小红书、xhs、小红书搜索、小红书帖子等
