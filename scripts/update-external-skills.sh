@@ -17,6 +17,13 @@ find "$SKILLS_ROOT/skills" -name "upstream.json" | while read upstream_file; do
   source_url=$(jq -r '.source' "$upstream_file")
   source_path=$(jq -r '.path' "$upstream_file")
   tracking_dir=$(jq -r '.tracking_dir' "$upstream_file")
+  update_method=$(jq -r '.update_method // "auto"' "$upstream_file")
+  
+  # 跳过手动更新的 skill
+  if [ "$update_method" = "manual" ]; then
+    echo "⏭️  跳过 $skill_name (手动更新)"
+    continue
+  fi
   
   # 跳过来源未知的 skill
   if [ "$source_url" = "unknown" ] || [ -z "$tracking_dir" ]; then

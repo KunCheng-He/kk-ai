@@ -1,0 +1,10 @@
+{
+  "source": "playwright",
+  "repo_url": "https://www.npmjs.com/package/@playwright/cli",
+  "install_command": "npm install -g @playwright/cli@latest",
+  "update_method": "manual",
+  "description": "Playwright CLI - 浏览器自动化交互工具，通过命令行控制浏览器，支持截图、表单填写、多标签页等操作",
+  "created_at": "2026-05-28",
+  "last_update": "2026-05-28",
+  "notes": "通过 npm 全局安装，手动执行 npm install -g @playwright/cli@latest 更新。不走 GitHub 追踪更新流程。"
+}

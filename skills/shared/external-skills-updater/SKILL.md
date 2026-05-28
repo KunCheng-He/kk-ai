@@ -36,12 +36,27 @@ git diff
 
 ## upstream.json 格式
 
+### 自动更新（外部 GitHub 仓库追踪）
+
 ```json
 {
   "source": "https://github.com/xxx/repo.git",
   "path": "skills/xxx-skill",
   "last_update": "2026-04-28",
   "tracking_dir": "~/Code/GitHub-Skills/common/xxx"
+}
+```
+
+### 手动更新
+
+对于通过 npm、pip 等包管理器安装的 skill，设置 `"update_method": "manual"` 以跳过自动更新：
+
+```json
+{
+  "source": "npm",
+  "update_method": "manual",
+  "install_command": "npm install -g @xxx/cli@latest",
+  "last_update": "2026-05-28"
 }
 ```
 
