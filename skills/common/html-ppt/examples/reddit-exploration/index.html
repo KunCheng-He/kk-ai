@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="tokyo-night">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reddit Exploration · AI & Hot Topics May 2026</title>
+<link rel="stylesheet" href="../../assets/fonts.css">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../assets/themes/tokyo-night.css">
+<link rel="stylesheet" href="../../assets/animations/animations.css">
+<style>
+  :root{
+    --mono:'JetBrains Mono','SF Mono','Fira Code',monospace;
+    --accent:#7dcfff;--accent-2:#bb9af7;--accent-3:#f7768e;--grad:linear-gradient(135deg,#7dcfff 0%,#bb9af7 50%,#f7768e 100%);
+  }
+  .h1{font-size:72px;line-height:1.05;font-weight:800;letter-spacing:-.03em}
+  .h2{font-size:48px;font-weight:700;letter-spacing:-.02em}
+  .h3{font-size:28px;font-weight:600}
+  .kicker{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.02em}
+  .kicker::before{content:">> "}
+  .mono{font-family:var(--mono)}
+  .lede{color:var(--text-2);font-size:18px;line-height:1.6}
+  .dim{color:var(--text-3);font-size:15px;line-height:1.6}
+  .gradient-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .slide{padding:56px 80px}
+
+  /* cards */
+  .card{border-radius:16px;padding:22px 26px;border:1px solid var(--border);background:var(--surface)}
+  .card-accent{border-left:4px solid var(--accent)}
+  .card-purple{border-left:4px solid var(--accent-2)}
+  .card-red{border-left:4px solid var(--accent-3)}
+  .card-glow{box-shadow:0 8px 32px rgba(125,207,255,.08)}
+  .card h4{font-size:18px;margin-bottom:8px;line-height:1.35}
+
+  /* tags */
+  .tag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2)}
+  .tag-hot{background:rgba(247,118,142,.15);color:var(--accent-3);border-color:rgba(247,118,142,.3)}
+  .tag-ai{background:rgba(125,207,255,.15);color:var(--accent);border-color:rgba(125,207,255,.3)}
+  .tag-purple{background:rgba(187,154,247,.15);color:var(--accent-2);border-color:rgba(187,154,247,.3)}
+  .tag-gold{background:rgba(224,175,104,.15);color:#e0af68;border-color:rgba(224,175,104,.3)}
+
+  /* topic row */
+  .topic-row{display:flex;align-items:baseline;gap:18px;padding:14px 0;border-bottom:1px dashed var(--border)}
+  .topic-row .num{color:var(--accent);font-family:var(--mono);flex:none;width:40px;font-size:15px}
+  .topic-row .t{flex:1;font-size:17px;font-weight:600;line-height:1.4}
+  .topic-row .meta{color:var(--text-3);font-size:12px;font-family:var(--mono);white-space:nowrap}
+  .topic-row .sub{color:var(--accent-2);font-size:12px;font-family:var(--mono);white-space:nowrap;min-width:140px;text-align:right}
+
+  .speaker-row{display:flex;align-items:center;gap:14px;margin-top:28px}
+  .speaker-av{width:48px;height:48px;border-radius:50%;background:var(--grad)}
+  .speaker-row b{display:block;color:var(--text-1);font-size:17px}
+  .speaker-row span{color:var(--text-3);font-size:12px;font-family:var(--mono)}
+
+  /* stat pill */
+  .stat-pill{display:inline-flex;align-items:baseline;gap:8px;padding:6px 16px;border-radius:100px;background:var(--surface-2);border:1px solid var(--border)}
+  .stat-pill .n{font-size:28px;font-weight:800;color:var(--accent);line-height:1}
+  .stat-pill .l{font-size:13px;color:var(--text-2)}
+
+  /* key-number */
+  .key-num{font-size:44px;font-weight:900;line-height:1;color:var(--accent);margin-bottom:6px;min-width:52px}
+
+  /* grid */
+  .grid.g2.gap-m{gap:20px}
+  .grid.g3.gap-m{gap:18px}
+
+  /* big quote */
+  .big-quote{font-size:22px;font-style:italic;color:var(--text-2);line-height:1.5;padding:20px 0;border-left:3px solid var(--accent);padding-left:20px;margin:12px 0}
+
+  /* subreddit chip */
+  .sub-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:13px;background:var(--surface-2);border:1px solid var(--border);font-family:var(--mono)}
+</style>
+</head>
+<body data-themes="tokyo-night,dracula,catppuccin-mocha,nord,gruvbox-dark,rose-pine,engineering-whiteprint" data-theme-base="../../assets/themes/">
+<div class="deck">
+
+  <!-- ===== 1. COVER ===== -->
+  <section class="slide" data-title="Cover">
+    <p class="kicker">reddit exploration · 2026-05-29</p>
+    <h1 class="h1 anim-fade-up" data-anim="fade-up">Reddit 探索报告<br><span class="gradient-text">AI 浪潮与全球热点</span></h1>
+    <p class="lede mt-m">通过 CDP 连接 Brave，深度遍历 r/artificial · r/MachineLearning · r/singularity<br>r/technology · r/LocalLLaMA · r/ChatGPT · r/popular · 个性化首页</p>
+    <div class="speaker-row">
+      <div class="speaker-av"></div>
+      <div><b>@OpenCode AI Agent</b><span>playwright-cli + Brave CDP · 8+ 子版块 · 50+ 帖子</span></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:24px">
+      <span class="sub-chip">r/artificial</span><span class="sub-chip">r/singularity</span><span class="sub-chip">r/MachineLearning</span>
+      <span class="sub-chip">r/LocalLLaMA</span><span class="sub-chip">r/technology</span><span class="sub-chip">r/ChatGPT</span>
+    </div>
+    <div class="deck-footer"><span class="mono">#ai #reddit #trending #anthropic #openai #meta</span><span class="slide-number" data-current="1" data-total="13"></span></div>
+  </section>
+
+  <!-- ===== 2. EXPLORATION MAP ===== -->
+  <section class="slide" data-title="探索地图">
+    <p class="kicker">exploration.coverage</p>
+    <h2 class="h2">探索覆盖 <span class="gradient-text">8+ 子版块</span></h2>
+    <div class="grid g3 mt-l anim-stagger-list" data-anim-target>
+      <div class="card card-accent card-glow"><h4>r/artificial</h4><p class="dim">36万周访客 · AI 综合讨论社区<br>本周 TOP: 微软砍 Anthropic 授权、Uber 削减 AI 预算</p><span class="tag tag-ai mt-s">5,312 周贡献</span></div>
+      <div class="card card-accent card-glow"><h4>r/singularity</h4><p class="dim">技术奇点论社区 · AGI 话题<br>TOP: Anthropic $900B 超越 OpenAI、动画已解决</p><span class="tag tag-purple mt-s">未来主义者聚集地</span></div>
+      <div class="card card-accent card-glow"><h4>r/MachineLearning</h4><p class="dim">学术向 ML 研究 · 论文讨论<br>arXiv 1年禁令、AI CUDA kernel bug、LLM 置信度</p><span class="tag mt-s">Research · Papers</span></div>
+      <div class="card card-accent"><h4>r/LocalLLaMA</h4><p class="dim">73万成员 · 本地模型部署<br>Meta 起诉 Heretic、StepFun 3.7 Flash 发布</p><span class="tag tag-purple mt-s">开源 · 本地部署</span></div>
+      <div class="card card-accent"><h4>r/technology</h4><p class="dim">科技新闻聚合 · 主流视角<br>Blue Origin 爆炸确认、牙齿再生药丸、Claude Mythos</p><span class="tag tag-hot mt-s">主流科技媒体</span></div>
+      <div class="card card-accent"><h4>r/popular + Home</h4><p class="dim">Reddit 全站热门 + 个性化推荐<br>全球热点 + 区域内容（新加坡/香港）</p><span class="tag mt-s">Global + Regional</span></div>
+    </div>
+  </section>
+
+  <!-- ===== 3. ANTHROPIC MEGA-HEADLINE ===== -->
+  <section class="slide" data-title="Anthropic 超越 OpenAI">
+    <p class="kicker">r/singularity · breaking-news</p>
+    <h2 class="h2">本周最大新闻<br><span class="gradient-text">Anthropic $900B 登顶 AI 之王</span></h2>
+    <div class="grid g2 mt-l" style="align-items:start;gap:28px">
+      <div>
+        <div class="stat-pill" style="margin-bottom:16px"><span class="n">$900B</span><span class="l">估值</span></div>
+        <p class="lede">Anthropic 正式超越 OpenAI，成为全球最有价值的 AI 初创公司。与此同时发布了 <span class="mono" style="color:var(--accent)">Claude Opus 4.8</span> 新模型。</p>
+        <div class="big-quote">"Animation is solved. This is like Pixar level quality."<br>— r/singularity 对 AI 动画生成的评价</div>
+        <div class="stack" style="gap:8px">
+          <div class="tag tag-ai">Claude Opus 4.8 已发布</div>
+          <div class="tag tag-hot">"Most Dangerous AI" Claude Mythos 即将公开</div>
+        </div>
+      </div>
+      <div>
+        <div class="card card-purple" style="margin-bottom:16px">
+          <h4>Claude Mythos</h4>
+          <p class="dim">r/technology 报道: Anthropic 最危险的 AI 系统 Claude Mythos 即将向公众开放。社区对 AI 安全边界的讨论再度升温。</p>
+        </div>
+        <div class="card card-accent">
+          <h4>Simulated Society 实验</h4>
+          <p class="dim">Emergence AI 用 Claude、Gemini、Grok、GPT 同时运行了一个为期 2 周的模拟社会——"结果令人不安"。</p>
+          <span class="tag tag-hot mt-s">r/singularity · 高风险实验</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 4. AI BUSINESS WAR ===== -->
+  <section class="slide" data-title="AI 商业大战">
+    <p class="kicker">r/artificial · business-economics</p>
+    <h2 class="h2">AI 经济的 <span class="gradient-text">三重悖论</span></h2>
+    <div class="grid g2 mt-l" style="gap:22px;align-items:start">
+      <div class="card card-accent card-glow" style="padding:26px 30px">
+        <h4>微软砍掉内部 Anthropic 授权</h4>
+        <p class="dim">从年度定价转向 Token 计费后，微软的 AI 预算在 <strong>几个月内就被消耗殆尽</strong>，被迫取消内部团队的 Anthropic 使用许可。</p>
+        <div class="row" style="gap:8px;margin-top:10px"><span class="tag tag-hot">预算爆炸</span><span class="tag">Token-based billing</span></div>
+      </div>
+      <div class="card card-accent card-glow" style="padding:26px 30px">
+        <h4>微软数据：用 AI 比雇人更贵</h4>
+        <p class="dim">Microsoft 内部数据显示，在很多场景下使用 AI 的成本 <strong>高于直接雇佣人类员工</strong>。这一发现正在动摇"AI 降本论"。</p>
+        <div class="row" style="gap:8px;margin-top:10px"><span class="tag tag-hot">成本争议</span><span class="tag">AI > Human cost</span></div>
+      </div>
+      <div class="card card-accent card-glow" style="padding:26px 30px">
+        <h4>Uber COO：AI tokenmaxxing 越来越难以 justify</h4>
+        <p class="dim">Uber 首席运营官公开表示：<strong>在 AI token 上的巨额花费越来越难以向董事会交代</strong>。大公司开始重新评估 AI 投资回报率。</p>
+        <div class="row" style="gap:8px;margin-top:10px"><span class="tag tag-ai">ROI 危机</span><span class="tag">Uber · COO statement</span></div>
+      </div>
+      <div class="card card-red" style="padding:26px 30px">
+        <h4>"一场巨大的崩盘正在酝酿"</h4>
+        <p class="dim">619 条评论的社区热议贴。当 AI 成本高于预期、ROI 存疑、投资泡沫膨胀时，<strong>崩盘是否不可避免？</strong></p>
+        <div class="row" style="gap:8px;margin-top:10px"><span class="tag tag-hot">619 💬 本周最热</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 5. AI SAFETY & SECURITY ===== -->
+  <section class="slide" data-title="AI 安全危机">
+    <p class="kicker">r/artificial · r/MachineLearning · security</p>
+    <h2 class="h2">AI 安全：<span class="gradient-text">红灯闪烁</span></h2>
+    <div class="grid g2 mt-l" style="gap:22px;align-items:start">
+      <div class="card card-red" style="padding:26px 30px">
+        <h4>🚨 OpenClaw 危机：Agentic AI 安全失败的完整案例</h4>
+        <p class="dim">r/artificial 本周最完整的 AI 安全案例研究。OpenClaw 事件揭示了<strong>自主代理 AI 在安全层面的系统性漏洞</strong>，包括完整的时间线和攻击链分析。</p>
+        <span class="tag tag-hot mt-s">Agentic AI · 安全失败 · 案例研究</span>
+      </div>
+      <div class="card card-red" style="padding:26px 30px">
+        <h4>AI 生成的 CUDA Kernel 悄悄破坏训练/推理</h4>
+        <p class="dim">r/MachineLearning 研究 [R] 发现：AI 生成的 CUDA 内核代码可能<strong>在不报错的情况下产生错误结果</strong>，悄然破坏模型训练和推理管道。</p>
+        <span class="tag tag-hot mt-s">CUDA · Silent Failure · Research</span>
+      </div>
+      <div class="card card-accent" style="padding:26px 30px">
+        <h4>尝试让 LLM 告诉你它们有多自信</h4>
+        <p class="dim">r/MachineLearning [R]：通过 <strong>probe-targeted fine tuning</strong> 让 LLM 准确报告自己的置信度水平——解决 AI "不懂装懂"问题。</p>
+        <span class="tag tag-ai mt-s">Confidence · Fine-tuning · Research</span>
+      </div>
+      <div class="card card-purple" style="padding:26px 30px">
+        <h4>Use HTML for agent diagrams</h4>
+        <p class="dim">r/LocalLLaMA 新技巧：用 <strong>HTML 作为 Agent 的主要对话语言</strong>，让 AI 自动生成图表和可视化——提升 Agent 输出丰富度。</p>
+        <span class="tag tag-purple mt-s">Agent · HTML · 工程技巧</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 6. ACADEMIC EARTHQUAKE ===== -->
+  <section class="slide" data-title="学术地震">
+    <p class="kicker">r/MachineLearning · academic-integrity</p>
+    <h2 class="h2">学术界的 <span class="gradient-text">AI 危机</span></h2>
+    <div class="grid g2 mt-l" style="align-items:start;gap:28px">
+      <div>
+        <div class="card card-red card-glow" style="padding:30px">
+          <h4 style="font-size:20px">arXiv 实施 1 年禁令</h4>
+          <p class="dim" style="font-size:17px;line-height:1.7">全球最大预印本平台 arXiv 正式宣布：<strong>对包含无可辩驳的 LLM 生成错误（如虚构引用、编造结果）的论文作者实行为期 1 年的提交禁令</strong>。这是学术出版对 AI 滥用的最严厉回应。</p>
+          <div class="row" style="gap:8px;margin-top:12px">
+            <span class="tag tag-hot">1-Year Ban</span>
+            <span class="tag">Hallucinated References</span>
+            <span class="tag tag-ai">学术诚信</span>
+          </div>
+        </div>
+        <div class="big-quote mt-m">"Backlash against arXiv's proposed 1 year ban is genuinely perplexing."<br>— r/MachineLearning 社区对禁令争议的评论</div>
+      </div>
+      <div>
+        <div class="card card-accent" style="margin-bottom:16px">
+          <h4>ChatGPT 正在编写教科书内容</h4>
+          <p class="dim">r/singularity 发现：ChatGPT 生成的内容已经开始进入教科书——AI 正在重塑教育内容的生产方式。</p>
+        </div>
+        <div class="card card-purple">
+          <h4>"Reddit 对 AI 骂声一片，但我在医疗领域的体验..."</h4>
+          <p class="dim">r/singularity 上的反潮流帖子：来自医疗专业人士的正面 AI 体验，与 Reddit 主流悲观情绪形成鲜明对比。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 7. ROBOTICS & GENERATION ===== -->
+  <section class="slide" data-title="机器人与生成">
+    <p class="kicker">r/singularity · robotics-content</p>
+    <h2 class="h2">机器人与生成：<span class="gradient-text">里程碑时刻</span></h2>
+    <div class="grid g3 mt-l" style="gap:20px;align-items:start">
+      <div class="card card-accent card-glow" style="padding:26px 30px">
+        <h4>Figure AI · 200 小时里程碑</h4>
+        <p class="dim">Figure AI 的人形机器人在仓库连续运行 <strong>200 小时（8天以上）</strong>，处理包裹包装任务——向实用化迈出关键一步。</p>
+        <span class="tag tag-ai mt-s">Humanoid · 8 days runtime</span>
+      </div>
+      <div class="card card-purple card-glow" style="padding:26px 30px">
+        <h4>"动画已经解决了"</h4>
+        <p class="dim">社区最新 AI 动画生成达到 <strong>皮克斯级别质量</strong>。从文本到高质量 3D 动画的门槛正在消失。</p>
+        <span class="tag tag-purple mt-s">Pixar quality · Text-to-Animation</span>
+      </div>
+      <div class="card card-accent card-glow" style="padding:26px 30px">
+        <h4>Wall-OSS-0.5 · 开源机器人 VLA</h4>
+        <p class="dim">4B 参数的 Vision-Language-Action 模型，<strong>完全开源</strong>训练代码 + 零样本真实机器人评估——推动机器人 AI 平权。</p>
+        <span class="tag mt-s">Open Source · VLA</span>
+      </div>
+      <div class="card card-accent" style="padding:26px 30px">
+        <h4>"家居机器人需要会洗澡穿鞋"</h4>
+        <p class="dim">r/singularity 的有趣讨论：如果要让机器人真正进入家庭，<strong>防水和地板保护</strong>成为被忽视的关键问题。</p>
+        <span class="tag tag-ai mt-s">Home Robot · UX Discussion</span>
+      </div>
+      <div class="card card-purple" style="padding:26px 30px">
+        <h4>100M+ 新图像数据集发布</h4>
+        <p class="dim">r/MachineLearning [P]：超过 <strong>1亿张高质量精选图片</strong>，附带精确标注和元数据——训练数据的重大升级。</p>
+        <span class="tag tag-purple mt-s">Dataset · 100M+ curated</span>
+      </div>
+      <div class="card card-accent" style="padding:26px 30px">
+        <h4>AI 不能替代人群，但能生成人群</h4>
+        <p class="dim">"Nothing is real anymore" —— 当 AI 可以完全生成逼真的人群场景时，影视制作的游戏规则被彻底改写。</p>
+        <span class="tag tag-hot mt-s">103 💬 · r/artificial</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 8. OPEN SOURCE WAR ===== -->
+  <section class="slide" data-title="开源战争">
+    <p class="kicker">r/LocalLLaMA · open-source-drama</p>
+    <h2 class="h2">开源战场：<span class="gradient-text">Meta 的律师函</span></h2>
+    <div class="grid g2 mt-l" style="align-items:start;gap:28px">
+      <div>
+        <div class="card card-red card-glow" style="padding:28px;margin-bottom:18px">
+          <h4>Meta 向 Heretic 发出法律通知</h4>
+          <p class="dim" style="font-size:17px;line-height:1.7">开源项目 Heretic 收到 Meta 的律师函——科技巨头开始用法律手段<strong>围剿可能威胁其 AI 商业利益的开源项目</strong>。</p>
+          <span class="tag tag-hot mt-s">Legal Notice · r/LocalLLaMA</span>
+        </div>
+        <div class="card card-accent" style="padding:24px">
+          <h4>金融时报跟进报道</h4>
+          <p class="dim">The Financial Times 发表 Heretic 事件专题文章——<strong>开源 AI 与大公司的法律对抗正在进入主流媒体视野</strong>。</p>
+          <span class="tag tag-purple mt-s">Financial Times · Mainstream Coverage</span>
+        </div>
+      </div>
+      <div>
+        <div class="card card-accent" style="padding:24px;margin-bottom:16px">
+          <h4>项目被 Fork 和窃取警告</h4>
+          <p class="dim">r/LocalLLaMA 社区警告：开源开发者需要警惕<strong>项目被恶意 fork 和代码窃取</strong>，尤其在 AI 模型领域。</p>
+          <span class="tag tag-hot mt-s">Security Alert</span>
+        </div>
+        <div class="card card-accent" style="padding:24px;margin-bottom:16px">
+          <h4>StepFun 3.7 Flash 发布</h4>
+          <p class="dim">新模型 StepFun 3.7 Flash 发布——<strong>本地 LLM 生态持续扩张</strong>，新模型层出不穷。</p>
+          <span class="tag tag-ai mt-s">New Model · Flash</span>
+        </div>
+        <div class="card card-accent" style="padding:24px">
+          <h4>"Chase the new or lock-in?"</h4>
+          <p class="dim">AI 工具生态爆炸式增长，开发者面临<strong>追逐新工具 vs 深耕一个生态</strong>的经典困境。</p>
+          <span class="tag mt-s">r/artificial · 11 💬</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 9. AI ETHICS & PRIVACY ===== -->
+  <section class="slide" data-title="AI 伦理与隐私">
+    <p class="kicker">r/artificial · r/technology · ethics-privacy</p>
+    <h2 class="h2">AI 伦理：<span class="gradient-text">从实验室到战场</span></h2>
+    <div class="grid g3 mt-l" style="gap:20px;align-items:start">
+      <div class="card card-red" style="padding:24px">
+        <h4>Amnesty 报告：Palantir + NHS</h4>
+        <p class="dim">Palantir 等承包商获得 NHS England 患者信息的<strong>无限制访问权限</strong>。AI 数据分析与公民隐私的激烈碰撞。</p>
+        <span class="tag tag-hot mt-s">35 💬 · r/artificial</span>
+      </div>
+      <div class="card card-red" style="padding:24px">
+        <h4>城市用垃圾袋遮盖 Flock 摄像头</h4>
+        <p class="dim">美国多个城市因后悔签订监控合同，<strong>用垃圾袋物理遮盖 AI 监控摄像头</strong>——AI 监控的橡皮筋效应。</p>
+        <span class="tag tag-hot mt-s">r/technology</span>
+      </div>
+      <div class="card card-accent" style="padding:24px">
+        <h4>荷兰阻止美国公司收购本土 App</h4>
+        <p class="dim">荷兰政府直接介入，<strong>阻止美国科技公司收购全民使用的本土应用</strong>——欧洲数字主权的新战线。</p>
+        <span class="tag mt-s">r/technology</span>
+      </div>
+      <div class="card card-accent" style="padding:24px">
+        <h4>Meta 离职员工反 AI 抗议</h4>
+        <p class="dim">Meta 大规模裁员期间，离职员工在内网发布<strong>激烈反 AI 视频</strong>，直指 AI 取代人工的核心矛盾。</p>
+        <span class="tag tag-hot mt-s">63 💬 · r/artificial</span>
+      </div>
+      <div class="card card-purple" style="padding:24px">
+        <h4>政府员工不喜欢 Grok</h4>
+        <p class="dim">新数据显示美国政府雇员<strong>普遍不喜欢 Elon Musk 的 Grok 聊天机器人</strong>——AI 产品的用户接受度危机。</p>
+        <span class="tag mt-s">r/artificial</span>
+      </div>
+      <div class="card card-accent" style="padding:24px">
+        <h4>Marc Andreessen 被群嘲</h4>
+        <p class="dim">风投大佬意外暴露<strong>对 AI 运作方式的深层误解</strong>，278 条评论的集体嘲讽——硅谷精英与 AI 技术的认知鸿沟。</p>
+        <span class="tag tag-hot mt-s">278 💬 · r/artificial</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 10. GLOBAL HOT ===== -->
+  <section class="slide" data-title="全球热门">
+    <p class="kicker">r/popular · r/technology · global-trending</p>
+    <h2 class="h2">全球热门 <span class="gradient-text">TOP 6</span></h2>
+    <div class="stack mt-l">
+      <div class="topic-row">
+        <span class="num">#1</span><span class="t">Blue Origin New Glenn 火箭静态点火爆炸，巨大蘑菇云升腾</span>
+        <span class="sub">r/technology</span><span class="meta">13K 🔺 · 4h</span>
+      </div>
+      <div class="topic-row">
+        <span class="num">#2</span><span class="t">告别种植牙：科学家发现可令牙齿再生的药丸</span>
+        <span class="sub">r/technology</span><span class="meta">🔥 Hot</span>
+      </div>
+      <div class="topic-row">
+        <span class="num">#3</span><span class="t">81岁奶奶直播 Minecraft 为孙子筹癌症治疗费遭 SWAT 袭击</span>
+        <span class="sub">r/technology</span><span class="meta">🔥 Hot</span>
+      </div>
+      <div class="topic-row">
+        <span class="num">#4</span><span class="t">经理称宗教原因拒绝与女性单独共处，HR 表示支持</span>
+        <span class="sub">r/popular</span><span class="meta">🔥 Hot</span>
+      </div>
+      <div class="topic-row">
+        <span class="num">#5</span><span class="t">如果按保姆时薪给老师发工资会怎样</span>
+        <span class="sub">r/popular</span><span class="meta">🔥 Hot</span>
+      </div>
+      <div class="topic-row">
+        <span class="num">#6</span><span class="t">18岁女孩用朋友给住酒店的钱买了食物，被指责说谎</span>
+        <span class="sub">r/popular</span><span class="meta">🔥 Hot</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 11. REGIONAL ===== -->
+  <section class="slide" data-title="区域热点">
+    <p class="kicker">home feed · singapore-hongkong</p>
+    <h2 class="h2">你的区域 <span class="gradient-text">热点头条</span></h2>
+    <div class="stack mt-l">
+      <div class="topic-row">
+        <span class="num">#1</span><span class="t">Give NSFs a break, can? — 新加坡国民服役讨论</span>
+        <span class="sub">r/SMRTRabak</span><span class="meta">1.1K 🔺 · 168 💬</span>
+      </div>
+      <div class="topic-row">
+        <span class="num">#2</span><span class="t">用手机也能拍出好照片 — 新加坡摄影分享</span>
+        <span class="sub">r/SingaporePhotography</span><span class="meta">487 🔺 · 32 💬</span>
+      </div>
+      <div class="topic-row">
+        <span class="num">#3</span><span class="t">新加坡月薪3K的人多吗？30岁男性的真诚提问</span>
+        <span class="sub">r/singaporejobs</span><span class="meta">370 🔺 · 358 💬</span>
+      </div>
+      <div class="topic-row">
+        <span class="num">#4</span><span class="t">香港校长在新加坡辱骂保安后辞职</span>
+        <span class="sub">r/HongKong</span><span class="meta">143 🔺 · 64 💬</span>
+      </div>
+      <div class="topic-row">
+        <span class="num">#5</span><span class="t">Steam 游戏选择：你会点哪个？</span>
+        <span class="sub">r/SgGamers</span><span class="meta">72 🔺 · 43 💬</span>
+      </div>
+      <div class="topic-row" style="border-bottom:none">
+        <span class="num">+</span><span class="t">Notion AI Workshop · Malaysia SMEs 自动化工作流</span>
+        <span class="sub">r/Notion</span><span class="meta">1天前</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 12. KEY FINDINGS ===== -->
+  <section class="slide" data-title="关键发现">
+    <p class="kicker">exploration.takeaways</p>
+    <h2 class="h2">7 个 <span class="gradient-text">关键发现</span></h2>
+    <div class="grid g2 mt-l" style="gap:18px;align-items:start">
+      <div class="card card-accent" style="display:flex;gap:16px;align-items:flex-start;padding:20px 24px">
+        <div class="key-num">01</div>
+        <div><h4>Anthropic 统治 2026</h4><p class="dim">$900B 估值超越 OpenAI，Opus 4.8 + Claude Mythos 双箭齐发。AI 权力版图正在重绘。</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;gap:16px;align-items:flex-start;padding:20px 24px">
+        <div class="key-num">02</div>
+        <div><h4>AI 经济账算不平</h4><p class="dim">微软数据：AI > 人类成本。Uber COO 喊停。Token 计费让预算几个月耗尽。AI 降本叙事遭遇现实打击。</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;gap:16px;align-items:flex-start;padding:20px 24px">
+        <div class="key-num">03</div>
+        <div><h4>AI 安全的"切尔诺贝利时刻"</h4><p class="dim">OpenClaw 事件 = Agentic AI 安全失败完整案例。CUDA kernel 静默破坏。Claude Mythos 压线发布。安全不再是 PPT 话题。</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;gap:16px;align-items:flex-start;padding:20px 24px">
+        <div class="key-num">04</div>
+        <div><h4>学术诚信地震</h4><p class="dim">arXiv 1 年禁令、LLM 虚假引用、ChatGPT 编教科书——AI 正在颠覆学术出版和教育的根基。</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;gap:16px;align-items:flex-start;padding:20px 24px">
+        <div class="key-num">05</div>
+        <div><h4>机器人+AI 生成双突破</h4><p class="dim">Figure AI 200h 连续运行、Pixar 级动画、Wall-OSS 开源 VLA、100M 数据集——从实验室到产品的最后一公里在缩短。</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;gap:16px;align-items:flex-start;padding:20px 24px">
+        <div class="key-num">06</div>
+        <div><h4>开源 vs 大公司的战争公开化</h4><p class="dim">Meta 律师函打击 Heretic、金融时报跟进、社区警告代码窃取——"Open" Source AI 正在成为法律新战场。</p></div>
+      </div>
+      <div class="card card-accent" style="grid-column:1/-1;display:flex;gap:16px;align-items:flex-start;padding:20px 24px">
+        <div class="key-num">07</div>
+        <div><h4>AI 焦虑是全球情绪，但正面应用也在显现</h4><p class="dim">"Crash waiting to happen"(619💬)、"How not to doom"(36💬) 的恐慌，与医疗 AI 的实际正面体验并存。AI 叙事正在两极分化。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 13. THANKS ===== -->
+  <section class="slide center tc" data-title="Thanks">
+    <div>
+      <div class="mono" style="font-size:120px;color:var(--accent);font-weight:800;letter-spacing:-.04em;margin-bottom:10px">&infin;</div>
+      <h2 class="h2">探索永无止境</h2>
+      <p class="lede" style="margin:18px auto;max-width:680px">
+        数据采集于 <strong>2026-05-29</strong> · Playwright CLI + Brave CDP 实时抓取<br>
+        覆盖 8 个子版块 · 50+ 热门帖子 · 千条评论生态
+      </p>
+      <div class="row mt-l" style="justify-content:center;gap:12px;flex-wrap:wrap">
+        <span class="tag tag-ai">r/artificial · 36万周访客</span>
+        <span class="tag tag-purple">r/singularity · 技术奇点</span>
+        <span class="tag">r/MachineLearning · 学术前沿</span>
+        <span class="tag tag-hot">r/LocalLLaMA · 73万成员</span>
+        <span class="tag">r/technology · 科技主流</span>
+        <span class="tag tag-gold">13 张幻灯片</span>
+      </div>
+      <p class="dim" style="margin-top:28px">按 ← → 翻页 · T 切换主题 · F 全屏 · S 演讲者模式 · O 概览</p>
+    </div>
+  </section>
+
+</div>
+<script src="../../assets/runtime.js"></script>
+</body></html>

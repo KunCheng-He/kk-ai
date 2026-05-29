@@ -28,6 +28,7 @@ opencode-skills/
 | `playwright-cli` | [Playwright](https://www.npmjs.com/package/@playwright/cli) | 浏览器自动化交互工具（手动更新） |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
+| `html-ppt` | [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) | HTML 演示文稿生成 |
 
 ### Skills - Shared（共享，项目按需链接）
 
@@ -37,7 +38,6 @@ opencode-skills/
 | `douban-k-search` | self-developed | 豆瓣数据搜索 |
 | `external-skills-updater` | self-developed | 更新外部 skill |
 | `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | 前端界面设计 |
-| `html-ppt` | [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) | HTML 演示文稿生成 |
 | `images-k-generation` | self-developed | 图像生成 |
 | `ob_architect_structure` | self-developed | 整理思路、构建大纲（kk-brain） |
 | `ob_capture_insight` | self-developed | 捕捉洞察、结晶知识卡片（kk-brain） |
