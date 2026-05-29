@@ -64,7 +64,7 @@ opencode-skills/
 | Agent | 说明 |
 |-------|------|
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（kk-brain） |
-| `ProductResearch.md` | 产品调研 subagent（多源信息收集，webfetch → 浏览器自动化 fallback） |
+| `ProductResearch.md` | 产品调研 subagent（专属 Skill 优先 → 简单页面 webfetch → 复杂页面 playwright-cli CDP） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
 | `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、drawio 架构图、nano-banana-prompt 提示词生成） |
 

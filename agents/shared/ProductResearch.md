@@ -42,38 +42,24 @@ temperature: 0.3
 - **收集关键图片**：产品截图、架构图、特性对比图、定价表等
   - 优先选择：官方产品图、功能演示图、架构图、数据图表
   - 下载图片到 `assets/` 目录，使用相对路径引用
-- **信息获取顺序（强制）**：
-  1. 先用 `webfetch` 尝试获取页面内容
-   2. 如 webfetch 返回内容为空、解析失败、或页面明显为动态渲染（React/Next.js/Vue）-> **使用 `kimi-webbridge` skill 获取**
-   3. 如 `kimi-webbridge` 也失败 -> 尝试替代 URL（移动版、精简版）
-  4. 如仍失败 -> 跳过该来源，在报告中注明未能访问的来源
+- **信息获取策略**：
+  - 简单静态页面 → 直接用 `webfetch` 获取
+  - 动态渲染（React/Next.js/Vue）、反爬拦截、网络无法访问 → 使用 `playwright-cli` CDP 模式
 
 ### 3. 收集社区反馈
 
-按照以下**分层 fallback 策略**执行：
+**第一层：专属平台 Skill（优先）**
+- 小红书：使用 `xhs-k-research` skill（搜索帖子、获取详情和评论）
+- 知乎：使用 `zhihu-k-research` skill（搜索问题/回答/文章、获取详情）
+- 豆瓣：使用 `douban-k-research` skill（搜索书籍/电影/音乐、获取详情和短评）
 
-**第一层：专属 Skill**
-- 小红书：使用 `xhs-k-research` skill
-- 知乎：使用 `zhihu-k-research` skill
-
-**第二层：webfetch 直接访问**
-- Hacker News: `https://hn.algolia.com/?q={query}`
-- V2EX: `https://www.v2ex.com/search?q={query}&t=topic`
-- Reddit: `https://www.reddit.com/search/?q={query}`
-- Bilibili: `https://search.bilibili.com/all?keyword={query}`
-
-**第三层：webfetch 失败后的浏览器自动化 fallback（关键）**
-- 当 webfetch 无法获取以下场景时，**必须**调用 `kimi-webbridge` skill：
-  - 页面返回空内容或仅返回标题
-  - 页面为 React/Next.js/Vue 等前端动态渲染
-  - 页面需要 JavaScript 执行后才能展示内容
-  - 反爬虫机制导致 webfetch 被拦截
-- 调用方式：加载 `kimi-webbridge` skill，使用其提供的浏览器自动化能力获取页面完整渲染后的内容
-- 优先用于：厂商官网、产品详情页、动态定价页、技术文档
-
-**第四层：搜索引擎补充**
-- Bing: `https://cn.bing.com/search?q={query}`
-- 百度: `https://www.baidu.com/s?wd={query}`
+**第二层：通用平台收集**
+- 简单静态页面 → 直接用 `webfetch` 获取
+- 复杂动态 JS 页面、反爬拦截、网络无法访问的平台 → 使用 `playwright-cli` CDP 模式：
+  ```bash
+  playwright-cli attach --cdp=http://localhost:9222
+  ```
+  若 CDP 端口未就绪 → 提示用户启动浏览器调试模式，等待确认后重试。使用 `playwright-cli goto` 导航、`playwright-cli snapshot` 获取内容。
 
 ### 4. 识别竞品
 - 搜索产品名 vs 或 产品名 alternatives/替代品
@@ -92,7 +78,7 @@ temperature: 0.3
 - 官方来源：官方文档, GitHub 仓库, Release Notes
 
 ### 消费软件（浏览器/应用/服务）
-- 优先社区：V2EX, 知乎, 小红书, Bilibili, Reddit
+- 优先社区：V2EX, 知乎, 小红书, 豆瓣, Bilibili, Reddit
 - 官方来源：产品页面, 博客, 帮助中心
 
 ### 硬件设备
@@ -149,30 +135,6 @@ temperature: 0.3
 - 社区:
   - {社区} - {标题}: {URL}
 ```
-
----
-
-## 访问失败处理（完整 fallback 链）
-
-当信息获取受阻时，按以下顺序尝试，**不要直接跳过**：
-
-1. **webfetch 失败时** -> **立即使用 `kimi-webbridge` skill**
-   - kimi-webbridge 可控制真实浏览器，能获取动态渲染页面的完整内容
-   - 适用场景：React/Next.js/Vue 官网、需要登录但未完全拦截的页面、懒加载内容
-   - 调用方式：加载 kimi-webbridge skill，按 skill 指引执行浏览器自动化
-
-2. **kimi-webbridge 也失败时** -> 尝试替代 URL
-   - 移动版页面（m.example.com）
-   - 精简版/旧版页面
-   - 搜索引擎缓存版本
-
-3. **替代 URL 也失败时** -> 使用搜索引擎站内搜索
-   - `site:目标域名 {查询词}`
-   - 查看搜索引擎缓存快照
-
-4. **全部失败时** -> 跳过该来源
-   - 在报告中明确注明：未能访问的来源及尝试过的方法
-   - 继续其他来源的调研，不要因为单一来源失败而中断整体流程
 
 ---
 
