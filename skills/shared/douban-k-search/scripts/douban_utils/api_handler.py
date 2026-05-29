@@ -14,7 +14,6 @@ from douban_utils.html_parser import (
     parse_music_detail,
 )
 from douban_utils.http_client import (
-    DoubanBlockedError,
     DoubanHttpClient,
     extract_window_data,
     parse_search_results,
@@ -89,50 +88,38 @@ async def get_book_detail(
 
 
 async def get_movie_detail(
-    subject_id: int, with_comments: bool = False, use_browser: bool = True
+    subject_id: int,
+    with_comments: bool = False,
+    use_cdp: bool = True,
+    cdp_url: str = "http://localhost:9222",
 ) -> DetailWithComments | None:
     """获取电影详情。
+
+    CDP 模式（默认）：连接已有浏览器，处理 POW 验证。
+    Launch 模式（use_cdp=False）：启动独立 Chromium。
 
     Args:
         subject_id: 条目 ID。
         with_comments: 是否获取短评。
-        use_browser: 是否使用浏览器（应对反爬）。
+        use_cdp: 是否使用 CDP 模式连接已有浏览器。默认 True。
+        cdp_url: CDP 调试端点 URL。
 
     Returns:
         详情+评论，获取失败返回 None。
     """
-    if use_browser:
-        return await _get_movie_detail_browser(subject_id, with_comments)
-    return await _get_movie_detail_http(subject_id, with_comments)
-
-
-async def _get_movie_detail_http(subject_id: int, with_comments: bool) -> DetailWithComments | None:
-    """HTTP 方式获取电影详情。"""
-    client = DoubanHttpClient()
-    try:
-        html = await client.fetch_detail_page(subject_id, Category.MOVIE)
-        movie = parse_movie_detail(html, subject_id)
-
-        if not movie:
-            return None
-
-        comments: list[Comment] = []
-        if with_comments:
-            comments_html = await client.fetch_comments_page(subject_id, Category.MOVIE)
-            comments = parse_comments(comments_html)
-
-        return DetailWithComments(detail=movie, comments=comments)
-    except DoubanBlockedError:
-        return await _get_movie_detail_browser(subject_id, with_comments)
-    finally:
-        await client.close()
+    return await _get_movie_detail_browser(
+        subject_id, with_comments, use_cdp=use_cdp, cdp_url=cdp_url
+    )
 
 
 async def _get_movie_detail_browser(
-    subject_id: int, with_comments: bool
+    subject_id: int,
+    with_comments: bool,
+    use_cdp: bool = True,
+    cdp_url: str = "http://localhost:9222",
 ) -> DetailWithComments | None:
     """浏览器方式获取电影详情。"""
-    browser = DoubanBrowser()
+    browser = DoubanBrowser(use_cdp=use_cdp, cdp_url=cdp_url)
     try:
         await browser.start()
         html = await browser.fetch_movie_detail(subject_id)
@@ -182,7 +169,11 @@ async def get_music_detail(
 
 
 async def get_detail(
-    subject_id: int, category: Category, with_comments: bool = False
+    subject_id: int,
+    category: Category,
+    with_comments: bool = False,
+    use_cdp: bool = True,
+    cdp_url: str = "http://localhost:9222",
 ) -> DetailWithComments | None:
     """获取条目详情（统一入口）。
 
@@ -190,6 +181,8 @@ async def get_detail(
         subject_id: 条目 ID。
         category: 内容类目。
         with_comments: 是否获取短评。
+        use_cdp: 是否使用 CDP 模式（仅电影类目用到浏览器）。默认 True。
+        cdp_url: CDP 调试端点 URL。
 
     Returns:
         详情+评论，获取失败返回 None。
@@ -197,7 +190,7 @@ async def get_detail(
     if category == Category.BOOK:
         return await get_book_detail(subject_id, with_comments)
     elif category == Category.MOVIE:
-        return await get_movie_detail(subject_id, with_comments)
+        return await get_movie_detail(subject_id, with_comments, use_cdp=use_cdp, cdp_url=cdp_url)
     elif category == Category.MUSIC:
         return await get_music_detail(subject_id, with_comments)
     return None

@@ -67,5 +67,6 @@ cd scripts && uv run python main.py detail 1889243 --category movie --comments
 ## 技术方案
 
 - 搜索：HTTP 请求 + 提取 `window.__DATA__`
-- 详情：HTTP 优先，失败则 Playwright
-- 短评：Playwright + playwright-stealth（触发 SHA-512 POW 验证）
+- 详情：**CDP 浏览器**（默认）/ Launch 备用 — 处理 POW 验证
+- 短评：**CDP 浏览器**（默认）/ Launch 备用 — 处理 SHA-512 POW 验证
+- `--no-cdp` 切回 Launch 模式（自启 Chromium + playwright-stealth）

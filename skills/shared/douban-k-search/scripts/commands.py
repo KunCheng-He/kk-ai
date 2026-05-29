@@ -11,7 +11,14 @@ from rich.table import Table
 
 from douban_utils.api_handler import get_detail
 from douban_utils.api_handler import search as do_search
-from douban_utils.data_models import Book, Category, DetailWithComments, Movie, Music, SearchResponse
+from douban_utils.data_models import (
+    Book,
+    Category,
+    DetailWithComments,
+    Movie,
+    Music,
+    SearchResponse,
+)
 
 app = typer.Typer(help="豆瓣搜索与数据采集工具")
 console = Console()
@@ -59,10 +66,15 @@ def detail(
     comments: bool = typer.Option(False, "--comments", help="获取短评"),
     json_output: bool = typer.Option(True, "--json/--table", help="JSON 或表格格式输出"),
     output: Path | None = typer.Option(None, "-o", "--output", help="输出文件路径"),
+    no_cdp: bool = typer.Option(
+        False, "--no-cdp", help="使用 Launch 模式（自启 Chromium），而不是默认的 CDP 模式"
+    ),
+    cdp_url: str = typer.Option("http://localhost:9222", "--cdp-url", help="CDP 调试端点 URL"),
 ):
     """获取条目详情。"""
     cat = parse_category(category)
-    result = asyncio.run(get_detail(subject_id, cat, comments))
+    use_cdp = not no_cdp
+    result = asyncio.run(get_detail(subject_id, cat, comments, use_cdp=use_cdp, cdp_url=cdp_url))
 
     if not result:
         console.print(f"[red]获取详情失败: {subject_id}[/red]")
@@ -136,8 +148,6 @@ def _print_book(book: Book) -> None:
         info_lines.append(f"页数: {book.pages}")
     if book.price:
         info_lines.append(f"定价: {book.price}")
-    if book.binding:
-        info_lines.append(f"装帧: {book.binding}")
     if book.isbn:
         info_lines.append(f"ISBN: {book.isbn}")
 

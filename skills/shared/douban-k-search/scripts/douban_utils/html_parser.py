@@ -195,7 +195,10 @@ def parse_comments(html: str) -> list[Comment]:
             user_url = user_link.get("href") if user_link else None
 
             rating = None
-            rating_span = item.select_one("span.user-stars, span.allstar50, span.allstar40, span.allstar30, span.allstar20, span.allstar10")
+            rating_span = item.select_one(
+                "span.user-stars, span.allstar50, span.allstar40, "
+                "span.allstar30, span.allstar20, span.allstar10"
+            )
             if rating_span:
                 rating_class = rating_span.get("class", [])
                 for cls in rating_class:
