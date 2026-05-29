@@ -24,12 +24,10 @@ opencode-skills/
 |-------|------|------|
 | `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
 | `markdown-to-image` | self-developed | Markdown/代码片段转图片 |
-| `network-proxy` | self-developed | 网络代理配置工具 |
 | `opencode-project-init` | self-developed | OpenCode 项目初始化工具 |
 | `playwright-cli` | [Playwright](https://www.npmjs.com/package/@playwright/cli) | 浏览器自动化交互工具（手动更新） |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
-| `kimi-webbridge` | [Kimi](https://cdn.kimi.com/webbridge) | AI 控制用户真实浏览器进行网页交互 |
 
 ### Skills - Shared（共享，项目按需链接）
 
