@@ -12,7 +12,7 @@ temperature: 0.6
 
 ## 核心约束（必须遵守）
 
-1. **调研强制调用 ProductResearch**：调研阶段必须使用 Task 工具调用 ProductResearch subagent，禁止用通用智能体替代。
+1. **调研阶段按需选择方式**：根据主题类型灵活选择调研手段——互联网产品/服务类主题使用 ProductResearch subagent 收集网络信息；本地项目/内部材料/非产品主题可直接分析本地文件或使用通用 agent 调研。无论哪种方式，必须产出结构化的调研报告。
 2. **修改必须回退状态**：用户提出修改意见时，必须按修改类型回退到对应阶段重新执行完整流程，禁止在当前状态直接修改文件后跳过验证发布。
 3. **架构图强制使用 drawio**：文章中需要架构图、流程图、类图等结构化图形时，必须使用 drawio skill 生成，禁止用生图方式替代。
 4. **封面和表格图片使用 nano-banana-prompt**：封面图和 Markdown 表格转图片，必须使用 nano-banana-prompt skill 生成提示词，保存到素材目录后提示用户手动生图。禁止自动调用生图 API 或使用其他生图工具。
@@ -29,7 +29,7 @@ temperature: 0.6
 ```
 状态定义：
   INIT          — 初始化，创建工作目录
-  RESEARCH      — 调研中，调用 ProductResearch
+  RESEARCH      — 调研中，收集材料产出调研报告
   DRAFTING      — 写作中，调用 gzh-article-creator
   IMAGE_GEN     — 等待用户手动生图（暂停状态）
   REVIEW        — 用户审阅成稿
@@ -98,7 +98,7 @@ temperature: 0.6
 2. 目录结构：
    ```
    {时间戳}_{主题名}/
-   ├── 调研报告.md      # ProductResearch 输出（必须以此命名）
+   ├── 调研报告.md      # 调研输出（必须以此命名）
    ├── 成稿.md          # gzh-article-creator 输出（必须以此命名）
    └── 素材/            # 配图、封面、提示词文件等
    ```
@@ -111,11 +111,12 @@ temperature: 0.6
 
 ### 阶段 2：调研（RESEARCH）
 
-⚠️ **强制约束**：本阶段**必须使用 Task 工具**调用 ProductResearch subagent。
-禁止使用通用智能体、webfetch 直接抓取或其他方式替代调研。
+根据主题类型选择合适的调研方式，最终产出调研报告.md 写入工作目录：
+
+**方式 A：互联网产品/服务类主题** — 使用 ProductResearch subagent
 
 ```
-调用方式（严格按此执行）：
+调用方式：
 - 工具：Task
 - subagent_type: "subagent"
 - 输入：
@@ -124,6 +125,21 @@ temperature: 0.6
   3. 调研方向建议（如有用户补充）
 - 输出：调研报告.md（写入工作目录）
 ```
+
+**方式 B：本地项目/内部材料/非产品主题** — 直接分析与收集
+
+当主题涉及本地代码库、本地文档、内部材料、个人经验分享、技术方案等非互联网产品内容时：
+- 直接读取分析本地文件（代码、文档、资料等）
+- 使用通用 agent 或 glob/grep/read 等工具收集信息
+- 如需要补充网络信息，可使用 webfetch 按需抓取
+- 必须产出结构化的调研报告.md 写入工作目录（含核心观点和数据支撑，建议 > 1500 字）
+
+**方式 C：混合场景** — 本地分析 + ProductResearch 补充
+
+当主题既有本地材料需要分析，又需要网络调研补充时：
+- 先分析本地材料产出初步调研笔记
+- 再调用 ProductResearch subagent 补充网络信息
+- 合并整理后输出最终调研报告.md
 
 **调研完成后执行验证检查点 1**：
 - [ ] 调研报告文件是否存在且非空
@@ -307,7 +323,7 @@ temperature: 0.6
 
 **回退到 RESEARCH 时**：
 1. 明确告知用户：正在重新调研，将覆盖原调研报告
-2. 使用 Task 工具重新调用 ProductResearch subagent
+2. 根据主题类型选择合适的调研方式（参考阶段 2 的方式 A/B/C），重新产出调研报告
 3. 调研完成后重新执行验证检查点 1
 4. 继续执行 DRAFTING -> IMAGE_GEN(如需) -> REVIEW -> IMAGE_GEN(封面) -> PUBLISH_READY 的完整流程
 
@@ -339,7 +355,7 @@ temperature: 0.6
 
 | Skill | 用途 | 调用时机 |
 |-------|------|----------|
-| ProductResearch | 调研收集材料 | 用户提供主题后（强制使用 Task 调用） |
+| ProductResearch | 互联网产品/服务类主题调研（网络信息收集） | 调研阶段按需使用（方式 A/方式 C） |
 | gzh-article-creator | 材料转公众号文章 | 调研完成后 |
 | drawio | 绘制架构图/流程图/类图等结构化图形 | 成稿中需要结构化图形时（gzh-article-creator 内部调用或 DRAFTING 阶段调用） |
 | nano-banana-prompt | 生成封面图/表格/代码块转图片的提示词 | DRAFTING 阶段需要表格转图片时；REVIEW 通过后需要封面图时 |
