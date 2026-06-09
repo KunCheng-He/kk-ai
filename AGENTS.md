@@ -9,6 +9,7 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 - `agents/common/` - 通用 agents，链接到全局 `~/.config/opencode/agents/`
 - `agents/shared/` - 共享 agents，按需链接到项目
 - `scripts/` - 辅助脚本
+- `AGENTS.global.md` - 全局代理规则，链接到 `~/.config/opencode/AGENTS.md`
 
 ## 关键命令
 

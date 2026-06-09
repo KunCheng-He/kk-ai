@@ -13,6 +13,8 @@ opencode-skills/
 │   ├── common/          # 通用 agent（ln 到全局）
 │   └── shared/          # 共享 agent（项目按需 ln）
 ├── scripts/             # 辅助脚本
+├── AGENTS.global.md     # 全局代理规则（ln ~/.config/opencode/AGENTS.md）
+├── AGENTS.md            # 本仓库开发指南
 └── README.md
 ```
 
@@ -80,6 +82,14 @@ ln -s ~/Code/opencode-skills/agents/common ~/.config/opencode/agents
 # 查看
 ls ~/.config/opencode/skills/
 ls ~/.config/opencode/agents/
+```
+
+### 全局代理规则
+
+AGENTS.global.md 通过文件级符号链接到全局配置，为所有项目提供统一的代理行为规则：
+
+```bash
+ln -sf ~/Code/opencode-skills/AGENTS.global.md ~/.config/opencode/AGENTS.md
 ```
 
 ### 共享 Skill/Agent
