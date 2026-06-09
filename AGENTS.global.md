@@ -8,5 +8,6 @@
 
 1. **使用 `playwright-cli` SKILL** — 加载该 skill 后通过 CDP 连接用户的默认浏览器，**不要安装浏览器**（不要运行 `npx playwright install` 或 `npm install playwright`）。
 2. **CDP 连接方式**：
-   - 优先使用 `playwright-cli attach --cdp=chrome` 或 `playwright-cli attach --cdp=http://localhost:9222`
-   - 如果 CDP 连接失败（如浏览器未在调试模式下运行），执行命令 `brave-debug` — 这是自定义在 `~/.zshrc` 中的快捷命令，会以调试模式启动 Brave 浏览器并开启远程调试端口。启动后重试 `playwright-cli attach`。
+   - 默认使用 `playwright-cli attach --cdp=http://localhost:9222`
+   - 如果连接失败，执行命令 `brave-debug`（位于 `~/.my_shell/brave-debug`），它会以调试模式启动 Brave 浏览器并开启远程调试端口。启动后重试上一步的连接命令。
+   - 如果 `brave-debug` 也失败，应主动询问用户希望使用哪种方式连接到浏览器（如指定其他 CDP 端口、使用其他浏览器等）。
