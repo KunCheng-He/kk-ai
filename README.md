@@ -49,7 +49,7 @@ opencode-skills/
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
 | `zhihu-k-search` | self-developed | 知乎数据搜索 |
-| `nano-banana-prompt` | self-developed | Nano Banana (Gemini) 生图提示词生成 |
+| `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
 | `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
 
 ### Agents - Common（通用，已链接到全局）
@@ -66,7 +66,7 @@ opencode-skills/
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（kk-brain） |
 | `ProductResearch.md` | 产品调研 subagent（专属 Skill 优先 → 简单页面 webfetch → 复杂页面 playwright-cli CDP） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
-| `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、drawio 架构图、nano-banana-prompt 提示词生成） |
+| `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、drawio 架构图、image-prompt 提示词生成） |
 
 ## 使用方式
 

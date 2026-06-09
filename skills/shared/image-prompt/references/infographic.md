@@ -41,7 +41,7 @@
 
 > I want to wash my car. The car wash is 50 meters away. Should I walk or drive?
 
-> **技巧**：Nano Banana 会自动将这类问题转化为信息图。不需要额外指定"画成信息图"。
+> **技巧**：AI 图像生成模型会自动将这类问题转化为信息图。不需要额外指定"画成信息图"。
 
 ### 食谱信息图
 

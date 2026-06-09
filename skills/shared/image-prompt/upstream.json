@@ -1,0 +1,7 @@
+{
+  "source": "self-developed",
+  "path": "",
+  "last_update": "2026-06-09",
+  "tracking_dir": "",
+  "notes": "AI 图像生成提示词生成器。v2: 通用化改造，适用于任何 AI 图像生成模型"
+}

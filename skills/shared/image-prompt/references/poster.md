@@ -29,7 +29,7 @@
 Translate all text in this [image/poster/advertisement] to the language of [target language]. ONLY translate the text - do not add any cultural imagery, flags, national symbols, or stereotypical visual elements. Keep the image, composition, styling, colors, and all visual elements exactly the same as the original. The only change should be the language of the text.
 ```
 
-> Google 官方使用的全球化翻译提示词。`${market}` 替换为目标市场语言。建议用英文提示词。
+> 全球化翻译提示词模板。建议用英文提示词。
 
 ## 示例
 

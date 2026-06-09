@@ -21,7 +21,7 @@ aspect_ratio: [比例]
 - Create an image which includes location name text, and a brief summary of the weather, using graphic design that matches the theme. Don't add any other text.
 ```
 
-> **注意**：Nano Banana 2 支持 Image Search 功能，可以更准确地还原真实地点。Pro 版本只有 Google Search 工具。
+> **注意**：支持 Image Search 功能的 AI 图像生成模型（如 Gemini）可以更准确地还原真实地点。
 
 ## 示例
 
