@@ -1,6 +1,6 @@
-# OpenCode Skills & Agents 统一管理仓库
+# OpenCode / Pi Skills & Agents 统一管理仓库
 
-统一管理所有 OpenCode 的 Skills 和 Agents 资源。
+统一管理 OpenCode 和 Pi 的 Skills、Agents 及全局规则资源。
 
 ## 目录结构
 
@@ -13,7 +13,7 @@ opencode-skills/
 │   ├── common/          # 通用 agent（ln 到全局）
 │   └── shared/          # 共享 agent（项目按需 ln）
 ├── scripts/             # 辅助脚本
-├── AGENTS.global.md     # 全局代理规则（ln ~/.config/opencode/AGENTS.md）
+├── AGENTS.global.md     # 全局代理规则（ln OpenCode + Pi 双 harness）
 ├── AGENTS.md            # 本仓库开发指南
 └── README.md
 ```
@@ -86,10 +86,14 @@ ls ~/.config/opencode/agents/
 
 ### 全局代理规则
 
-AGENTS.global.md 通过文件级符号链接到全局配置，为所有项目提供统一的代理行为规则：
+AGENTS.global.md 通过文件级符号链接同时服务于 OpenCode 和 Pi，为所有项目提供统一的代理行为规则：
 
 ```bash
+# OpenCode
 ln -sf ~/Code/opencode-skills/AGENTS.global.md ~/.config/opencode/AGENTS.md
+
+# Pi
+ln -sf ~/Code/opencode-skills/AGENTS.global.md ~/.pi/agent/AGENTS.md
 ```
 
 ### 共享 Skill/Agent
@@ -120,9 +124,12 @@ ln -s ~/Code/opencode-skills/agents/shared/xxx-agent.md .opencode/agents/xxx-age
 
 - **统一仓库**：`~/Code/opencode-skills/`
 - **上游追踪**：`~/Code/GitHub-Skills/`
-- **全局配置**：`~/.config/opencode/`
+- **全局配置（OpenCode）**：`~/.config/opencode/`
+- **全局配置（Pi）**：`~/.pi/agent/`
 
 ## 相关文档
 
 - [OpenCode Skills 官方文档](https://opencode.ai/docs/skills/)
 - [OpenCode Agents 官方文档](https://opencode.ai/docs/agents/)
+- [Pi Skills 文档](https://github.com/badlogic/pi-skills)
+- [Agent Skills 标准](https://agentskills.io/specification)
