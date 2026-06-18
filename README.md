@@ -26,7 +26,7 @@ opencode-skills/
 |-------|------|------|
 | `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
 | `markdown-to-image` | self-developed | Markdown/代码片段转图片 |
-| `opencode-project-init` | self-developed | OpenCode 项目初始化工具 |
+| `project-init` | self-developed | 项目初始化工具（OpenCode / Pi 双支持） |
 | `playwright-cli` | [Playwright](https://www.npmjs.com/package/@playwright/cli) | 浏览器自动化交互工具（手动更新） |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
