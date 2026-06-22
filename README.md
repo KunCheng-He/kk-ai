@@ -28,6 +28,7 @@ opencode-skills/
 | `markdown-to-image` | self-developed | Markdown/代码片段转图片 |
 | `project-init` | self-developed | 项目初始化工具（OpenCode / Pi 双支持） |
 | `playwright-cli` | [Playwright](https://www.npmjs.com/package/@playwright/cli) | 浏览器自动化交互工具（手动更新） |
+| `pi-agent-creator` | self-developed | 创建 Pi 主 Agent 定义文件（供 pi-agent-switcher 使用） |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
 | `html-ppt` | [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) | HTML 演示文稿生成 |
