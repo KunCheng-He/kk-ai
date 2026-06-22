@@ -10,8 +10,11 @@ opencode-skills/
 │   ├── common/          # 通用工具类 skill（ln 到全局）
 │   └── shared/          # 共享 skill（项目按需 ln）
 ├── agents/
-│   ├── common/          # 通用 agent（ln 到全局）
-│   └── shared/          # 共享 agent（项目按需 ln）
+│   ├── common/          # OpenCode 通用 agent（ln 到全局）
+│   └── shared/          # OpenCode 共享 agent（项目按需 ln）
+├── pi-agents/
+│   ├── common/          # Pi 通用 agent（ln 到 ~/.pi/agent/agents/）
+│   └── shared/          # Pi 共享 agent（项目按需 ln 到 .pi/agents/）
 ├── scripts/             # 辅助脚本
 ├── AGENTS.global.md     # 全局代理规则（ln OpenCode + Pi 双 harness）
 ├── AGENTS.md            # 本仓库开发指南
@@ -53,14 +56,14 @@ opencode-skills/
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
 | `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
 
-### Agents - Common（通用，已链接到全局）
+### Agents - Common（OpenCode 通用，已链接到全局）
 
 | Agent | 说明 |
 |-------|------|
 | `verification.md` | 验证 agent |
 | `诸葛亮.md` | 人生导师、思维军师 agent |
 
-### Agents - Shared（共享，项目按需链接）
+### Agents - Shared（OpenCode 共享，项目按需链接）
 
 | Agent | 说明 |
 |-------|------|
@@ -120,6 +123,20 @@ ln -s ~/Code/opencode-skills/agents/shared/xxx-agent.md .opencode/agents/xxx-age
 外部来源的 skill 通过 `external-skills-updater` skill 进行更新，详见资源清单中标记为外部来源的 skill。
 
 更新方式：告诉 AI "请更新外部 skill"，AI 将自动执行更新流程。
+
+### Pi Agents - Common（Pi 通用，已链接到 ~/.pi/agent/agents/）
+
+| Agent | 说明 |
+|-------|------|
+| `verification.md` | 验证专家，尝试破坏实现、发现边缘情况和回归问题 |
+| `zhugeliang.md` | 人生导师、思维军师，帮助分析复杂处境、认知突破、行动策略 |
+| `build.md` | 通用构建与实现 agent（本地文件，不在本仓库） |
+
+### Pi Agents - Shared（Pi 共享，项目按需链接到 .pi/agents/）
+
+| Agent | 说明 |
+|-------|------|
+| _(暂无)_ | |
 
 ## 相关目录
 
