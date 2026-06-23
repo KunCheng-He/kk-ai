@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "description": "Pi extension for user-controlled agent role switching with markdown-defined agents",
   "main": "index.ts",
+  "keywords": ["pi-package"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KunCheng-He/opencode-k-skills.git",
+    "directory": "pi-extensions/common/pi-agent-switcher"
+  },
   "pi": {
     "extensions": ["./index.ts"]
   },
