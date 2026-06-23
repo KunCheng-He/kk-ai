@@ -10,6 +10,8 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 - `opencode-agents/shared/` - OpenCode 共享 agents，按需链接到项目
 - `pi-agents/shared/` - Pi 共享 agents（已迁移），手动复制到 `~/.pi/agents/` 使用
 - `pi-agents/common/` - Pi 通用 agents（预留）
+- `pi-extensions/common/` - Pi 通用扩展，链接到全局 `~/.pi/agent/extensions/`
+- `pi-extensions/shared/` - Pi 共享扩展，按需链接到项目 `.pi/extensions/`
 - `scripts/` - 辅助脚本
 - `AGENTS.global.md` - 全局代理规则，链接到 `~/.config/opencode/AGENTS.md` 和 `~/.pi/agent/AGENTS.md`
 
@@ -25,18 +27,22 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 # 链接 Pi Agent 到指定项目
 ~/Code/opencode-skills/scripts/link-skills.sh pi-agent <agent-name> /path/to/project
 
+# 链接 Pi Extension 到指定项目
+~/Code/opencode-skills/scripts/link-skills.sh pi-extension <extension-name> /path/to/project
+
 # 更新所有外部 skill（从上游仓库拉取）
 ~/Code/opencode-skills/scripts/update-external-skills.sh
 ```
 
 ## 全局链接
 
-通用 skills/agents 通过目录级符号链接到全局：
+通用 skills/agents/extensions 通过目录级符号链接到全局：
 
 ```bash
 # 一次性设置（已完成）
 ln -s ~/Code/opencode-skills/skills/common ~/.config/opencode/skills
 ln -s ~/Code/opencode-skills/opencode-agents/common ~/.config/opencode/agents
+ln -s ~/Code/opencode-skills/pi-extensions/common ~/.pi/agent/extensions
 ```
 
 ## Skill 结构规范
@@ -72,9 +78,10 @@ Pi Agent 格式与 OpenCode 的区别：
 
 ## 新增 Skill/Agent
 
-- 通用 skill/agent 放入 `skills/common/`、`opencode-agents/common/` 或 `pi-agents/common/`，自动生效（全局目录已链接）
-- 共享 skill/agent 放入 `skills/shared/`、`opencode-agents/shared/` 或 `pi-agents/shared/`，按需链接到项目
+- 通用 skill/agent 放入 `skills/common/`、`opencode-agents/common/`、`pi-agents/common/` 或 `pi-extensions/common/`，自动生效（全局目录已链接）
+- 共享 skill/agent 放入 `skills/shared/`、`opencode-agents/shared/`、`pi-agents/shared/` 或 `pi-extensions/shared/`，按需链接到项目
 - Pi agent 新增/修改后，必须同步更新 `pi-agents/shared/` 和 `~/.pi/agents/` 两处文件
+- Pi 扩展新增/修改后，必须同步更新 `pi-extensions/` 和对应的 `~/.pi/agent/extensions/` 或项目 `.pi/extensions/` 中的符号链接
 
 ## 完成后自动更新文档
 

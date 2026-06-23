@@ -15,6 +15,9 @@ opencode-skills/
 ├── pi-agents/
 │   ├── common/          # Pi 通用 agent（ln 到 ~/.pi/agent/agents/）
 │   └── shared/          # Pi 共享 agent（项目按需 ln 到 .pi/agents/）
+├── pi-extensions/
+│   ├── common/          # Pi 通用扩展（ln 到 ~/.pi/agent/extensions/）
+│   └── shared/          # Pi 共享扩展（项目按需 ln 到 .pi/extensions/）
 ├── scripts/             # 辅助脚本
 ├── AGENTS.global.md     # 全局代理规则（ln OpenCode + Pi 双 harness）
 ├── AGENTS.md            # 本仓库开发指南
@@ -74,7 +77,7 @@ opencode-skills/
 
 ## 使用方式
 
-### 通用 Skill/Agent
+### 通用 Skill/Agent/Extension
 
 通过目录级符号链接到全局，所有项目自动可用：
 
@@ -82,10 +85,12 @@ opencode-skills/
 # 已完成的设置
 ln -s ~/Code/opencode-skills/skills/common ~/.config/opencode/skills
 ln -s ~/Code/opencode-skills/opencode-agents/common ~/.config/opencode/agents
+ln -s ~/Code/opencode-skills/pi-extensions/common ~/.pi/agent/extensions
 
 # 查看
 ls ~/.config/opencode/skills/
 ls ~/.config/opencode/agents/
+ls ~/.pi/agent/extensions/
 ```
 
 ### 全局代理规则
@@ -143,6 +148,14 @@ ln -s ~/Code/opencode-skills/opencode-agents/shared/xxx-agent.md .opencode/agent
 | `universal-translator.md` | `universal-translator.md` | 多语言翻译专家，将非英语文本翻译成自然、准确、地道的英语 |
 | `wechat-gzh-operator.md` | `WeChat-GZH-Operator.md` | 公众号运营 Agent，从选题到发布全流程管理（含状态机、生图暂停、发布确认） |
 
+### Pi Extensions - Common（Pi 通用扩展，已链接到 ~/.pi/agent/extensions/）
+
+| Extension | 来源 | 说明 |
+|-----------|------|------|
+| `baishan` | self-developed | 白山云 API 扩展 |
+| `huawei-cloud` | self-developed | 华为云 API 扩展 |
+| `pi-agent-switcher` | self-developed | Pi Agent 角色切换扩展 |
+
 ### Pi Agents 使用方式
 
 Pi Agent 文件存放在 `~/.pi/agents/`，Pi 启动时自动加载，使用 `/agents` 查看、`/agent <name>` 切换。
@@ -154,12 +167,24 @@ Pi Agent 文件存放在 `~/.pi/agents/`，Pi 启动时自动加载，使用 `/a
 cp ~/Code/opencode-skills/pi-agents/shared/*.md ~/.pi/agents/
 ```
 
+### Pi Extensions 使用方式
+
+Pi 扩展是 TypeScript 模块，存放在 `pi-extensions/` 目录。`common/` 目录已通过目录级符号链接到 `~/.pi/agent/extensions/`，所有项目自动加载。
+
+- **通用扩展**（`common/`）：放入即可全局生效，无需额外操作
+- **共享扩展**（`shared/`）：按需链接到项目的 `.pi/extensions/` 目录
+
+```bash
+# 链接共享扩展到项目
+~/Code/opencode-skills/scripts/link-skills.sh pi-extension <extension-name> /path/to/project
+```
+
 ## 相关目录
 
 - **统一仓库**：`~/Code/opencode-skills/`
 - **上游追踪**：`~/Code/GitHub-Skills/`
 - **全局配置（OpenCode）**：`~/.config/opencode/`
-- **全局配置（Pi）**：`~/.pi/agents/`
+- **全局配置（Pi）**：`~/.pi/agents/`、`~/.pi/agent/extensions/`
 
 ## 相关文档
 

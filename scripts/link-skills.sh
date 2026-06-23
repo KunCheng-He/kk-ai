@@ -94,6 +94,36 @@ link_pi_agent() {
   echo "✅ 已链接 Pi Agent $agent_name 到 $project_path"
 }
 
+link_pi_extension() {
+  local extension_name=$1
+  local project_path=$2
+  
+  if [ -z "$extension_name" ] || [ -z "$project_path" ]; then
+    echo "用法: link-skills.sh pi-extension <extension-name> <project-path>"
+    exit 1
+  fi
+  
+  extension_src="$SKILLS_ROOT/pi-extensions/shared/$extension_name"
+  
+  if [ ! -e "$extension_src" ]; then
+    echo "❌ Pi Extension 不存在: $extension_name"
+    echo "   可用 Extension:"
+    ls "$SKILLS_ROOT/pi-extensions/shared/" 2>/dev/null || echo "   (无)"
+    exit 1
+  fi
+  
+  target="$project_path/.pi/extensions/$extension_name"
+  
+  mkdir -p "$project_path/.pi/extensions"
+  
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    rm -rf "$target"
+  fi
+  
+  ln -s "$extension_src" "$target"
+  echo "✅ 已链接 Pi Extension $extension_name 到 $project_path"
+}
+
 case "$1" in
   shared)
     link_shared_skill "$2" "$3"
@@ -104,10 +134,14 @@ case "$1" in
   pi-agent)
     link_pi_agent "$2" "$3"
     ;;
+  pi-extension)
+    link_pi_extension "$2" "$3"
+    ;;
   *)
     echo "用法:"
     echo "  $0 shared <skill> <project>            # 链接共享 skill 到 OpenCode 项目"
     echo "  $0 opencode-agent <agent> <project>    # 链接 OpenCode Agent 到 OpenCode 项目"
     echo "  $0 pi-agent <agent> <project>          # 链接 Pi Agent 到 Pi 项目"
+    echo "  $0 pi-extension <extension> <project>  # 链接 Pi Extension 到 Pi 项目"
     ;;
 esac

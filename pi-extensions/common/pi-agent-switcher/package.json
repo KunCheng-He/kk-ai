@@ -1,0 +1,14 @@
+{
+  "name": "pi-agent-switcher",
+  "version": "0.1.0",
+  "description": "Pi extension for user-controlled agent role switching with markdown-defined agents",
+  "main": "index.ts",
+  "pi": {
+    "extensions": ["./index.ts"]
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=1.0.0"
+  },
+  "license": "MIT"
+}
