@@ -9,7 +9,7 @@ opencode-skills/
 ├── skills/
 │   ├── common/          # 通用工具类 skill（ln 到全局）
 │   └── shared/          # 共享 skill（项目按需 ln）
-├── agents/
+├── opencode-agents/
 │   ├── common/          # OpenCode 通用 agent（ln 到全局）
 │   └── shared/          # OpenCode 共享 agent（项目按需 ln）
 ├── pi-agents/
@@ -63,7 +63,7 @@ opencode-skills/
 | `verification.md` | 验证 agent |
 | `诸葛亮.md` | 人生导师、思维军师 agent |
 
-### Agents - Shared（OpenCode 共享，项目按需链接）
+### OpenCode Agents - Shared（OpenCode 共享，项目按需链接）
 
 | Agent | 说明 |
 |-------|------|
@@ -81,7 +81,7 @@ opencode-skills/
 ```bash
 # 已完成的设置
 ln -s ~/Code/opencode-skills/skills/common ~/.config/opencode/skills
-ln -s ~/Code/opencode-skills/agents/common ~/.config/opencode/agents
+ln -s ~/Code/opencode-skills/opencode-agents/common ~/.config/opencode/agents
 
 # 查看
 ls ~/.config/opencode/skills/
@@ -112,10 +112,12 @@ ln -s ~/Code/opencode-skills/skills/shared/xxx-skill .opencode/skills/xxx-skill
 
 # 链接 agent
 mkdir -p .opencode/agents
-ln -s ~/Code/opencode-skills/agents/shared/xxx-agent.md .opencode/agents/xxx-agent.md
+ln -s ~/Code/opencode-skills/opencode-agents/shared/xxx-agent.md .opencode/agents/xxx-agent.md
 
 # 或使用脚本
 ~/Code/opencode-skills/scripts/link-skills.sh shared xxx-skill /path/to/project
+~/Code/opencode-skills/scripts/link-skills.sh opencode-agent xxx-agent.md /path/to/project
+~/Code/opencode-skills/scripts/link-skills.sh pi-agent xxx-agent.md /path/to/project
 ```
 
 ## 外部 Skill 更新
@@ -132,18 +134,32 @@ ln -s ~/Code/opencode-skills/agents/shared/xxx-agent.md .opencode/agents/xxx-age
 | `zhugeliang.md` | 人生导师、思维军师，帮助分析复杂处境、认知突破、行动策略 |
 | `build.md` | 通用构建与实现 agent（本地文件，不在本仓库） |
 
-### Pi Agents - Shared（Pi 共享，项目按需链接到 .pi/agents/）
+### Pi Agents - Shared（Pi 共享，存放于 ~/.pi/agents/）
 
-| Agent | 说明 |
-|-------|------|
-| _(暂无)_ | |
+| Agent | OpenCode 源文件 | 说明 |
+|-------|-----------------|------|
+| `knowledge-co-creator.md` | `Knowledge Co-Creator.md` | 知识共建者，识别用户思维阶段并协助知识构建 |
+| `product-research.md` | `ProductResearch.md` | 产品调研 Agent，通过多源调查收集信息并输出结构化调研报告 |
+| `universal-translator.md` | `universal-translator.md` | 多语言翻译专家，将非英语文本翻译成自然、准确、地道的英语 |
+| `wechat-gzh-operator.md` | `WeChat-GZH-Operator.md` | 公众号运营 Agent，从选题到发布全流程管理（含状态机、生图暂停、发布确认） |
+
+### Pi Agents 使用方式
+
+Pi Agent 文件存放在 `~/.pi/agents/`，Pi 启动时自动加载，使用 `/agents` 查看、`/agent <name>` 切换。
+
+迁移命令：
+
+```bash
+# 从本仓库同步 Pi Agent 到全局
+cp ~/Code/opencode-skills/pi-agents/shared/*.md ~/.pi/agents/
+```
 
 ## 相关目录
 
 - **统一仓库**：`~/Code/opencode-skills/`
 - **上游追踪**：`~/Code/GitHub-Skills/`
 - **全局配置（OpenCode）**：`~/.config/opencode/`
-- **全局配置（Pi）**：`~/.pi/agent/`
+- **全局配置（Pi）**：`~/.pi/agents/`
 
 ## 相关文档
 

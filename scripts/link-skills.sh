@@ -1,6 +1,6 @@
 #!/bin/bash
 # link-skills.sh
-# 链接共享 skill 到指定项目
+# 链接共享 skill/agent 到指定项目（同时支持 OpenCode 和 Pi）
 
 set -e
 
@@ -31,15 +31,83 @@ link_shared_skill() {
   fi
   
   ln -s "$skill_dir" "$target"
-  echo "✅ 已链接 $skill_name 到 $project_path"
+  echo "✅ 已链接 skill $skill_name 到 $project_path"
+}
+
+link_opencode_agent() {
+  local agent_name=$1
+  local project_path=$2
+  
+  if [ -z "$agent_name" ] || [ -z "$project_path" ]; then
+    echo "用法: link-skills.sh opencode-agent <agent-name> <project-path>"
+    exit 1
+  fi
+  
+  agent_file="$SKILLS_ROOT/opencode-agents/shared/$agent_name"
+  
+  if [ ! -f "$agent_file" ]; then
+    echo "❌ OpenCode Agent 不存在: $agent_name"
+    echo "   可用 Agent:"
+    ls "$SKILLS_ROOT/opencode-agents/shared/" 2>/dev/null || echo "   (无)"
+    exit 1
+  fi
+  
+  target="$project_path/.opencode/agents/$agent_name"
+  
+  mkdir -p "$project_path/.opencode/agents"
+  
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    rm -rf "$target"
+  fi
+  
+  ln -s "$agent_file" "$target"
+  echo "✅ 已链接 OpenCode Agent $agent_name 到 $project_path"
+}
+
+link_pi_agent() {
+  local agent_name=$1
+  local project_path=$2
+  
+  if [ -z "$agent_name" ] || [ -z "$project_path" ]; then
+    echo "用法: link-skills.sh pi-agent <agent-name> <project-path>"
+    exit 1
+  fi
+  
+  agent_file="$SKILLS_ROOT/pi-agents/shared/$agent_name"
+  
+  if [ ! -f "$agent_file" ]; then
+    echo "❌ Pi Agent 不存在: $agent_name"
+    echo "   可用 Agent:"
+    ls "$SKILLS_ROOT/pi-agents/shared/" 2>/dev/null || echo "   (无)"
+    exit 1
+  fi
+  
+  target="$project_path/.pi/agents/$agent_name"
+  
+  mkdir -p "$project_path/.pi/agents"
+  
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    rm -rf "$target"
+  fi
+  
+  ln -s "$agent_file" "$target"
+  echo "✅ 已链接 Pi Agent $agent_name 到 $project_path"
 }
 
 case "$1" in
   shared)
     link_shared_skill "$2" "$3"
     ;;
+  opencode-agent)
+    link_opencode_agent "$2" "$3"
+    ;;
+  pi-agent)
+    link_pi_agent "$2" "$3"
+    ;;
   *)
     echo "用法:"
-    echo "  $0 shared <skill> <project>  # 链接共享 skill 到指定项目"
+    echo "  $0 shared <skill> <project>            # 链接共享 skill 到 OpenCode 项目"
+    echo "  $0 opencode-agent <agent> <project>    # 链接 OpenCode Agent 到 OpenCode 项目"
+    echo "  $0 pi-agent <agent> <project>          # 链接 Pi Agent 到 Pi 项目"
     ;;
 esac

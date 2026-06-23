@@ -6,16 +6,24 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 
 - `skills/common/` - 通用 skills，链接到全局 `~/.config/opencode/skills/`
 - `skills/shared/` - 共享 skills，部分已链接到全局，部分按需链接到项目
-- `agents/common/` - 通用 agents，链接到全局 `~/.config/opencode/agents/`
-- `agents/shared/` - 共享 agents，按需链接到项目
+- `opencode-agents/common/` - OpenCode 通用 agents，链接到全局 `~/.config/opencode/agents/`
+- `opencode-agents/shared/` - OpenCode 共享 agents，按需链接到项目
+- `pi-agents/shared/` - Pi 共享 agents（已迁移），手动复制到 `~/.pi/agents/` 使用
+- `pi-agents/common/` - Pi 通用 agents（预留）
 - `scripts/` - 辅助脚本
-- `AGENTS.global.md` - 全局代理规则，链接到 `~/.config/opencode/AGENTS.md`
+- `AGENTS.global.md` - 全局代理规则，链接到 `~/.config/opencode/AGENTS.md` 和 `~/.pi/agent/AGENTS.md`
 
 ## 关键命令
 
 ```bash
-# 链接共享 skill 到指定项目
+# 链接共享 skill 到指定 OpenCode 项目
 ~/Code/opencode-skills/scripts/link-skills.sh shared <skill-name> /path/to/project
+
+# 链接 OpenCode Agent 到指定项目
+~/Code/opencode-skills/scripts/link-skills.sh opencode-agent <agent-name> /path/to/project
+
+# 链接 Pi Agent 到指定项目
+~/Code/opencode-skills/scripts/link-skills.sh pi-agent <agent-name> /path/to/project
 
 # 更新所有外部 skill（从上游仓库拉取）
 ~/Code/opencode-skills/scripts/update-external-skills.sh
@@ -28,7 +36,7 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 ```bash
 # 一次性设置（已完成）
 ln -s ~/Code/opencode-skills/skills/common ~/.config/opencode/skills
-ln -s ~/Code/opencode-skills/agents/common ~/.config/opencode/agents
+ln -s ~/Code/opencode-skills/opencode-agents/common ~/.config/opencode/agents
 ```
 
 ## Skill 结构规范
@@ -44,10 +52,29 @@ ln -s ~/Code/opencode-skills/agents/common ~/.config/opencode/agents
 2. 拷贝文件到本仓库对应 skill 目录
 3. 更新 `upstream.json` 中的 `last_update`
 4. 手动检查并提交变更
+## Pi Agent 迁移
+
+OpenCode `opencode-agents/shared/` 下的 Agent 已迁移为 Pi 格式，存放在 `pi-agents/shared/` 目录。
+
+迁移到 Pi 使用：
+
+```bash
+# 复制到 Pi 全局 agents 目录
+cp ~/Code/opencode-skills/pi-agents/shared/*.md ~/.pi/agents/
+
+# Pi 重启后生效，使用 /agents 查看、/agent <name> 切换
+```
+
+Pi Agent 格式与 OpenCode 的区别：
+- 不支持 `mode: subagent`（Pi 无子 agent 概念），改为 primary agent
+- 不支持 `permission` 字段，用 `tools` 字段限制工具集
+- `temperature` 映射为 `thinking` 级别（off/low/medium/high）
+
 ## 新增 Skill/Agent
 
-- 通用 skill/agent 放入 `skills/common/` 或 `agents/common/`，自动生效（全局目录已链接）
-- 共享 skill/agent 放入 `skills/shared/` 或 `agents/shared/`，按需链接到项目
+- 通用 skill/agent 放入 `skills/common/`、`opencode-agents/common/` 或 `pi-agents/common/`，自动生效（全局目录已链接）
+- 共享 skill/agent 放入 `skills/shared/`、`opencode-agents/shared/` 或 `pi-agents/shared/`，按需链接到项目
+- Pi agent 新增/修改后，必须同步更新 `pi-agents/shared/` 和 `~/.pi/agents/` 两处文件
 
 ## 完成后自动更新文档
 

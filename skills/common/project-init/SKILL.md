@@ -14,7 +14,7 @@ version: 2.0.0
 从 `~/Code/opencode-skills/README.md` 读取可用的 shared 资源清单：
 
 - **Skills - Shared** 章节：读取 `skills/shared/` 下的可用 skill
-- **Agents - Shared** 章节：读取 `agents/shared/` 下的可用 agent
+- **Agents - Shared** 章节：读取 `opencode-agents/shared/` 下的可用 agent
 
 解析 README 中的表格，提取名称和说明，作为推荐依据。
 
