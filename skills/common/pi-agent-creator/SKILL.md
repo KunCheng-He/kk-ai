@@ -42,9 +42,17 @@ thinking: high
 
 ### Agent 存放位置
 
-- **用户级**（所有项目可用）：`~/.pi/agent/agents/<name>.md`
-- **项目级**（仅当前项目）：`<project>/.pi/agents/<name>.md`
-- 项目级 Agent 会覆盖同名的用户级 Agent
+本仓库将 Pi agent 分为两类，读取不同目录、互不干扰：
+
+- **主 agent（primary）** — 由 `pi-agent-switcher` 扩展管理的主会话角色
+  - 用户级（所有项目可用）：`~/.pi/agent/main-agents/<name>.md`（仓库 `pi-agents/common/` 已链接）
+  - 项目级（仅当前项目）：`<project>/.pi/main-agents/<name>.md`
+  - 项目级覆盖同名的用户级
+- **子 agent（subagent）** — 被 `@agwab/pi-subagent` 委派的子代理
+  - 用户级：`~/.pi/agent/agents/<name>.md`（仓库 `pi-subagents/common/` 已链接）
+  - 项目级：`<project>/.pi/agents/<name>.md`（⚠️ 不能是符号链接，共享子 agent 须复制）
+
+> 本 skill 创建的是 **主 agent**，默认放入仓库 `pi-agents/common/`（自动链接为 `~/.pi/agent/main-agents/`）。仅当用户明确要创建子 agent 时才使用 `pi-subagents/`。
 
 ## 工作流程
 
@@ -53,8 +61,8 @@ thinking: high
 向用户了解：
 1. **Agent 名称**：英文 kebab-case，如 `code-reviewer`、`api-designer`
 2. **用途**：这个 Agent 负责什么类型的任务？
-3. **存放位置**：用户级（全局可用）还是项目级（仅当前项目）？
-   - 没有明确说明时，默认放用户级 `~/.pi/agent/agents/`
+3. **存放位置**：主 agent（默认，仓库 `pi-agents/common/`）还是子 agent（仓库 `pi-subagents/common/`）？
+   - 没有明确说明时，默认创建主 agent，放入仓库 `pi-agents/common/`（自动链接为 `~/.pi/agent/main-agents/`）
 4. **特殊配置**：
    - 是否需要限制工具集？
    - 是否需要指定模型？

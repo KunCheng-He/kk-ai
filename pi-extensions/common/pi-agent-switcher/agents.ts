@@ -2,10 +2,16 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { CONFIG_DIR_NAME, getAgentDir } from "@earendil-works/pi-coding-agent";
 
-// An agent's effective scope is determined by its file location:
-//   user    → ~/.pi/agent/agents/, available in all projects
-//   project → .pi/agents/, available only in current project
+// This extension (pi-agent-switcher) manages *primary* agents — the ones a user
+// switches into as the main session role. They live in `main-agents/` to avoid
+// colliding with `~/.pi/agent/agents/`, which is reserved for subagent
+// definitions consumed by @agwab/pi-subagent (which hardcodes that path).
+//
+//   user    → ~/.pi/agent/main-agents/, available in all projects
+//   project → .pi/main-agents/, available only in current project
 // No scope field is needed in the markdown frontmatter.
+const AGENT_SUBDIR = "main-agents";
+
 export type AgentScope = "user" | "project" | "both";
 
 export interface AgentConfig {
@@ -139,12 +145,12 @@ function isDirectory(p: string): boolean {
 }
 
 /**
- * Walk up from cwd to find the nearest .pi/agents directory.
+ * Walk up from cwd to find the nearest .pi/main-agents directory.
  */
 function findNearestProjectAgentsDir(cwd: string): string | null {
   let currentDir = cwd;
   while (true) {
-    const candidate = path.join(currentDir, CONFIG_DIR_NAME, "agents");
+    const candidate = path.join(currentDir, CONFIG_DIR_NAME, AGENT_SUBDIR);
     if (isDirectory(candidate)) return candidate;
     const parentDir = path.dirname(currentDir);
     if (parentDir === currentDir) return null;
@@ -161,7 +167,7 @@ export function discoverAgents(
   scope: AgentScope,
 ): AgentDiscoveryResult {
   // Global user agents
-  const userAgentDir = path.join(getAgentDir(), "agents");
+  const userAgentDir = path.join(getAgentDir(), AGENT_SUBDIR);
   const userAgents =
     scope === "project" ? [] : loadAgentsFromDir(userAgentDir, "user");
 
