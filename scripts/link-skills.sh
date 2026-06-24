@@ -4,7 +4,7 @@
 
 set -e
 
-SKILLS_ROOT="$HOME/Code/opencode-skills"
+SKILLS_ROOT="$HOME/Code/kk-ai"
 
 link_shared_skill() {
   local skill_name=$1

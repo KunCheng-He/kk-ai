@@ -19,10 +19,10 @@ mkdir -p {项目路径}/.opencode/agents
 mkdir -p {项目路径}/.opencode/skills
 
 # 链接 agents
-ln -s ~/Code/opencode-skills/opencode-agents/shared/{agent-name}.md {项目路径}/.opencode/agents/
+ln -s ~/Code/kk-ai/opencode-agents/shared/{agent-name}.md {项目路径}/.opencode/agents/
 
 # 链接 skills
-ln -s ~/Code/opencode-skills/skills/shared/{skill-name} {项目路径}/.opencode/skills/
+ln -s ~/Code/kk-ai/skills/shared/{skill-name} {项目路径}/.opencode/skills/
 
 # 初始化 git 仓库
 cd {项目路径} && git init

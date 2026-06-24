@@ -11,7 +11,7 @@ version: 2.0.0
 
 ## 数据源
 
-从 `~/Code/opencode-skills/README.md` 读取可用的 shared 资源清单：
+从 `~/Code/kk-ai/README.md` 读取可用的 shared 资源清单：
 
 - **Skills - Shared** 章节：读取 `skills/shared/` 下的可用 skill
 - **Agents - Shared** 章节：读取 `opencode-agents/shared/` 下的可用 agent
@@ -29,7 +29,7 @@ version: 2.0.0
 
 ### 2. 读取资源清单
 
-读取 `~/Code/opencode-skills/README.md`，解析以下章节：
+读取 `~/Code/kk-ai/README.md`，解析以下章节：
 
 ```markdown
 ### Skills - Shared（共享，项目按需链接）

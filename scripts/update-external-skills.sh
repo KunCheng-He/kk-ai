@@ -4,7 +4,7 @@
 
 set -e
 
-SKILLS_ROOT="$HOME/Code/opencode-skills"
+SKILLS_ROOT="$HOME/Code/kk-ai"
 
 echo "🔍 查找所有外部 skill..."
 

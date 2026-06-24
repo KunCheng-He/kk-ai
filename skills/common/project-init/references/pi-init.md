@@ -19,7 +19,7 @@
 mkdir -p {项目路径}/.pi/skills
 
 # 链接 skills（Pi 使用相同的 SKILL.md 格式，直接符号链接即可）
-ln -s ~/Code/opencode-skills/skills/shared/{skill-name} {项目路径}/.pi/skills/
+ln -s ~/Code/kk-ai/skills/shared/{skill-name} {项目路径}/.pi/skills/
 
 # 初始化 git 仓库
 cd {项目路径} && git init

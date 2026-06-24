@@ -16,7 +16,7 @@
 如需在其他机器上设置：
 
 ```bash
-ln -s ~/Code/opencode-skills/pi-extensions/common ~/.pi/agent/extensions
+ln -s ~/Code/kk-ai/pi-extensions/common ~/.pi/agent/extensions
 ```
 
 ### 项目级扩展（shared）
@@ -25,10 +25,10 @@ ln -s ~/Code/opencode-skills/pi-extensions/common ~/.pi/agent/extensions
 
 ```bash
 # 使用脚本链接
-~/Code/opencode-skills/scripts/link-skills.sh pi-extension <extension-name> /path/to/project
+~/Code/kk-ai/scripts/link-skills.sh pi-extension <extension-name> /path/to/project
 
 # 或手动链接
-ln -s ~/Code/opencode-skills/pi-extensions/shared/my-extension.ts /path/to/project/.pi/extensions/my-extension.ts
+ln -s ~/Code/kk-ai/pi-extensions/shared/my-extension.ts /path/to/project/.pi/extensions/my-extension.ts
 ```
 
 ## 扩展规范
