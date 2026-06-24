@@ -8,7 +8,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/KunCheng-He/opencode-k-skills.git",
+        "url": "git+https://github.com/KunCheng-He/kk-ai.git",
         "directory": "pi-extensions/common/pi-agent-switcher"
     },
     "pi": {
