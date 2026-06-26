@@ -35,6 +35,7 @@ kk-ai/
 |-------|------|------|
 | `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
 | `markdown-to-image` | self-developed | Markdown/代码片段转图片 |
+| `mermaid` | self-developed | Mermaid 图表生成（mmdc CLI，渲染 SVG/PNG/PDF） |
 | `project-init` | self-developed | 项目初始化工具（OpenCode / Pi 双支持） |
 | `playwright-cli` | [Playwright](https://www.npmjs.com/package/@playwright/cli) | 浏览器自动化交互工具（手动更新） |
 | `pi-agent-creator` | self-developed | 创建 Pi 主 Agent 定义文件（供 pi-agent-switcher 使用） |

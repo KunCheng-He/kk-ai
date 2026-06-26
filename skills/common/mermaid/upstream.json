@@ -1,0 +1,6 @@
+{
+  "source": "self-developed",
+  "created_at": "2026-06-26",
+  "version": "1.0.0",
+  "description": "Mermaid diagram generation skill, wraps the mmdc CLI (https://github.com/mermaid-js/mermaid-cli). Official docs: https://mermaid.nodejs.cn/"
+}
