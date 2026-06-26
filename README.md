@@ -33,7 +33,6 @@ kk-ai/
 
 | Skill | 来源 | 说明 |
 |-------|------|------|
-| `drawio` | [drawio-mcp](https://github.com/jgraph/drawio-mcp) | 图表绘制 |
 | `markdown-to-image` | self-developed | Markdown/代码片段转图片 |
 | `mermaid` | self-developed | Mermaid 图表生成（mmdc CLI，渲染 SVG/PNG/PDF） |
 | `project-init` | self-developed | 项目初始化工具（OpenCode / Pi 双支持） |
@@ -77,7 +76,7 @@ kk-ai/
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（kk-brain） |
 | `ProductResearch.md` | 产品调研 subagent（专属 Skill 优先 → 简单页面 webfetch → 复杂页面 playwright-cli CDP） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
-| `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、drawio 架构图、image-prompt 提示词生成） |
+| `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、image-prompt 提示词生成） |
 
 ## 使用方式
 

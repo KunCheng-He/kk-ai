@@ -123,7 +123,7 @@ description: |
    - 对比分析处：增强对比效果
 
 3. **配图生成方式**
-   - 架构图/流程图 → 调用 `drawio` skill
+   - 架构图/流程图 → 调用可用的图表/绘图 skill
    - 产品图/示意图 → 调用 `images-k-generation` skill
    - 代码/表格 → 调用 `markdown-to-image` skill
 
