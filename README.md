@@ -51,10 +51,10 @@ kk-ai/
 | `external-skills-updater` | self-developed | 更新外部 skill |
 | `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | 前端界面设计 |
 | `images-k-generation` | self-developed | 图像生成 |
-| `ob_architect_structure` | self-developed | 整理思路、构建大纲（kk-brain） |
-| `ob_capture_insight` | self-developed | 捕捉洞察、结晶知识卡片（kk-brain） |
-| `ob_compile_manuscript` | self-developed | 整合内容、输出文章（kk-brain） |
-| `ob_polish_prose` | self-developed | 扩写大纲、优化文字（kk-brain） |
+| `ob_architect_structure` | self-developed | 整理思路、构建逻辑骨架模板（kk-brain） |
+| `ob_capture_insight` | self-developed | 捕捉洞察、结晶知识卡片（含一句话核心观点，kk-brain） |
+| `ob_compile_manuscript` | self-developed | 整合内容、输出文章（含成稿模板 + 三层审计，kk-brain） |
+| `ob_polish_prose` | self-developed | 扩写大纲、优化文字（含 author_voice 人格注入 + 三层风格审计，kk-brain） |
 | `gzh-article-creator` | self-developed | 公众号文章创作工具 |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
@@ -73,7 +73,7 @@ kk-ai/
 
 | Agent | 说明 |
 |-------|------|
-| `Knowledge Co-Creator.md` | 知识共建者主 agent（kk-brain） |
+| `Knowledge Co-Creator.md` | 知识共建者主 agent（hkc 第一人称视角，含工作流阶段调度，kk-brain） |
 | `ProductResearch.md` | 产品调研 subagent（专属 Skill 优先 → 简单页面 webfetch → 复杂页面 playwright-cli CDP） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
 | `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、image-prompt 提示词生成） |
