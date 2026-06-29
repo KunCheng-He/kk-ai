@@ -107,8 +107,14 @@ which mmdc
 
 ### 基本命令
 
+**推荐默认参数**：渲染时始终使用 `-w 1600 -s 3`，确保输出清晰度。仅在用户明确指定其他值时覆盖。
+
 ```bash
+# SVG（默认，清晰度不受分辨率参数影响）
 mmdc -i <输入.mmd> -o <输出.svg>
+
+# PNG（推荐默认参数，确保清晰度）
+mmdc -i <输入.mmd> -o <输出.png> -w 1600 -s 3 -b white
 ```
 
 ### 常用参数
@@ -119,9 +125,9 @@ mmdc -i <输入.mmd> -o <输出.svg>
 | `-o, --output` | 输出文件路径 | `-o diagram.svg` |
 | `-t, --theme` | 主题：`default`、`forest`、`dark`、`neutral` | `-t dark` |
 | `-b, --backgroundColor` | 背景色（仅 PNG/SVG） | `-b transparent` |
-| `-w, --width` | 页面宽度 px（默认 800） | `-w 1200` |
+| `-w, --width` | 页面宽度 px（CLI 默认 800，**本 SKILL 默认 1600**） | `-w 1600` |
 | `-H, --height` | 页面高度 px（默认 600） | `-H 900` |
-| `-s, --scale` | Puppeteer 缩放因子（默认 1） | `-s 2` |
+| `-s, --scale` | Puppeteer 缩放因子（CLI 默认 1，**本 SKILL 默认 3**） | `-s 3` |
 | `-c, --configFile` | Mermaid JSON 配置文件 | `-c config.json` |
 | `-C, --cssFile` | 自定义 CSS 文件 | `-C style.css` |
 | `-q, --quiet` | 静默模式，不输出日志 | `-q` |
@@ -133,8 +139,8 @@ mmdc -i <输入.mmd> -o <输出.svg>
 # 渲染为 SVG（默认）
 mmdc -i flowchart.mmd -o flowchart.svg
 
-# 渲染为 PNG，暗色主题，透明背景
-mmdc -i flowchart.mmd -o flowchart.png -t dark -b transparent
+# 渲染为 PNG，推荐默认参数（宽 1600，3 倍缩放）
+mmdc -i flowchart.mmd -o flowchart.png -b white -w 1600 -s 3
 
 # 渲染为 PDF，自动缩放适配
 mmdc -i gantt.mmd -o gantt.pdf -f
