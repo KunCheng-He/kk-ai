@@ -1,0 +1,8 @@
+{
+  "source": "https://github.com/open-herdr/herdr",
+  "path": ".",
+  "tracking_dir": "~/Code/GitHub-Skills/common/herdr",
+  "last_update": "2026-07-02",
+  "notes": "Only SKILL.md is the skill file; the upstream repo is the full herdr application. When updating, only sync SKILL.md.",
+  "update_method": "manual"
+}

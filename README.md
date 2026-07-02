@@ -40,6 +40,7 @@ kk-ai/
 | `pi-agent-creator` | self-developed | 创建 Pi 主 Agent 定义文件（供 pi-agent-switcher 使用） |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
+| `herdr` | [open-herdr/herdr](https://github.com/open-herdr/herdr) | herdr 终端 agent 多路复用器控制（手动更新） |
 | `html-ppt` | [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) | HTML 演示文稿生成 |
 
 ### Skills - Shared（共享，项目按需链接）
