@@ -4,8 +4,9 @@ title: {{concept_name}}
 tags:
   - {{tag1}}
   - {{tag2}}
-nodeType: 原子
+nodeType: 原子 <!-- 06 工作区类型，表示未精炼的知识单元 -->
 created: {{date}}
+updated: {{date}}
 source: {{source_url}}
 ---
 

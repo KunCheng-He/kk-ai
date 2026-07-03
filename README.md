@@ -53,9 +53,8 @@ kk-ai/
 | `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | 前端界面设计 |
 | `images-k-generation` | self-developed | 图像生成 |
 | `ob_architect_structure` | self-developed | 整理思路、构建逻辑骨架模板（前置条件 ≥3 张卡片，kk-brain） |
-| `ob_capture_insight` | self-developed | 捕捉洞察、结晶知识卡片（含一句话核心观点 + 信息边界，kk-brain） |
-| `ob_assemble_card` | self-developed | 整合精炼卡片、输出 Obsidian 知识卡片（含卡片模板 + 四层审计，取代 ob_compile_manuscript） |
-| `ob_refine_card` | self-developed | 结构化精炼、转化为扫读友好格式（含 author_voice 人格注入 + style_guide 风格审计，取代 ob_polish_prose） |
+| `ob_capture_insight` | self-developed | 捕捉洞察、结晶原子化知识卡片（苏格拉底引导 + 事实验证 + 原子卡片模板，kk-brain） |
+| `ob_refine_card` | self-developed | 骨架→卡片全流程：框架确认→内容填充→交叉引用审计（含 author_voice 人格注入 + style_guide 风格审计；取代 ob_polish_prose + ob_assemble_card + ob_compile_manuscript） |
 | `gzh-article-creator` | self-developed | 公众号文章创作工具 |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
@@ -74,7 +73,7 @@ kk-ai/
 
 | Agent | 说明 |
 |-------|------|
-| `Knowledge Co-Creator.md` | 知识共建者主 agent（hkc 第一人称视角，含工作流阶段调度，kk-brain） |
+| `Knowledge Co-Creator.md` | 知识共建者主 agent（识别思维阶段 + 质量门禁 + Skill 调度，hkc 第一人称视角，kk-brain） |
 | `ProductResearch.md` | 产品调研 subagent（专属 Skill 优先 → 简单页面 webfetch → 复杂页面 playwright-cli CDP） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
 | `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、image-prompt 提示词生成） |
