@@ -25,9 +25,21 @@ find "$SKILLS_ROOT/skills" -name "upstream.json" | while read upstream_file; do
     continue
   fi
   
+  # 跳过自开发的 skill
+  if [ "$source_url" = "self-developed" ]; then
+    echo "⏭️  跳过 $skill_name (自开发)"
+    continue
+  fi
+  
   # 跳过来源未知的 skill
-  if [ "$source_url" = "unknown" ] || [ -z "$tracking_dir" ]; then
+  if [ "$source_url" = "unknown" ] || [ -z "$source_url" ]; then
     echo "⏭️  跳过 $skill_name (来源未知)"
+    continue
+  fi
+  
+  # 跳过缺少追踪目录的 skill
+  if [ -z "$tracking_dir" ] || [ "$tracking_dir" = "null" ]; then
+    echo "⏭️  跳过 $skill_name (缺少追踪目录)"
     continue
   fi
   
