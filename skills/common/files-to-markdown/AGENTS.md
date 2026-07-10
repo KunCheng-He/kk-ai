@@ -10,6 +10,7 @@
 - Python 3.12+
 - 包管理：`uv`
 - 核心依赖：`markitdown[all]`（Microsoft 出品）
+- 可选依赖：`markitdown[llm-image]`（LLM OCR 插件）
 
 ## 重要约定
 
@@ -51,11 +52,24 @@ uv run --project <skill-path>/scripts python <skill-path>/scripts/convert.py doc
 # 指定输出目录
 uv run --project <skill-path>/scripts python <skill-path>/scripts/convert.py document.pdf -o ./output
 
-# 支持任意格式
-uv run --project <skill-path>/scripts python <skill-path>/scripts/convert.py slides.pptx
+# 强制重新转换（跳过缓存）
+uv run --project <skill-path>/scripts python <skill-path>/scripts/convert.py document.pdf -f
+
+# 启用 LLM OCR（需安装 markitdown[llm-image]）
+uv run --project <skill-path>/scripts python <skill-path>/scripts/convert.py scan.png --ocr --llm-model gpt-4o
+
+# 查看版本
+uv run --project <skill-path>/scripts python <skill-path>/scripts/convert.py --version
 ```
 
 > **注意**：使用 `--project` 而非 `cd`，确保相对路径（如 `-o markdown-conversions`）解析到用户的项目目录，而非 skill 的 scripts 目录。
+
+### 新特性（v1.1.0）
+
+- **文件缓存**：默认跳过已转换且未修改的文件，使用 `-f` 强制重新转换
+- **LLM OCR 支持**：通过 `--ocr` 和 `--llm-model` 启用 markitdown-ocr 插件
+- **.gitignore 检查**：自动警告 `markdown-conversions/` 是否已加入 `.gitignore`
+- **更好的错误提示**：文件未找到时列出近似文件名，依赖缺失时给出安装命令
 
 ## 代码风格指南
 
