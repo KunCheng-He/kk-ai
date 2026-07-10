@@ -110,7 +110,7 @@ Pi Agent 格式与 OpenCode 的区别：
 
 ## Python 项目约定
 
-部分 skill（如 `douban-k-search`、`xhs-k-search`、`zhihu-k-search`、`images-k-generation`）包含 Python 脚本：
+部分 skill（如 `pdf-to-markdown`、`douban-k-search`、`xhs-k-search`、`zhihu-k-search`、`images-k-generation`）包含 Python 脚本：
 - 代码放在 `scripts/` 子目录
 - 使用 `uv` 作为包管理器
 - 详见各 skill 目录下的 `AGENTS.md`
