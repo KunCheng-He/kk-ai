@@ -41,7 +41,7 @@ kk-ai/
 | `skillify` | self-developed | 将会话过程捕获为 skill |
 | `herdr` | [open-herdr/herdr](https://github.com/open-herdr/herdr) | herdr 终端 agent 多路复用器控制（手动更新） |
 | `html-ppt` | [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) | HTML 演示文稿生成 |
-| `pdf-to-markdown` | self-developed | PDF 转 Markdown（pymupdf4llm），支持图文、表格、OCR 扫描版 |
+| `files-to-markdown` | self-developed | 多格式文件转 Markdown（Microsoft MarkItDown），支持 PDF/Word/PPT/Excel/图片/音频/EPUB/ZIP 等 |
 
 ### Skills - Shared（共享，项目按需链接）
 
