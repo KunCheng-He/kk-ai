@@ -1,6 +1,0 @@
-{
-  "source": "self-developed",
-  "created_at": "2026-07-10",
-  "version": "1.0.0",
-  "description": "PDF 转 Markdown 工具，使用 pymupdf4llm 将 PDF 转换为 LLM 可读的 Markdown 格式，支持图文混合 PDF、表格和 OCR 扫描版 PDF"
-}

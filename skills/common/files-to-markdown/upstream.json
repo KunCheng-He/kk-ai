@@ -1,0 +1,6 @@
+{
+  "source": "self-developed",
+  "created_at": "2026-07-10",
+  "version": "1.0.0",
+  "description": "多格式文件转 Markdown 工具，基于 Microsoft MarkItDown 将 PDF/Word/PPT/Excel/图片/HTML/CSV/JSON/XML/EPUB/ZIP/音频 等格式转换为 LLM 可读的 Markdown"
+}

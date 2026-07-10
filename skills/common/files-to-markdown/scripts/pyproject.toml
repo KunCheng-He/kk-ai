@@ -1,0 +1,8 @@
+[project]
+name = "files-to-markdown"
+version = "0.1.0"
+description = "Convert various file formats to Markdown using Microsoft MarkItDown"
+requires-python = ">=3.12"
+dependencies = [
+    "markitdown[all]>=0.1.0",
+]
