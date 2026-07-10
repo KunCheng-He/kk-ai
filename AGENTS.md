@@ -117,7 +117,7 @@ Pi Agent 格式与 OpenCode 的区别：
 
 ## Node.js 项目约定
 
-部分 skill（如 `markdown-to-image`、`html-ppt`）包含 Node.js 脚本：
+部分 skill（如 `html-ppt`）包含 Node.js 脚本：
 - 代码放在 `scripts/` 子目录
 - 使用 `npm` 作为包管理器
 - 首次使用需在 `scripts/` 目录执行 `npm install`
