@@ -67,6 +67,7 @@ kk-ai/
 
 | Agent | 说明 |
 |-------|------|
+| `browser-researcher.md` | 浏览器研究员 subagent，操作浏览器搜集信息，只返回提炼结论，不回流中间噪声 |
 | `verification.md` | 验证 agent |
 | `诸葛亮.md` | 人生导师、思维军师 agent |
 
