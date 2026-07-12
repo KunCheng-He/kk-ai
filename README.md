@@ -43,6 +43,7 @@ kk-ai/
 | `html-ppt` | [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) | HTML 演示文稿生成 |
 | `files-to-markdown` | self-developed | 多格式文件转 Markdown（Microsoft MarkItDown），支持 PDF/Word/PPT/Excel/图片/音频/EPUB/ZIP 等 |
 | `workflow-designer` | self-developed | AI 编码工具工作流设计，基于三层架构和五项原则分析推荐 agent/skill 方案 |
+| `loop-by-herdr` | self-developed | Herdr 驱动的迭代优化循环（执行→审查→优化→重试），适用于任何需要反复验证的迭代任务 |
 
 ### Skills - Shared（共享，项目按需链接）
 
@@ -62,7 +63,6 @@ kk-ai/
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
 | `zhihu-k-search` | self-developed | 知乎数据搜索 |
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
-| `loop-by-herdr` | self-developed | Herdr 驱动的迭代优化循环（执行→审查→优化→重试） |
 | `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
 
 ### Agents - Common（OpenCode 通用，已链接到全局）
