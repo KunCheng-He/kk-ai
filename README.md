@@ -58,6 +58,7 @@ kk-ai/
 | `ob_refine_card` | self-developed | 骨架→卡片全流程：框架确认→内容填充→交叉引用审计（含 author_voice 人格注入 + style_guide 风格审计；取代 ob_polish_prose + ob_assemble_card + ob_compile_manuscript） |
 | `gzh-article-creator` | self-developed | 公众号文章创作工具 |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
+| `research-workflow` | self-developed | 产品调研工作流（识别类型→并行收集→报告生成→蓝图后处理） |
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
 | `zhihu-k-search` | self-developed | 知乎数据搜索 |
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
@@ -77,6 +78,7 @@ kk-ai/
 |-------|------|
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（识别思维阶段 + 质量门禁 + Skill 调度，hkc 第一人称视角，kk-brain） |
 | `ProductResearch.md` | 产品调研 subagent（专属 Skill 优先 → 简单页面 webfetch → 复杂页面 playwright-cli CDP） |
+| `ResearchReporter.md` | 产品调研报告生成 subagent（接收结论摘要，按模板生成 README.md） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
 | `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、image-prompt 提示词生成） |
 

@@ -49,7 +49,8 @@ temperature: 0.3
 ### 3. 收集社区反馈
 
 **第一层：专属平台 Skill（优先）**
-- 小红书：使用 `xhs-k-research` skill（搜索帖子、获取详情和评论）
+- 首先检查项目 `AGENTS.md` 中的数据源规则，遵守所有平台使用限制
+- 小红书：使用 `xhs-k-research` skill（搜索帖子、获取详情和评论；如项目 AGENTS.md 禁止则跳过）
 - 知乎：使用 `zhihu-k-research` skill（搜索问题/回答/文章、获取详情）
 - 豆瓣：使用 `douban-k-research` skill（搜索书籍/电影/音乐、获取详情和短评）
 
