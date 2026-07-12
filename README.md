@@ -62,6 +62,7 @@ kk-ai/
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
 | `zhihu-k-search` | self-developed | 知乎数据搜索 |
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
+| `loop-by-herdr` | self-developed | Herdr 驱动的迭代优化循环（执行→审查→优化→重试） |
 | `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
 
 ### Agents - Common（OpenCode 通用，已链接到全局）
