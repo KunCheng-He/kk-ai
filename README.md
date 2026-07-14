@@ -58,6 +58,7 @@ kk-ai/
 | `ob_capture_insight` | self-developed | 捕捉洞察、结晶原子化知识卡片（苏格拉底引导 + 事实验证 + 原子卡片模板，kk-brain） |
 | `ob_refine_card` | self-developed | 骨架→卡片全流程：框架确认→内容填充→交叉引用审计（含 author_voice 人格注入 + style_guide 风格审计；取代 ob_polish_prose + ob_assemble_card + ob_compile_manuscript） |
 | `gzh-article-creator` | self-developed | 公众号文章创作工具 |
+| `gzh-workflow` | self-developed | 公众号运营全流程工作流（调研→写作→配图→审查→发布），由通用主 Agent 加载，替代原 WeChat-GZH-Operator 主 Agent |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `research-workflow` | self-developed | 产品调研工作流（识别类型→并行收集→报告生成→蓝图后处理） |
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
@@ -70,18 +71,18 @@ kk-ai/
 | Agent | 说明 |
 |-------|------|
 | `browser-researcher.md` | 浏览器研究员 subagent，操作浏览器搜集信息，只返回提炼结论，不回流中间噪声 |
-| `verification.md` | 验证 agent |
 | `诸葛亮.md` | 人生导师、思维军师 agent |
 
 ### OpenCode Agents - Shared（OpenCode 共享，项目按需链接）
 
 | Agent | 说明 |
 |-------|------|
+| `GZH-Writer.md` | 公众号文章写作 subagent（加载 gzh-article-creator skill，隔离长文上下文，只返回文件路径和摘要） |
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（识别思维阶段 + 质量门禁 + Skill 调度，hkc 第一人称视角，kk-brain） |
-| `ProductResearch.md` | 产品调研 subagent（专属 Skill 优先 → 简单页面 webfetch → 复杂页面 playwright-cli CDP） |
+| `ProductResearch.md` | 产品调研 subagent（**已废弃**，由 research-workflow skill + ResearchReporter 替代） |
 | `ResearchReporter.md` | 产品调研报告生成 subagent（接收结论摘要，按模板生成 README.md） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
-| `WeChat-GZH-Operator.md` | 公众号运营主 agent（状态机管理、IMAGE_GEN 暂停生图、用户确认节点、验证检查点、image-prompt 提示词生成） |
+| `WeChat-GZH-Operator.md` | 公众号运营主 agent（**已废弃**，由 gzh-workflow skill + GZH-Writer subagent 替代，保留供旧项目参考） |
 
 ## 使用方式
 
@@ -156,19 +157,17 @@ ln -s ~/Code/kk-ai/opencode-agents/shared/xxx-agent.md .opencode/agents/xxx-agen
 |-------|-----------------|------|
 | `knowledge-co-creator.md` | `Knowledge Co-Creator.md` | 知识共建者，识别用户思维阶段并协助知识构建 |
 | `universal-translator.md` | `universal-translator.md` | 多语言翻译专家，将非英语翻译成自然地道的英语 |
-| `wechat-gzh-operator.md` | `WeChat-GZH-Operator.md` | 公众号运营 Agent，从选题到发布全流程管理 |
+| `wechat-gzh-operator.md` | `WeChat-GZH-Operator.md` | **已废弃**，由 gzh-workflow skill 替代。Pi 默认 Agent 加载 gzh-workflow skill 即可完成公众号运营 |
 
 ### Pi Subagents - Common（Pi 通用子 agent，已链接到 ~/.pi/agent/agents/）
 
-| Agent | 说明 |
-|-------|------|
-| `verification.md` | 验证专家，尝试破坏实现、发现边缘情况和回归问题（被 @agwab/pi-subagent 委派） |
+（暂无）
 
 ### Pi Subagents - Shared（Pi 共享子 agent，项目按需复制到 .pi/agents/）
 
 | Agent | OpenCode 源文件 | 说明 |
 |-------|-----------------|------|
-| `product-research.md` | `ProductResearch.md` | 产品调研 Agent，多源调查并输出结构化调研报告 |
+| `product-research.md` | `ProductResearch.md` | **已废弃**，由 research-workflow skill + ResearchReporter 替代 |
 
 ### Pi Extensions - Common（Pi 通用扩展，已链接到 ~/.pi/agent/extensions/）
 
