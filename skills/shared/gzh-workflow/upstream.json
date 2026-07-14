@@ -1,0 +1,5 @@
+{
+  "source": "self-developed",
+  "created_at": "2026-07-13",
+  "description": "公众号运营全流程工作流，由默认通用主Agent加载，协调 subagent/skill 完成调研→写作→配图→审查→发布"
+}
