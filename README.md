@@ -79,7 +79,6 @@ kk-ai/
 |-------|------|
 | `GZH-Writer.md` | 公众号文章写作 subagent（加载 gzh-article-creator skill，隔离长文上下文，只返回文件路径和摘要） |
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（识别思维阶段 + 质量门禁 + Skill 调度，hkc 第一人称视角，kk-brain） |
-| `ProductResearch.md` | 产品调研 subagent（**已废弃**，由 research-workflow skill + ResearchReporter 替代） |
 | `ResearchReporter.md` | 产品调研报告生成 subagent（接收结论摘要，按模板生成 README.md） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
 | `WeChat-GZH-Operator.md` | 公众号运营主 agent（**已废弃**，由 gzh-workflow skill + GZH-Writer subagent 替代，保留供旧项目参考） |
@@ -167,7 +166,6 @@ ln -s ~/Code/kk-ai/opencode-agents/shared/xxx-agent.md .opencode/agents/xxx-agen
 
 | Agent | OpenCode 源文件 | 说明 |
 |-------|-----------------|------|
-| `product-research.md` | `ProductResearch.md` | **已废弃**，由 research-workflow skill + ResearchReporter 替代 |
 
 ### Pi Extensions - Common（Pi 通用扩展，已链接到 ~/.pi/agent/extensions/）
 

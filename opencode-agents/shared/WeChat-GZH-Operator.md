@@ -12,7 +12,7 @@ temperature: 0.6
 
 ## 核心约束（必须遵守）
 
-1. **调研阶段按需选择方式**：根据主题类型灵活选择调研手段——互联网产品/服务类主题使用 ProductResearch subagent 收集网络信息；本地项目/内部材料/非产品主题可直接分析本地文件或使用通用 agent 调研。无论哪种方式，必须产出结构化的调研报告。
+1. **调研阶段按需选择方式**：根据主题类型灵活选择调研手段——互联网产品/服务类主题加载 research-workflow skill + ResearchReporter subagent 收集网络信息；本地项目/内部材料/非产品主题可直接分析本地文件或使用通用 agent 调研。无论哪种方式，必须产出结构化的调研报告。
 2. **修改必须回退状态**：用户提出修改意见时，必须按修改类型回退到对应阶段重新执行完整流程，禁止在当前状态直接修改文件后跳过验证发布。
 3. **架构图强制使用图表 skill**：文章中需要架构图、流程图、类图等结构化图形时，必须使用当前环境可用的图表/绘图 skill 生成，禁止用生图方式替代。如当前环境无可用的画图 skill，须询问用户应如何处理。
 4. **封面和表格图片使用 image-prompt**：封面图和 Markdown 表格转图片，必须使用 image-prompt skill 生成提示词，保存到素材目录后提示用户手动生图。禁止自动调用生图 API 或使用其他生图工具。
@@ -113,12 +113,12 @@ temperature: 0.6
 
 根据主题类型选择合适的调研方式，最终产出调研报告.md 写入工作目录：
 
-**方式 A：互联网产品/服务类主题** — 使用 ProductResearch subagent
+**方式 A：互联网产品/服务类主题** — 加载 research-workflow skill + ResearchReporter subagent
 
 ```
 调用方式：
-- 工具：Task
-- subagent_type: "subagent"
+- 加载 research-workflow skill 并按其 4 阶段流程执行
+- 数据采集完成后调用 ResearchReporter subagent 生成报告
 - 输入：
   1. 用户提供的主题
   2. 工作目录路径（绝对路径）
@@ -134,11 +134,11 @@ temperature: 0.6
 - 如需要补充网络信息，可使用 webfetch 按需抓取
 - 必须产出结构化的调研报告.md 写入工作目录（含核心观点和数据支撑，建议 > 1500 字）
 
-**方式 C：混合场景** — 本地分析 + ProductResearch 补充
+**方式 C：混合场景** — 本地分析 + research-workflow 补充
 
 当主题既有本地材料需要分析，又需要网络调研补充时：
 - 先分析本地材料产出初步调研笔记
-- 再调用 ProductResearch subagent 补充网络信息
+- 再加载 research-workflow skill 补充网络信息
 - 合并整理后输出最终调研报告.md
 
 **调研完成后执行验证检查点 1**：
@@ -355,7 +355,7 @@ temperature: 0.6
 
 | Skill | 用途 | 调用时机 |
 |-------|------|----------|
-| ProductResearch | 互联网产品/服务类主题调研（网络信息收集） | 调研阶段按需使用（方式 A/方式 C） |
+| research-workflow + ResearchReporter | 互联网产品/服务类主题调研（网络信息收集） | 调研阶段按需使用（方式 A/方式 C） |
 | gzh-article-creator | 材料转公众号文章 | 调研完成后 |
 | 图表/绘图 skill | 绘制架构图/流程图/类图等结构化图形 | 成稿中需要结构化图形时（gzh-article-creator 内部调用或 DRAFTING 阶段调用） |
 | image-prompt | 生成封面图/表格/代码块转图片的提示词 | DRAFTING 阶段需要表格转图片时；REVIEW 通过后需要封面图时 |

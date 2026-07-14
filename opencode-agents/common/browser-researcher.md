@@ -37,9 +37,9 @@ color: "#00BFFF"
 | Skill | 适用场景 |
 |-------|---------|
 | `playwright-cli` | 未封装脚本的任意网站，通过 CDP 连接用户已有浏览器 |
-| `douban-k-research` | 豆瓣书籍/电影/音乐搜索与详情 |
-| `xhs-k-research` | 小红书搜索与帖子详情 |
-| `zhihu-k-research` | 知乎搜索与问题回答详情 |
+| `douban-k-search` | 豆瓣书籍/电影/音乐搜索与详情 |
+| `xhs-k-search` | 小红书搜索与帖子详情 |
+| `zhihu-k-search` | 知乎搜索与问题回答详情 |
 | `webfetch` | 简单页面，不需要浏览器交互时优先使用 |
 
 ## 核心原则：信息不回流
