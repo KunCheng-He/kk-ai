@@ -54,8 +54,8 @@ version: 2.0.0
 | 内容创作/知识管理 | ob_* 系列 | Knowledge Co-Creator |
 | 产品调研 | xhs-k-search, zhihu-k-search, douban-k-search, research-workflow | ResearchReporter |
 | 前端/Web 开发 | frontend-design | - |
-| 社交媒体运营 | baoyu-xhs-images, xhs-k-search | - |
-| 需要图像素材 | images-k-generation | - |
+| 社交媒体运营 | xhs-k-search | - |
+| 需要图像素材 | image-prompt | - |
 
 > **注意**：Agents 仅对 OpenCode 项目推荐。Pi 使用 Prompt Templates 而非 Agents，初始化 Pi 项目时只推荐 Skills。
 

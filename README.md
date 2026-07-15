@@ -49,15 +49,12 @@ kk-ai/
 
 | Skill | 来源 | 说明 |
 |-------|------|------|
-| `baoyu-xhs-images` | [baoyu-skills](https://github.com/JimLiu/baoyu-skills) | 小红书图片生成 |
 | `douban-k-search` | self-developed | 豆瓣数据搜索 |
 | `external-skills-updater` | self-developed | 更新外部 skill |
 | `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | 前端界面设计 |
-| `images-k-generation` | self-developed | 图像生成 |
 | `ob_architect_structure` | self-developed | 整理思路、构建逻辑骨架模板（前置条件 ≥3 张卡片，kk-brain） |
 | `ob_capture_insight` | self-developed | 捕捉洞察、结晶原子化知识卡片（苏格拉底引导 + 事实验证 + 原子卡片模板，kk-brain） |
 | `ob_refine_card` | self-developed | 骨架→卡片全流程：框架确认→内容填充→交叉引用审计（含 author_voice 人格注入 + style_guide 风格审计；取代 ob_polish_prose + ob_assemble_card + ob_compile_manuscript） |
-| `gzh-article-creator` | self-developed | 公众号文章创作工具 |
 | `gzh-workflow` | self-developed | 公众号运营全流程工作流（调研→写作→配图→审查→发布），由通用主 Agent 加载，替代原 WeChat-GZH-Operator 主 Agent |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `research-workflow` | self-developed | 产品调研工作流（识别类型→并行收集→报告生成→蓝图后处理） |
@@ -77,11 +74,10 @@ kk-ai/
 
 | Agent | 说明 |
 |-------|------|
-| `GZH-Writer.md` | 公众号文章写作 subagent（加载 gzh-article-creator skill，隔离长文上下文，只返回文件路径和摘要） |
+| `GZH-Writer.md` | 公众号文章写作 subagent（写作规范已内嵌，隔离长文上下文，只返回文件路径和摘要） |
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（识别思维阶段 + 质量门禁 + Skill 调度，hkc 第一人称视角，kk-brain） |
 | `ResearchReporter.md` | 产品调研报告生成 subagent（接收结论摘要，按模板生成 README.md） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
-| `WeChat-GZH-Operator.md` | 公众号运营主 agent（**已废弃**，由 gzh-workflow skill + GZH-Writer subagent 替代，保留供旧项目参考） |
 
 ## 使用方式
 

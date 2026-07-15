@@ -47,6 +47,8 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 # 一次性设置（已完成）
 ln -s ~/Code/kk-ai/skills/common ~/.config/opencode/skills
 ln -s ~/Code/kk-ai/opencode-agents/common ~/.config/opencode/agents
+ln -s ~/Code/kk-ai/pi-agents/common ~/.pi/agent/main-agents
+ln -s ~/Code/kk-ai/pi-subagents/common ~/.pi/agent/agents
 ln -s ~/Code/kk-ai/pi-extensions/common ~/.pi/agent/extensions
 ```
 
@@ -110,7 +112,7 @@ Pi Agent 格式与 OpenCode 的区别：
 
 ## Python 项目约定
 
-部分 skill（如 `pdf-to-markdown`、`douban-k-search`、`xhs-k-search`、`zhihu-k-search`、`images-k-generation`）包含 Python 脚本：
+部分 skill（如 `files-to-markdown`、`douban-k-search`、`xhs-k-search`、`zhihu-k-search`）包含 Python 脚本：
 - 代码放在 `scripts/` 子目录
 - 使用 `uv` 作为包管理器
 - 详见各 skill 目录下的 `AGENTS.md`
