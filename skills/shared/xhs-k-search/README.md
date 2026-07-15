@@ -1,4 +1,4 @@
-# xhs-k-research
+# xhs-k-search
 
 小红书数据搜索与调研 SKILL，通过浏览器自动化技术获取小红书搜索结果、帖子详情和评论数据。专为 AI Agent 调用设计。
 

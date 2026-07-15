@@ -116,7 +116,7 @@ zhihu-k-search/
 
 ## 作为 Skill 使用
 
-本项目已封装为 OpenCode Skill，可在 OpenCode 中直接调用。将本项目目录添加到 OpenCode 的 skills 配置中，即可使用 `zhihu-k-research` 技能。
+本项目已封装为 OpenCode Skill，可在 OpenCode 中直接调用。将本项目目录添加到 OpenCode 的 skills 配置中，即可使用 `zhihu-k-search` 技能。
 
 详细使用说明请参考 [SKILL.md](./SKILL.md)。
 

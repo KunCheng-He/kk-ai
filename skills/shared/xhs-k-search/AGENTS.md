@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-本项目是一个小红书搜索脚本，通过浏览器自动化技术（Playwright）模拟用户行为，获取搜索结果、帖子内容及评论数据。项目已封装为 OpenCode Skill (`xhs-k-research`)，可供 AI Agent 直接调用。
+本项目是一个小红书搜索脚本，通过浏览器自动化技术（Playwright）模拟用户行为，获取搜索结果、帖子内容及评论数据。项目已封装为 OpenCode Skill (`xhs-k-search`)，可供 AI Agent 直接调用。
 
 **项目状态：已完成开发，可投入使用。**
 
@@ -137,5 +137,5 @@ def get_note_detail(note_id: str, xsec_token: str | None = None) -> NoteDetailWi
 
 **快速使用**：
 1. 将本项目目录添加到 OpenCode 的 skills 配置
-2. Skill 名称：`xhs-k-research`
+2. Skill 名称：`xhs-k-search`
 3. 触发关键词：小红书、xhs、小红书搜索、小红书帖子等

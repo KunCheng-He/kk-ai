@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-本项目是一个知乎搜索脚本，通过浏览器自动化技术（Playwright）模拟用户行为，获取搜索结果、问题内容及回答数据。项目已封装为 OpenCode Skill (`zhihu-k-research`)，可供 AI Agent 直接调用。
+本项目是一个知乎搜索脚本，通过浏览器自动化技术（Playwright）模拟用户行为，获取搜索结果、问题内容及回答数据。项目已封装为 OpenCode Skill (`zhihu-k-search`)，可供 AI Agent 直接调用。
 
 **项目状态：已完成开发，可投入使用。**
 
@@ -309,5 +309,5 @@ python_files = ["test_*.py"]
 
 **快速使用**：
 1. 将本项目目录添加到 OpenCode 的 skills 配置
-2. Skill 名称：`zhihu-k-research`
+2. Skill 名称：`zhihu-k-search`
 3. 触发关键词：知乎、zhihu、知乎搜索、知乎问题等
