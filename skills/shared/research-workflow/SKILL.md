@@ -43,6 +43,8 @@ description: |
 
 **执行方式**：4 路 subagent **同时启动** — 1 个 `browser-researcher`（T0+T2+T3，内部串行管理 CDP）+ 3 个 `general`（T1+T4+T5）。browser-researcher 自行管理内部 skill 加载顺序和 CDP 连接，确保不冲突。主 Agent 只负责收集返回的摘要，原始 CDP/搜索数据全部隔离在 subagent 上下文中。
 
+**重要约束**：调用 `browser-researcher` subagent 时，主 Agent 必须在 prompt 中明确告知当前工作目录路径，要求其直接使用该目录（如截图保存到 `{工作目录}/assets/`），**禁止** browser-researcher 自行创建新的工作目录。
+
 ### 数据源优先级规则
 
 1. **首先检查项目 AGENTS.md 中的数据源规则**，遵守所有平台使用限制
