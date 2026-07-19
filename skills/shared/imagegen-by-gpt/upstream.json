@@ -1,0 +1,9 @@
+{
+  "source": "external",
+  "upstream_type": "local-installed-skill",
+  "upstream_name": "CodeX imagegen",
+  "path": "~/.codex/skills/.system/imagegen",
+  "last_update": "2026-07-19",
+  "license": "Apache-2.0",
+  "notes": "Imported from the locally installed CodeX built-in image generation skill. Renamed in this repo to imagegen-by-gpt. Copied runnable text resources (SKILL.md, references/, scripts/, LICENSE.txt)."
+}

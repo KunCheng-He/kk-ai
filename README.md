@@ -61,6 +61,7 @@ kk-ai/
 | `xhs-k-search` | self-developed | 小红书数据搜索 |
 | `zhihu-k-search` | self-developed | 知乎数据搜索 |
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
+| `imagegen-by-gpt` | CodeX local install | CodeX 内置图像生成 skill，重命名接入本仓库；支持默认内建生图流程与 `scripts/image_gen.py` CLI fallback |
 | `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
 
 ### Agents - Common（OpenCode 通用，已链接到全局）
