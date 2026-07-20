@@ -1,13 +1,13 @@
 ---
 name: project-init
 description: |
-  项目初始化工具，同时支持 OpenCode 和 Pi 两种 AI 编程助手。当用户需要创建新项目、初始化项目、设置项目结构时使用此技能。根据项目需求智能推荐 shared 目录下的 agent 和 skill，自动创建项目目录和对应 harness 配置。触发关键词："初始化项目"、"创建项目"、"新建项目"、"项目初始化"、"设置项目"、"init project"。即使用户未明确提及，但上下文暗示需要开始一个新项目时，也应主动使用。
+  OpenCode 项目初始化工具。当用户需要创建新项目、初始化项目、设置项目结构时使用此技能。根据项目需求智能推荐 shared 目录下的 agent 和 skill，自动创建项目目录和 OpenCode 配置。触发关键词："初始化项目"、"创建项目"、"新建项目"、"项目初始化"、"设置项目"、"init project"。即使用户未明确提及，但上下文暗示需要开始一个新项目时，也应主动使用。
 version: 2.0.0
 ---
 
-# 项目初始化（OpenCode / Pi）
+# 项目初始化（OpenCode）
 
-根据项目需求智能筛选并配置适合的 agent 和 skill，自动创建项目目录结构。同时支持 OpenCode 和 Pi 两种 AI 编程助手。
+根据项目需求智能筛选并配置适合的 agent 和 skill，自动创建 OpenCode 项目目录结构。
 
 ## 数据源
 
@@ -25,7 +25,6 @@ version: 2.0.0
 询问用户：
 - **项目名称**：用于创建项目目录
 - **项目需求**：项目的功能、技术栈、目标等描述
-- **目标 Harness**：OpenCode 还是 Pi？（如果用户未明确指定，使用 ask 工具确认或者直接询问用户）
 
 ### 2. 读取资源清单
 
@@ -57,18 +56,13 @@ version: 2.0.0
 | 社交媒体运营 | xhs-k-search | - |
 | 需要图像素材 | image-prompt | - |
 
-> **注意**：Agents 仅对 OpenCode 项目推荐。Pi 使用 Prompt Templates 而非 Agents，初始化 Pi 项目时只推荐 Skills。
-
 ### 4. 展示计划并确认
 
 向用户展示初始化计划，使用 question 工具让用户勾选确认。展示项目的目录结构和推荐的资源清单。
 
 ### 5. 执行初始化
 
-用户确认后，**根据目标 harness 读取对应的参考文件来执行**：
-
-- **OpenCode 项目** → 读取 `references/opencode-init.md`，按其指令执行
-- **Pi 项目** → 读取 `references/pi-init.md`，按其指令执行
+用户确认后，读取 `references/opencode-init.md`，按其指令执行。
 
 ## 注意事项
 
@@ -78,4 +72,3 @@ version: 2.0.0
 4. **路径验证**：创建前检查目标路径是否已存在
 5. **增量添加**：配置目录已存在时增量添加而非覆盖
 6. **Git 初始化**：项目初始化后自动执行 git init
-7. **Skills 跨 harness 兼容**：OpenCode 和 Pi 的 SKILL.md 格式基于同一标准，符号链接可直接复用
