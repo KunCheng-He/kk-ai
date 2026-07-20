@@ -1,9 +1,6 @@
-import functools
 import io
 import json
-import os
 import struct
-import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -11,23 +8,6 @@ from typing import Optional
 import requests
 
 from config import TokenCache, WechatConfig
-
-
-def retry(max_retries: int = 3, delay: float = 1.0):
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            last_error = None
-            for attempt in range(max_retries):
-                try:
-                    return func(*args, **kwargs)
-                except WechatAPIError as e:
-                    last_error = e
-                    if attempt < max_retries - 1:
-                        time.sleep(delay)
-            raise last_error
-        return wrapper
-    return decorator
 
 
 class WechatAPIError(Exception):
@@ -129,7 +109,6 @@ class WechatAPI:
 
         return access_token
 
-    @retry(max_retries=3, delay=1.0)
     def upload_image(self, file_path: str) -> UploadResult:
         access_token = self.get_access_token()
         url = f"{self.BASE_URL}/media/uploadimg"
@@ -149,7 +128,6 @@ class WechatAPI:
             url=data["url"]
         )
 
-    @retry(max_retries=3, delay=1.0)
     def upload_material(self, file_path: str) -> UploadResult:
         access_token = self.get_access_token()
         url = f"{self.BASE_URL}/material/add_material"
@@ -172,7 +150,6 @@ class WechatAPI:
             url=data.get("url", "")
         )
 
-    @retry(max_retries=3, delay=1.0)
     def create_draft(
         self,
         title: str,
