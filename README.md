@@ -34,7 +34,6 @@ kk-ai/
 | `skillify` | self-developed | 将会话过程捕获为 skill |
 | `herdr` | [open-herdr/herdr](https://github.com/open-herdr/herdr) | herdr 终端 agent 多路复用器控制（手动更新） |
 | `html-ppt` | [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) | HTML 演示文稿生成 |
-| `files-to-markdown` | self-developed | 多格式文件转 Markdown（Microsoft MarkItDown），支持 PDF/Word/PPT/Excel/图片/音频/EPUB/ZIP 等 |
 | `workflow-designer` | self-developed | AI 编码工具工作流设计，基于三层架构和五项原则分析推荐 agent/skill 方案 |
 | `loop-by-herdr` | self-developed | Herdr 驱动的迭代优化循环（执行→审查→优化→重试），适用于任何需要反复验证的迭代任务 |
 
