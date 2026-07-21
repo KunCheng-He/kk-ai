@@ -8,6 +8,8 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 - `skills/shared/` - 共享 skills，部分已链接到全局，部分按需链接到项目
 - `opencode-agents/common/` - OpenCode 通用 agents，链接到全局 `~/.config/opencode/agents/`
 - `opencode-agents/shared/` - OpenCode 共享 agents，按需链接到项目
+- `opencode-commands/common/` - OpenCode 通用 commands，链接到全局 `~/.config/opencode/commands/`
+- `opencode-commands/shared/` - OpenCode 共享 commands，按需链接到项目
 - `pi-extensions/common/` - Pi 通用扩展，链接到全局 `~/.pi/agent/extensions/`
 - `pi-extensions/shared/` - Pi 共享扩展，按需链接到项目 `.pi/extensions/`
 - `scripts/` - 辅助脚本
@@ -31,12 +33,13 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 
 ## 全局链接
 
-通用 skills/agents/extensions 通过目录级符号链接到全局：
+通用 skills/agents/commands/extensions 通过目录级符号链接到全局：
 
 ```bash
 # 一次性设置（已完成）
 ln -s ~/Code/kk-ai/skills/common ~/.config/opencode/skills
 ln -s ~/Code/kk-ai/opencode-agents/common ~/.config/opencode/agents
+ln -s ~/Code/kk-ai/opencode-commands/common ~/.config/opencode/commands
 ln -s ~/Code/kk-ai/pi-extensions/common ~/.pi/agent/extensions
 ```
 
@@ -54,10 +57,10 @@ ln -s ~/Code/kk-ai/pi-extensions/common ~/.pi/agent/extensions
 3. 更新 `upstream.json` 中的 `last_update`
 4. 手动检查并提交变更
 
-## 新增 Skill/Agent
+## 新增 Skill/Agent/Command
 
-- 通用 skill/agent 放入 `skills/common/` 或 `opencode-agents/common/`，自动生效（全局目录已链接）
-- 共享 skill/agent 放入 `skills/shared/` 或 `opencode-agents/shared/`，按需链接到项目
+- 通用 skill/agent/command 放入 `skills/common/`、`opencode-agents/common/` 或 `opencode-commands/common/`，自动生效（全局目录已链接）
+- 共享 skill/agent/command 放入 `skills/shared/`、`opencode-agents/shared/` 或 `opencode-commands/shared/`，按需链接到项目
 - Pi 扩展新增/修改后，必须同步更新 `pi-extensions/` 和对应的 `~/.pi/agent/extensions/` 或项目 `.pi/extensions/` 中的符号链接
 
 ## 完成后自动更新文档

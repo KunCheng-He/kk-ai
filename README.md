@@ -1,6 +1,6 @@
-# OpenCode Skills & Agents / Pi Extensions 统一管理仓库
+# OpenCode Skills & Agents & Commands / Pi Extensions 统一管理仓库
 
-统一管理 OpenCode 的 Skills、Agents，以及 Pi Extensions 资源。
+统一管理 OpenCode 的 Skills、Agents、Commands，以及 Pi Extensions 资源。
 
 ## 目录结构
 
@@ -12,6 +12,9 @@ kk-ai/
 ├── opencode-agents/
 │   ├── common/          # OpenCode 通用 agent（ln 到全局）
 │   └── shared/          # OpenCode 共享 agent（项目按需 ln）
+├── opencode-commands/
+│   ├── common/          # OpenCode 通用 command（ln 到全局）
+│   └── shared/          # OpenCode 共享 command（项目按需 ln）
 ├── pi-extensions/
 │   ├── common/          # Pi 通用扩展（ln 到 ~/.pi/agent/extensions/）
 │   └── shared/          # Pi 共享扩展（项目按需 ln 到 .pi/extensions/）
@@ -56,6 +59,12 @@ kk-ai/
 | `imagegen-by-gpt` | CodeX local install | CodeX 内置图像生成 skill，重命名接入本仓库；支持默认内建生图流程与 `scripts/image_gen.py` CLI fallback |
 | `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
 
+### Commands - Common（OpenCode 通用，已链接到全局）
+
+| Command | 说明 |
+|---------|------|
+| `goal` | 目标驱动的迭代执行——定义目标后自动 执行→审查→优化→重试 直到达标 |
+
 ### Agents - Common（OpenCode 通用，已链接到全局）
 
 | Agent | 说明 |
@@ -82,11 +91,13 @@ kk-ai/
 # 已完成的设置
 ln -s ~/Code/kk-ai/skills/common ~/.config/opencode/skills
 ln -s ~/Code/kk-ai/opencode-agents/common ~/.config/opencode/agents
+ln -s ~/Code/kk-ai/opencode-commands/common ~/.config/opencode/commands
 ln -s ~/Code/kk-ai/pi-extensions/common ~/.pi/agent/extensions
 
 # 查看
 ls ~/.config/opencode/skills/
 ls ~/.config/opencode/agents/
+ls ~/.config/opencode/commands/
 ls ~/.pi/agent/extensions/
 ```
 
