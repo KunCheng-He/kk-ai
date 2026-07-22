@@ -299,7 +299,7 @@ export async function discoverAgents(
         }
       } catch (err) {
         console.error(
-          `[k-subagent] Failed to load agent from ${file}:`,
+          `[pi-k-subagent] Failed to load agent from ${file}:`,
           err instanceof Error ? err.message : String(err),
         );
       }

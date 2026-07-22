@@ -1,5 +1,5 @@
 /**
- * k-subagent type definitions
+ * pi-k-subagent type definitions
  */
 
 import type { Message } from "@earendil-works/pi-ai";

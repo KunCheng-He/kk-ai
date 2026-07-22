@@ -1,5 +1,5 @@
 /**
- * k-subagent — A subagent extension for pi.
+ * pi-k-subagent — A subagent extension for pi.
  *
  * Subagent definitions live in:
  *   - Global:  ~/.pi/agent/k-subagents/
