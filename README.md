@@ -140,6 +140,7 @@ ln -s ~/Code/kk-ai/opencode-agents/shared/xxx-agent.md .opencode/agents/xxx-agen
 | Extension | 来源 | 说明 |
 |-----------|------|------|
 | `pi-agent-switcher` | self-developed | Pi Agent 角色切换扩展 |
+| `k-subagent` | self-developed | K-Subagent 子代理扩展 |
 
 ### Pi Extensions 使用方式
 
