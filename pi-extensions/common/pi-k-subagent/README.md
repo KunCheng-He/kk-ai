@@ -56,7 +56,7 @@ thinking: medium
 | `model`            | 否   | 模型覆盖（provider/model 格式）                                    |
 | `tools`            | 否   | 工具允许列表（逗号分隔），默认 `read,bash,grep,find,ls,edit,write` |
 | `thinking`         | 否   | 思考级别：`off` / `minimal` / `low` / `medium` / `high` / `xhigh`  |
-| `systemPromptMode` | 否   | `"append"`（默认，追加到输出约定后）或 `"replace"`                 |
+| `systemPromptMode` | 否   | `"append"`（默认，追加到输出约定后）或 `"replace"`（完全使用自定义系统提示词） |
 
 嵌套目录会生成点号分隔的名称，例如 `coding/review.md` → `coding.review`。
 
@@ -88,7 +88,7 @@ thinking: medium
 | `agent`                   | 子代理名称（单任务模式）                                  |
 | `task`                    | 委托任务描述（单任务模式）                                |
 | `tasks`                   | 并行任务数组 `[{agent, task, cwd?}]`                      |
-| `agentScope`              | 代理发现范围：`"global"` / `"project"` / `"both"`（默认） |
+| `agentScope`              | 代理发现范围：`"global"` / `"project"` / `"both"`（默认；未信任项目会降级为 global，显式请求 project/both 会报错） |
 | `cwd`                     | 工作目录覆盖                                              |
 | `concurrency`             | 并行上限（默认 4，最大 8）                                |
 | `failFast`                | 首个失败后停止调度                                        |
@@ -117,12 +117,13 @@ thinking: medium
 
 ## 运行记录
 
-每次子代理运行都会在 `/tmp/k-subagent/` 下生成：
+每次子代理运行都会在 `/tmp/k-subagent/` 下生成内部执行记录。若子代理最终输出过长，扩展会额外写入 `final-output.md`，并在返回给主 Agent 的摘要中给出该路径。
 
 ```
 /tmp/k-subagent/<runId>-<agent>/
-├── transcript.md   # 完整执行记录（Markdown）
-└── messages.json   # 原始消息数组（JSON）
+├── transcript.md    # 完整执行记录（Markdown）
+├── messages.json    # 原始消息数组（JSON）
+└── final-output.md  # 仅当最终输出过长时自动生成
 ```
 
 ## TUI 交互

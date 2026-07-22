@@ -147,10 +147,14 @@ export async function runSubagent(options: RunOptions): Promise<SubagentResult> 
     args.push("--thinking", agent.thinking);
   }
 
-  // Write system prompt to temp file and pass it
+  // Write system prompt to temp file and pass it. `replace` is an escape hatch
+  // for agents that intentionally want full control over their system prompt.
   const tmpDir = await mkdtempSafe(join(tmpdir(), "k-subagent-"));
   const promptFile = join(tmpDir, "system-prompt.md");
-  const systemPrompt = buildAgentSystemPrompt(agent, { workDir });
+  const systemPrompt =
+    agent.systemPromptMode === "replace"
+      ? agent.systemPrompt.trim()
+      : buildAgentSystemPrompt(agent, { workDir });
   await writeFile(promptFile, systemPrompt, "utf-8");
   args.push("--append-system-prompt", promptFile);
 
@@ -175,7 +179,7 @@ export async function runSubagent(options: RunOptions): Promise<SubagentResult> 
   const emitUpdate = () => options.onUpdate?.(result);
 
   try {
-    result.exitCode = await new Promise<number>((resolve, reject) => {
+    result.exitCode = await new Promise<number>((resolve) => {
       const piCmd = getPiCommand();
       const proc = spawn(piCmd, args, {
         cwd,
@@ -184,6 +188,21 @@ export async function runSubagent(options: RunOptions): Promise<SubagentResult> 
       });
 
       let buffer = "";
+      let closed = false;
+      let aborted = false;
+      let timedOut = false;
+      let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
+      let forceKillTimer: ReturnType<typeof setTimeout> | undefined;
+
+      const terminate = (reason: "aborted" | "timeout") => {
+        if (closed) return;
+        if (reason === "aborted") aborted = true;
+        else timedOut = true;
+        proc.kill("SIGTERM");
+        forceKillTimer = setTimeout(() => {
+          if (!closed) proc.kill("SIGKILL");
+        }, 5000);
+      };
 
       const processLine = (line: string) => {
         if (!line.trim()) return;
@@ -233,44 +252,41 @@ export async function runSubagent(options: RunOptions): Promise<SubagentResult> 
       });
 
       proc.on("close", (code) => {
+        closed = true;
+        if (timeoutTimer) clearTimeout(timeoutTimer);
+        if (forceKillTimer) clearTimeout(forceKillTimer);
         if (buffer.trim()) processLine(buffer);
-        resolve(code ?? 0);
+        if (aborted) {
+          result.stopReason = "aborted";
+          result.errorMessage = "Subagent was aborted.";
+        } else if (timedOut) {
+          result.stopReason = "error";
+          result.errorMessage = `Subagent timed out after ${timeoutMs}ms.`;
+        }
+        resolve(code ?? (aborted || timedOut ? 1 : 0));
       });
 
       proc.on("error", (err) => {
         result.stderr += `Process error: ${err.message}\n`;
+        result.stopReason = "error";
+        result.errorMessage = err.message;
         resolve(1);
       });
 
       // Timeout
-      let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
       if (timeoutMs && timeoutMs > 0) {
-        timeoutTimer = setTimeout(() => {
-          proc.kill("SIGTERM");
-          setTimeout(() => {
-            if (!proc.killed) proc.kill("SIGKILL");
-          }, 5000);
-        }, timeoutMs);
+        timeoutTimer = setTimeout(() => terminate("timeout"), timeoutMs);
       }
 
       // AbortSignal
       if (signal) {
-        const onAbort = () => {
-          proc.kill("SIGTERM");
-          setTimeout(() => {
-            if (!proc.killed) proc.kill("SIGKILL");
-          }, 5000);
-        };
+        const onAbort = () => terminate("aborted");
         if (signal.aborted) {
           onAbort();
         } else {
           signal.addEventListener("abort", onAbort, { once: true });
         }
       }
-
-      proc.on("close", () => {
-        if (timeoutTimer) clearTimeout(timeoutTimer);
-      });
     });
     result.endedAt = Date.now();
 
@@ -310,6 +326,7 @@ export async function runParallel(
     cancelSiblingsOnFailure?: boolean;
     /** Per-task streaming updates: (taskIndex, partialResult) */
     onTaskUpdate?: (index: number, partial: SubagentResult) => void;
+    timeoutMs?: number;
   } = {},
 ): Promise<{
   results: SubagentResult[];
@@ -323,6 +340,7 @@ export async function runParallel(
     failFast = false,
     cancelSiblingsOnFailure = false,
     onTaskUpdate,
+    timeoutMs,
   } = options;
 
   const limit = Math.max(1, Math.min(concurrency, tasks.length));
@@ -369,6 +387,7 @@ export async function runParallel(
         task: tasks[current].task,
         cwd: tasks[current].cwd ?? cwd,
         signal: combinedSignal,
+        timeoutMs,
         onUpdate: onTaskUpdate
           ? (partial) => onTaskUpdate(current, partial)
           : undefined,
@@ -387,6 +406,27 @@ export async function runParallel(
   });
 
   await Promise.all(workers);
+
+  // If the shared signal aborted, workers may exit before assigning every slot.
+  // Fill holes so callers can safely aggregate and render results.
+  for (let i = 0; i < tasks.length; i++) {
+    if (results[i]) continue;
+    skippedCount++;
+    results[i] = {
+      runId: `run-skipped-${i}`,
+      agentName: tasks[i].agent.name,
+      agentSource: tasks[i].agent.source,
+      task: tasks[i].task,
+      backend: "headless",
+      exitCode: -1,
+      messages: [],
+      stderr: "Skipped (aborted or fail-fast)",
+      usage: { ...EMPTY_USAGE },
+      startedAt: Date.now(),
+      endedAt: Date.now(),
+      stopReason: combinedSignal.aborted ? "aborted" : undefined,
+    };
+  }
 
   return { results, skippedCount, failFastTriggered };
 }

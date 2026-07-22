@@ -123,6 +123,8 @@ export interface SubagentRunSummary {
   /** Final output (possibly truncated) — the "summary" returned to the LLM */
   summary: string;
   summaryTruncated: boolean;
+  /** Path to the auto-saved full final output when summary was truncated */
+  finalOutputPath?: string;
   workDir?: string;
   transcriptPath?: string;
   startedAt: number;

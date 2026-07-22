@@ -29,7 +29,6 @@
  */
 
 import { readdir, readFile, lstat, realpath } from "node:fs/promises";
-import { homedir } from "node:os";
 import {
   basename,
   dirname,
@@ -39,6 +38,7 @@ import {
   resolve,
   sep,
 } from "node:path";
+import { CONFIG_DIR_NAME, getAgentDir } from "@earendil-works/pi-coding-agent";
 import type {
   AgentDefinition,
   AgentRegistry,
@@ -177,7 +177,7 @@ async function findProjectAgentsDir(
 ): Promise<string | null> {
   let current = resolve(cwd);
   while (true) {
-    const candidate = join(current, ".pi", "k-subagents");
+    const candidate = join(current, CONFIG_DIR_NAME, "k-subagents");
     try {
       const info = await lstat(candidate);
       if (info.isDirectory() || info.isSymbolicLink()) return candidate;
@@ -277,7 +277,7 @@ export async function discoverAgents(
   cwd: string,
   scope: AgentScope = "both",
 ): Promise<AgentRegistry> {
-  const globalDir = join(homedir(), ".pi", "agent", "k-subagents");
+  const globalDir = join(getAgentDir(), "k-subagents");
   const projectDir =
     scope !== "global" ? await findProjectAgentsDir(cwd) : null;
 

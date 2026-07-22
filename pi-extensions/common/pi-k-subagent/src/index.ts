@@ -17,12 +17,13 @@
  */
 
 import { join } from "node:path";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { Type } from "typebox";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { getAgentDir, keyHint } from "@earendil-works/pi-coding-agent";
 import { Container, Spacer, Text } from "@earendil-works/pi-tui";
-import type { Message, Usage } from "@earendil-works/pi-ai";
+import { StringEnum, type Message, type Usage } from "@earendil-works/pi-ai";
 import { discoverAgents, formatAgentList } from "./agents.ts";
 import { runSubagent, runParallel, getFinalOutput } from "./runner.ts";
 import { loadRunMessages } from "./report.ts";
@@ -76,14 +77,12 @@ const EMPTY_USAGE: UsageStats = {
 
 function textResult(
   text: string,
-  isError = false,
   details?: unknown,
   usage?: Usage,
 ) {
   return {
     content: [{ type: "text" as const, text }],
     details,
-    isError,
     usage,
   };
 }
@@ -106,9 +105,25 @@ function getResultOutput(r: SubagentResult): string {
   return getFinalOutput(r.messages) || "(no output)";
 }
 
+function writeFullFinalOutput(r: SubagentResult, output: string): string | undefined {
+  if (!r.workDir) return undefined;
+  try {
+    mkdirSync(r.workDir, { recursive: true });
+    const outputPath = join(r.workDir, "final-output.md");
+    writeFileSync(outputPath, output, "utf-8");
+    return outputPath;
+  } catch {
+    return undefined;
+  }
+}
+
 function makeSummary(r: SubagentResult, cap: number): SubagentRunSummary {
   const output = getResultOutput(r);
   const running = r.endedAt === undefined;
+  const summaryTruncated = !running && output.length > cap;
+  const finalOutputPath = summaryTruncated
+    ? writeFullFinalOutput(r, output)
+    : undefined;
   return {
     runId: r.runId,
     agentName: r.agentName,
@@ -120,8 +135,9 @@ function makeSummary(r: SubagentResult, cap: number): SubagentRunSummary {
     errorMessage: r.errorMessage,
     model: r.model,
     usage: r.usage,
-    summary: output.length > cap ? output.slice(0, cap) : output,
-    summaryTruncated: output.length > cap,
+    summary: summaryTruncated ? output.slice(0, cap) : output,
+    summaryTruncated,
+    finalOutputPath,
     workDir: r.workDir,
     transcriptPath: r.transcriptPath,
     startedAt: r.startedAt,
@@ -151,7 +167,7 @@ function formatRunForLLM(s: SubagentRunSummary): string {
   if (s.summaryTruncated) {
     lines.push("");
     lines.push(
-      `[Output truncated.${s.transcriptPath ? ` Full final output available at: ${s.transcriptPath}` : ""}]`,
+      `[Output truncated.${s.finalOutputPath ? ` Full final output available at: ${s.finalOutputPath}` : " Full final output was too large to return inline."}]`,
     );
   }
   return lines.join("\n");
@@ -206,7 +222,7 @@ const SubagentParams = Type.Object({
 
   // Options
   agentScope: Type.Optional(
-    Type.Union(AGENT_SCOPES.map((s) => Type.Literal(s)), {
+    StringEnum(AGENT_SCOPES, {
       default: "both",
       description: "Where to discover agents",
     }),
@@ -232,26 +248,17 @@ const SubagentParams = Type.Object({
   // Async
   async: Type.Optional(Type.Boolean({ description: "Run async, return immediately" })),
   onComplete: Type.Optional(
-    Type.Union(ON_COMPLETE_ACTIONS.map((a) => Type.Literal(a)), {
+    StringEnum(ON_COMPLETE_ACTIONS, {
       description: "Async completion action",
     }),
   ),
 
   // Lifecycle actions
   action: Type.Optional(
-    Type.Union(
-      [
-        Type.Literal("run"),
-        Type.Literal("status"),
-        Type.Literal("logs"),
-        Type.Literal("wait"),
-        Type.Literal("interrupt"),
-      ],
-      {
-        default: "run",
-        description: "Action: run (default), status, logs, wait, or interrupt",
-      },
-    ),
+    StringEnum(["run", "status", "logs", "wait", "interrupt"] as const, {
+      default: "run",
+      description: "Action: run (default), status, logs, wait, or interrupt",
+    }),
   ),
   runId: Type.Optional(Type.String({ description: "Run ID for lifecycle actions" })),
 
@@ -300,8 +307,8 @@ export default function kSubagent(pi: ExtensionAPI) {
 
   // ── agent discovery ────────────────────────────────────
 
-  async function refreshAgents(cwd: string) {
-    registry = await discoverAgents(cwd, "both");
+  async function refreshAgents(cwd: string, scope: AgentScope) {
+    registry = await discoverAgents(cwd, scope);
   }
 
   function findAgent(name: string): AgentDefinition | undefined {
@@ -316,7 +323,8 @@ export default function kSubagent(pi: ExtensionAPI) {
 
   pi.on("before_agent_start", async (event, ctx) => {
     const cwd = ctx.cwd;
-    await refreshAgents(cwd);
+    // Only include project-local subagents after PI has trusted the project.
+    await refreshAgents(cwd, ctx.isProjectTrusted() ? "both" : "global");
 
     if (registry.agents.length === 0) return;
 
@@ -376,11 +384,19 @@ export default function kSubagent(pi: ExtensionAPI) {
     parameters: SubagentParams,
 
     async execute(_toolCallId, params, signal, onUpdate, ctx) {
-      const cwd = params.cwd ?? ctx.cwd;
-      const scope: AgentScope = params.agentScope ?? "both";
+      const defaultRunCwd = params.cwd ?? ctx.cwd;
+      const requestedScope: AgentScope = params.agentScope ?? "both";
+      const projectTrusted = ctx.isProjectTrusted();
+      if (!projectTrusted && params.agentScope && params.agentScope !== "global") {
+        throw new Error(
+          `Project-local subagents require a trusted project. Current project is not trusted; use agentScope: "global" or trust the project first.`,
+        );
+      }
+      const scope: AgentScope = projectTrusted ? requestedScope : "global";
 
-      // Refresh agent list
-      await refreshAgents(cwd);
+      // Refresh agent definitions from the current session project only. `cwd`
+      // overrides affect execution cwd, not which project-local prompts are trusted.
+      await refreshAgents(ctx.cwd, scope);
 
       // ── lifecycle actions ────────────────────────────
 
@@ -388,11 +404,22 @@ export default function kSubagent(pi: ExtensionAPI) {
       if (action !== "run") {
         const runId = params.runId;
         if (!runId) {
-          return textResult("Lifecycle actions require a runId.", true);
+          throw new Error("Lifecycle actions require a runId.");
         }
         const tracked = running.get(runId);
         if (!tracked) {
-          return textResult(`No tracked run with id: ${runId}`, true);
+          const historical = runHistory.find((r) => r.summary.runId === runId);
+          if (historical) {
+            if (action === "status") return textResult(formatRunForLLM(historical.summary));
+            if (action === "logs") {
+              return textResult(
+                historical.summary.transcriptPath
+                  ? `Run ${runId} transcript: ${historical.summary.transcriptPath}`
+                  : `Run ${runId} has no transcript path available.`,
+              );
+            }
+          }
+          throw new Error(`No tracked run with id: ${runId}`);
         }
 
         if (action === "status") {
@@ -412,14 +439,12 @@ export default function kSubagent(pi: ExtensionAPI) {
             const summary = recordRun(result, SUMMARY_CAP_SINGLE);
             return textResult(
               formatRunForLLM(summary),
-              isFailedResult(result),
               { mode: "single", runs: [summary] } satisfies SubagentToolDetails,
               toUsage(result.usage),
             );
           } catch (err) {
-            return textResult(
+            throw new Error(
               `Run ${runId} failed: ${err instanceof Error ? err.message : String(err)}`,
-              true,
             );
           }
         }
@@ -441,9 +466,8 @@ export default function kSubagent(pi: ExtensionAPI) {
         const available = registry.agents
           .map((a) => `${a.name}: ${a.description}`)
           .join(", ") || "none";
-        return textResult(
+        throw new Error(
           `Provide exactly one mode: (agent + task) or tasks[]. Available agents: ${available}`,
-          true,
         );
       }
 
@@ -458,9 +482,8 @@ export default function kSubagent(pi: ExtensionAPI) {
         const agent = findAgent(params.agent!);
         if (!agent) {
           const available = registry.agents.map((a) => a.name).join(", ") || "none";
-          return textResult(
+          throw new Error(
             `Unknown subagent: "${params.agent}". Available: ${available}`,
-            true,
           );
         }
 
@@ -471,7 +494,7 @@ export default function kSubagent(pi: ExtensionAPI) {
           const resultPromise = runSubagent({
             agent,
             task: params.task!,
-            cwd: params.cwd ?? cwd,
+            cwd: params.cwd ?? defaultRunCwd,
             signal: abortController.signal,
             timeoutMs: params.timeoutMs,
           });
@@ -483,8 +506,23 @@ export default function kSubagent(pi: ExtensionAPI) {
 
           // Record completion for the viewer, then clean up tracking
           resultPromise
-            .then((r) => recordRun(r, SUMMARY_CAP_SINGLE))
-            .catch(() => {})
+            .then((r) => {
+              const summary = recordRun(r, SUMMARY_CAP_SINGLE);
+              if (params.onComplete === "notify" && ctx.hasUI) {
+                ctx.ui.notify(
+                  `Subagent ${summary.agentName} ${summary.status}: ${runId}`,
+                  summary.status === "failed" ? "warning" : "info",
+                );
+              }
+            })
+            .catch((err) => {
+              if (params.onComplete === "notify" && ctx.hasUI) {
+                ctx.ui.notify(
+                  `Subagent ${runId} failed: ${err instanceof Error ? err.message : String(err)}`,
+                  "error",
+                );
+              }
+            })
             .finally(() => {
               if (running.get(runId)?.result === resultPromise) {
                 running.delete(runId);
@@ -493,7 +531,6 @@ export default function kSubagent(pi: ExtensionAPI) {
 
           return textResult(
             `Async subagent started: ${runId}\nAgent: ${agent.name}\nTask: ${params.task}`,
-            false,
             { runId, agent: agent.name, task: params.task, mode: "single" },
           );
         }
@@ -502,7 +539,7 @@ export default function kSubagent(pi: ExtensionAPI) {
         const result = await runSubagent({
           agent,
           task: params.task!,
-          cwd: params.cwd ?? cwd,
+          cwd: params.cwd ?? defaultRunCwd,
           signal,
           timeoutMs: params.timeoutMs,
           onUpdate: onUpdate
@@ -534,7 +571,6 @@ export default function kSubagent(pi: ExtensionAPI) {
 
         return textResult(
           formatRunForLLM(summary),
-          isFailedResult(result),
           details,
           toUsage(result.usage),
         );
@@ -544,9 +580,8 @@ export default function kSubagent(pi: ExtensionAPI) {
 
       if (hasTasks) {
         if (params.tasks!.length > MAX_PARALLEL_TASKS) {
-          return textResult(
+          throw new Error(
             `Too many tasks (${params.tasks!.length}). Max: ${MAX_PARALLEL_TASKS}`,
-            true,
           );
         }
 
@@ -555,15 +590,14 @@ export default function kSubagent(pi: ExtensionAPI) {
           const agent = findAgent(t.agent);
           if (!agent) {
             const available = registry.agents.map((a) => a.name).join(", ") || "none";
-            return textResult(
+            throw new Error(
               `Unknown subagent: "${t.agent}". Available: ${available}`,
-              true,
             );
           }
           resolvedTasks.push({
             agent,
             task: t.task,
-            cwd: t.cwd ?? params.cwd ?? cwd,
+            cwd: t.cwd ?? params.cwd ?? defaultRunCwd,
           });
         }
 
@@ -599,12 +633,13 @@ export default function kSubagent(pi: ExtensionAPI) {
         const { results, skippedCount, failFastTriggered } = await runParallel(
           resolvedTasks,
           {
-            cwd,
+            cwd: defaultRunCwd,
             signal,
             concurrency: params.concurrency ?? DEFAULT_CONCURRENCY,
             failFast: params.failFast ?? false,
             cancelSiblingsOnFailure:
               params.cancelSiblingsOnFailure ?? false,
+            timeoutMs: params.timeoutMs,
             onTaskUpdate: emitParallelUpdate,
           },
         );
@@ -631,13 +666,12 @@ export default function kSubagent(pi: ExtensionAPI) {
 
         return textResult(
           content,
-          successCount < results.length,
           details,
           toUsage(aggregateUsage(results)),
         );
       }
 
-      return textResult("Invalid parameters.", true);
+      throw new Error("Invalid parameters.");
     },
 
     // ── custom rendering ───────────────────────────────────
@@ -844,6 +878,13 @@ export default function kSubagent(pi: ExtensionAPI) {
 
   pi.on("session_start", async (_event, ctx) => {
     runHistory.length = 0;
-    await refreshAgents(ctx.cwd);
+    await refreshAgents(ctx.cwd, ctx.isProjectTrusted() ? "both" : "global");
+  });
+
+  pi.on("session_shutdown", async () => {
+    for (const tracked of running.values()) {
+      tracked.abort();
+    }
+    running.clear();
   });
 }
