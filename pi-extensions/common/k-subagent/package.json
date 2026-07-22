@@ -1,0 +1,37 @@
+{
+  "name": "pi-k-subagent",
+  "version": "0.1.0",
+  "description": "Pi 编码代理的子代理（subagent）扩展 — 将复杂隔离任务委托给独立子代理进程执行",
+  "keywords": [
+    "pi",
+    "pi-extension",
+    "subagent",
+    "coding-agent",
+    "ai",
+    "cli"
+  ],
+  "license": "MIT",
+  "author": "KunCheng-He",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KunCheng-He/kk-ai.git",
+    "directory": "pi-extensions/common/k-subagent"
+  },
+  "type": "module",
+  "main": "index.ts",
+  "files": [
+    "index.ts",
+    "src/"
+  ],
+  "dependencies": {
+    "typebox": "^0.2.0"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "@earendil-works/pi-ai": "*"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
