@@ -3,14 +3,14 @@ import * as path from "node:path";
 import { CONFIG_DIR_NAME, getAgentDir } from "@earendil-works/pi-coding-agent";
 
 // This extension (pi-agent-switcher) manages *primary* agents — the ones a user
-// switches into as the main session role. They live in `main-agents/` to avoid
+// switches into as the main session role. They live in `k-priagent/` to avoid
 // colliding with `~/.pi/agent/agents/`, which is reserved for subagent
 // definitions consumed by @agwab/pi-subagent (which hardcodes that path).
 //
-//   user    → ~/.pi/agent/main-agents/, available in all projects
-//   project → .pi/main-agents/, available only in current project
+//   user    → ~/.pi/agent/k-priagent/, available in all projects
+//   project → .pi/k-priagent/, available only in current project
 // No scope field is needed in the markdown frontmatter.
-const AGENT_SUBDIR = "main-agents";
+const AGENT_SUBDIR = "k-priagent";
 
 export type AgentScope = "user" | "project" | "both";
 
@@ -145,7 +145,7 @@ function isDirectory(p: string): boolean {
 }
 
 /**
- * Walk up from cwd to find the nearest .pi/main-agents directory.
+ * Walk up from cwd to find the nearest .pi/k-priagent directory.
  */
 function findNearestProjectAgentsDir(cwd: string): string | null {
   let currentDir = cwd;
