@@ -8,3 +8,7 @@
 
 1. 仍然使用 ego-browser 打开详情，但必须将帖子 ID、`xsec_token` 和 `xsec_source=pc_feed` 拼入详情 URL：`https://www.xiaohongshu.com/explore/{帖子ID}?xsec_token={xsec_token}&xsec_source=pc_feed`。`xsec_token` 应从小红书搜索结果或帖子元数据中获取。
 2. 使用 ego-browser 模拟用户点击，从小红书页面中的帖子入口打开详情。
+
+## ego-browser 标签页管理
+
+使用 `ego-browser` 时，如果标签页后续不再使用，应立即关闭，不要等到最后与 workspace 一起关闭，避免打开过多标签页导致宿主机内存耗尽。
