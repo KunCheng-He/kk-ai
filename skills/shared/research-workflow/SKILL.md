@@ -15,8 +15,8 @@ description: |
 工作目录由主 Agent 统一管理：
 
 - 调用方已提供工作目录时，必须原样复用，不得创建新的日期目录或同主题目录。
-- 调用方同时提供报告文件路径和资源目录路径；只在这些指定路径中读写，不得自行改名或改用 `README.md`、`assets/`。
-- 未提供工作目录时，才由主 Agent 创建默认目录 `{YYYYMMDD}_{Topic}/`，默认报告为 `README.md`、资源目录为 `assets/`。
+- 调用方同时提供最终报告文件路径和资源目录路径；browser-researcher 另使用独立的浏览器结果文件路径，只在这些指定路径中读写，不得自行改名或改用 `README.md`、`assets/`。
+- 未提供工作目录时，主 Agent 可为最终报告创建默认目录 `{YYYYMMDD}_{Topic}/`；browser-researcher 的中间结果按其自身协议写入 `/tmp`，主 Agent 自行决定是否读取或移动。
 - subagent 不负责创建工作目录。收到的目录不存在时应返回错误，由主 Agent 处理。
 - 可选蓝图默认写入报告所在目录的 `visual_blueprint.json`。
 
@@ -35,8 +35,8 @@ description: |
 
 并行是性能优化，不得以牺牲数据完整性为代价。先判断页面访问方式，再分配执行者：
 
-- **已知 URL、静态页面、无需交互**：交给内置 `general` subagent 使用 `webfetch`，此类任务可以并行。
-- **需要搜索发现 URL、动态渲染、登录态、翻页、展开内容、截图或专用 skill**：进入唯一的 `browser-researcher` 队列，串行执行。
+- **已知 URL、静态页面、无需交互**：交给内置 `general` subagent 使用 `webfetch` 工具，此类任务可以并行。
+- **需要搜索发现 URL、动态渲染、登录态、翻页、展开内容、截图或浏览器交互**：进入唯一的 `browser-researcher` 队列，由 `ego-browser` skill 串行执行。
 - `webfetch` 返回内容不完整、被拦截或无法访问时，将任务追加到 browser 队列，不得以空结果结束。
 - 禁止为了维持固定并发数而限制任务只能使用 `webfetch`。
 
@@ -44,20 +44,20 @@ description: |
 
 | 任务 | 首选方式 | 具体操作 |
 |------|------|------|
-| T0. 产品截图 | browser 队列 | 截取产品首页和定价页，保存到调用方指定的资源目录，返回相对于报告文件的实际路径 |
+| T0. 产品截图 | browser 队列 | 截取产品首页和定价页，保存到调用方指定的资源目录；browser-researcher 返回绝对路径，主 Agent 汇总时转换为相对于最终报告的路径 |
 | T1. 官方信息 | 静态 URL 可用 `webfetch`，否则 browser 队列 | 获取核心功能、目标用户、定价、差异化特点、文档和 Release Notes |
-| T2. 中文社区 | browser 队列 | 依次执行 `zhihu-k-search` 和 `xhs-k-search`；书籍、电影、音乐产品再执行 `douban-k-search` |
+| T2. 中文社区 | browser 队列 | 使用 `ego-browser` 按主题搜索知乎、小红书；书籍、电影、音乐产品再搜索豆瓣 |
 | T3. 通用社区 | browser 队列 | 根据产品类型搜索 V2EX、掘金、InfoQ、GitHub、HN、Reddit 等平台 |
 | T4. 竞品识别 | browser 队列；已有候选竞品的静态官网可并行 `webfetch` | 搜索 "X vs"、"X alternatives"，识别 2-3 个主要竞品并验证定位 |
 
 ### 执行顺序
 
 1. 主 Agent 创建或确认调用方指定的工作目录、报告路径和资源目录，并列出已知官方 URL、待搜索平台和待截图页面。
-2. 同时启动静态 `webfetch` 并行池和一个 `browser-researcher`。从首次 browser Task 结果的 `<task id="...">` 中提取并记录 `task_id`；browser-researcher 内部严格串行执行 T0、T2、T3、T4 以及已知动态页面。
-3. 汇总第一轮结果；任何 `webfetch` 失败或内容不完整的任务，必须携带首次返回的 `task_id` 续接同一个 browser-researcher 会话。续接完成后比较返回结果中的 `<task id="...">` 与传入值：相同才视为成功续接；不同则说明 Task 静默创建了新会话，必须忽略该增量结果，使用完整的已完成任务、证据、失败上下文和待办任务重新创建 browser Task，并记录新的 `task_id`。
-4. browser-researcher 不得并发操作同一个 CDP 浏览器，不得再委派新的浏览器 subagent。
+2. 同时启动静态 `webfetch` 工具并行池和一个 `browser-researcher`。从首次 browser Task 结果的 `<task id="...">` 中提取并记录 OpenCode `task_id`；browser-researcher 使用 `ego-browser`，内部严格串行执行 T0、T2、T3、T4 以及已知动态页面。主 Agent 必须同时向 browser-researcher 传入独立的浏览器结果文件路径（或工作目录）和资源目录，不能传入最终报告路径作为其结果文件路径。
+3. 汇总第一轮结果；任何 `webfetch` 失败或内容不完整的任务，必须携带首次返回的 `task_id` 续接同一个 browser-researcher 会话。只要后续仍可能有浏览器任务，首次 browser-researcher 必须保留 ego task space；全部浏览器任务完成后，主 Agent 再要求其执行最终清理并关闭 task space。续接完成后比较返回结果中的 `<task id="...">` 与传入值：相同才视为成功续接；不同则说明 Task 静默创建了新会话，必须忽略该增量结果，使用完整的已完成任务、证据、失败上下文和待办任务重新创建 browser Task，并记录新的 `task_id`。
+4. browser-researcher 不得并发操作同一个 ego task space，不得再委派新的浏览器 subagent。
 
-调用 `browser-researcher` 时，prompt 必须提供工作目录、报告文件和资源目录的绝对路径，以及逻辑任务列表和预期证据格式。要求其直接使用指定资源目录；禁止自行创建新的工作目录。
+调用 `browser-researcher` 时，prompt 必须提供工作目录、独立的浏览器结果文件路径和资源目录的绝对路径，以及逻辑任务列表和预期证据格式。要求其将结果文件和资源直接写入指定路径；禁止自行创建新的工作目录或修改最终报告。若调用方没有提供工作目录或结果文件路径，要求其将结果写入 `/tmp` 并返回绝对路径。若任务可能续接，必须明确要求保留 ego task space；最终清理轮次才允许关闭。
 
 调用每个内置 `general` subagent 时，prompt 必须完整包含以下契约，不能假设它会继承本 skill 正文：
 
@@ -78,18 +78,17 @@ description: |
 
 ### 信息获取策略
 
-- 已知 URL 的简单静态页面 → `webfetch`
-- 动态渲染（React/Next.js/Vue）、反爬拦截、网络无法访问 → `playwright-cli` CDP 模式：
-  ```bash
-  playwright-cli attach --cdp=http://localhost:9222
-  ```
-  若 CDP 端口未就绪，先执行 `brave-debug` 启动调试浏览器并重试。仍然失败时再询问用户希望使用其他 CDP 端口还是其他浏览器。
+- 已知 URL 的简单静态页面 → 使用内置 `webfetch` 工具
+- 动态渲染（React/Next.js/Vue）、反爬拦截、网络无法访问 → 使用 `ego-browser` skill，通过 browser-researcher 的 task space 访问：
+  - 先创建或复用与当前任务对应的 ego task space
+  - 使用 `snapshotText()`、`click()`、`gotoAndWait()`、`js()` 等 ego-browser helper 完成观察、交互和提取
+  - 每次有意义的操作后重新观察并验证结果
 
-**浏览器底线**：只允许 CDP 模式复用用户已有浏览器，禁止执行 `playwright install`、`npx playwright install`、`--no-cdp` 或任何下载/安装 Chromium 的命令。本规则覆盖各专用 skill 中关于 Launch 模式和安装浏览器的通用回退说明。因坚持 CDP 模式而无法访问的平台，记录尝试过程和失败原因，在最终报告的“数据局限”中说明，不得静默跳过。
+**浏览器底线**：浏览器操作统一使用 `ego-browser`，不要调用其他浏览器自动化 CLI，也不要手动下载或安装 Chromium。任务完成后按 ego-browser 规则关闭临时 task space；因页面不可访问而失败时，记录尝试过程和失败原因，在最终报告的“数据局限”中说明，不得静默跳过。
 
 ### 证据返回格式
 
-所有 subagent 只返回提炼后的证据记录，不返回 DOM、原始 HTML 或完整搜索输出。每条记录必须包含：
+所有进入最终报告的 subagent 证据都必须是提炼后的记录，不得包含 DOM、原始 HTML 或完整搜索输出。browser-researcher 默认将结果写入指定工作目录或 `/tmp` 的结果文件，并只返回摘要和文件路径；主 Agent 自行决定是否读取该文件。每条证据记录必须包含：
 
 ```yaml
 - evidence_id: 平台缩写加序号，例如 zhihu-01
@@ -108,7 +107,7 @@ description: |
 
 ## 阶段 3：汇总与报告生成
 
-1. 汇总 browser-researcher 和所有 general subagent 返回的结构化证据摘要
+1. 按需读取 browser-researcher 返回的结果文件，汇总其中的结构化证据摘要和所有 general subagent 返回的结构化证据摘要
 2. 执行质量门禁：
    - 社区证据是否包含具体内容 URL 和发布时间
    - 官方常青页面是否包含具体 URL 和抓取日期

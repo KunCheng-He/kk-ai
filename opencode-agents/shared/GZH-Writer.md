@@ -24,7 +24,7 @@ temperature: 0.6
 
 ---
 
-## 写作规范（内嵌，替代 gzh-article-creator skill）
+## 写作规范（内嵌）
 
 ### 开头方式
 

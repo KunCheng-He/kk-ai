@@ -4,39 +4,15 @@
 
 ## 目录结构
 
-- `common/` - 通用扩展，已通过目录级符号链接到全局 `~/.pi/agent/extensions/`，所有项目自动加载
-- `shared/` - 共享扩展，按需链接到指定项目的 `.pi/extensions/` 目录
-
-## 使用方式
-
-### 全局扩展（common）
-
-`common/` 目录已链接为 `~/.pi/agent/extensions/`，扩展放入即可全局生效，无需额外操作。
-
-如需在其他机器上设置：
-
-```bash
-ln -s ~/Code/kk-ai/pi-extensions/common ~/.pi/agent/extensions
-```
-
-### 项目级扩展（shared）
-
-将扩展文件放入 `shared/` 目录，然后按需链接到项目的 `.pi/extensions/` 目录：
-
-```bash
-# 使用脚本链接
-~/Code/kk-ai/scripts/link-skills.sh pi-extension <extension-name> /path/to/project
-
-# 或手动链接
-ln -s ~/Code/kk-ai/pi-extensions/shared/my-extension.ts /path/to/project/.pi/extensions/my-extension.ts
-```
+- `common/` - 通用扩展目录
+- `shared/` - 共享扩展目录，按需放入指定项目的 `.pi/extensions/` 目录
 
 ## 扩展规范
 
-每个扩展目录应包含：
+每个扩展目录可包含：
 
 - `index.ts` 或单文件 `.ts` - 扩展入口（必需）
-- `upstream.json` - 上游信息（外部扩展必需，自开发扩展填 `"source": "self-developed"`）
+- `upstream.json` - 上游信息（外部扩展建议提供）
 - `package.json` - 如有 npm 依赖则必需
 
 ## 扩展格式

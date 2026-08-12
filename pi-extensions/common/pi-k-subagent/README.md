@@ -17,11 +17,11 @@ Pi 编码代理的子代理（subagent）扩展。允许主 Agent 将复杂、�
 pi install npm:pi-k-subagent
 ```
 
-或作为 Pi 扩展链接到全局：
+或将扩展目录安装到 Pi 的扩展目录：
 
 ```bash
-# 放入 ~/.pi/agent/extensions/pi-k-subagent/
-# Pi 启动时自动加载
+# 目标路径由当前 Pi 安装方式决定
+# 安装后由 Pi 启动时加载
 ```
 
 ## 子代理定义

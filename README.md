@@ -13,11 +13,10 @@ kk-ai/
 │   ├── common/          # OpenCode 通用 agent（ln 到全局）
 │   └── shared/          # OpenCode 共享 agent（项目按需 ln）
 ├── opencode-commands/
-│   ├── common/          # OpenCode 通用 command（ln 到全局）
-│   └── shared/          # OpenCode 共享 command（项目按需 ln）
+│   └── common/          # OpenCode 通用 command
 ├── pi-extensions/
-│   ├── common/          # Pi 通用扩展（ln 到 ~/.pi/agent/extensions/）
-│   └── shared/          # Pi 共享扩展（项目按需 ln 到 .pi/extensions/）
+│   ├── common/          # Pi 通用扩展
+│   └── shared/          # Pi 共享扩展
 ├── scripts/             # 辅助脚本
 ├── AGENTS.global.md     # OpenCode 全局代理规则
 ├── AGENTS.md            # 本仓库开发指南
@@ -32,11 +31,9 @@ kk-ai/
 |-------|------|------|
 | `mermaid` | self-developed | Mermaid 图表生成（mmdc CLI，渲染 SVG/PNG/PDF） |
 | `project-init` | self-developed | OpenCode 项目初始化工具 |
-| `playwright-cli` | [Playwright](https://www.npmjs.com/package/@playwright/cli) | 浏览器自动化交互工具（手动更新） |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
 | `herdr` | [open-herdr/herdr](https://github.com/open-herdr/herdr) | herdr 终端 agent 多路复用器控制（手动更新） |
-| `html-ppt` | [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) | HTML 演示文稿生成 |
 | `workflow-designer` | self-developed | AI 编码工具工作流设计，基于三层架构和五项原则分析推荐 agent/skill 方案 |
 | `loop-by-herdr` | self-developed | Herdr 驱动的迭代优化循环（执行→审查→优化→重试），适用于任何需要反复验证的迭代任务 |
 
@@ -44,19 +41,15 @@ kk-ai/
 
 | Skill | 来源 | 说明 |
 |-------|------|------|
-| `douban-k-search` | self-developed | 豆瓣数据搜索 |
 | `external-skills-updater` | self-developed | 更新外部 skill |
 | `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills) | 前端界面设计 |
 | `ob_architect_structure` | self-developed | 整理思路、构建逻辑骨架模板（前置条件 ≥3 张卡片，kk-brain） |
 | `ob_capture_insight` | self-developed | 捕捉洞察、结晶原子化知识卡片（苏格拉底引导 + 事实验证 + 原子卡片模板，kk-brain） |
-| `ob_refine_card` | self-developed | 骨架→卡片全流程：框架确认→内容填充→交叉引用审计（含 author_voice 人格注入 + style_guide 风格审计；取代 ob_polish_prose + ob_assemble_card + ob_compile_manuscript） |
-| `gzh-workflow` | self-developed | 公众号运营全流程工作流（调研→写作→配图→审查→发布），由通用主 Agent 加载，替代原 WeChat-GZH-Operator 主 Agent |
+| `ob_refine_card` | self-developed | 骨架→卡片全流程：框架确认→内容填充→交叉引用审计（含 author_voice 人格注入 + style_guide 风格审计） |
+| `gzh-workflow` | self-developed | 公众号运营全流程工作流（调研→写作→配图→审查→发布） |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `research-workflow` | self-developed | 产品调研工作流（识别类型→并行收集→报告生成→蓝图后处理） |
-| `xhs-k-search` | self-developed | 小红书数据搜索 |
-| `zhihu-k-search` | self-developed | 知乎数据搜索 |
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
-| `imagegen-by-gpt` | CodeX local install | CodeX 内置图像生成 skill，重命名接入本仓库；支持默认内建生图流程与 `scripts/image_gen.py` CLI fallback |
 | `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
 
 ### Commands - Common（OpenCode 通用，已链接到全局）
@@ -69,7 +62,7 @@ kk-ai/
 
 | Agent | 说明 |
 |-------|------|
-| `browser-researcher.md` | 浏览器研究员 subagent，操作浏览器搜集信息，只返回提炼结论，不回流中间噪声 |
+| `browser-researcher.md` | 使用 `ego-browser` 操作浏览器、使用 `webfetch` 获取静态页面，只返回提炼结论，不回流中间噪声 |
 | `诸葛亮.md` | 人生导师、思维军师 agent |
 
 ### OpenCode Agents - Shared（OpenCode 共享，项目按需链接）
@@ -78,12 +71,12 @@ kk-ai/
 |-------|------|
 | `GZH-Writer.md` | 公众号文章写作 subagent（写作规范已内嵌，隔离长文上下文，只返回文件路径和摘要） |
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（识别思维阶段 + 质量门禁 + Skill 调度，hkc 第一人称视角，kk-brain） |
-| `ResearchReporter.md` | 产品调研报告生成 subagent（接收结论摘要，按模板生成 README.md） |
+| `ResearchReporter.md` | 产品调研报告生成 subagent（接收结论摘要，按调用方指定路径生成报告） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
 
 ## 使用方式
 
-### 通用 Skill/Agent/Extension
+### 通用 Skill/Agent
 
 通过目录级符号链接到全局，所有项目自动可用：
 
@@ -92,13 +85,11 @@ kk-ai/
 ln -s ~/Code/kk-ai/skills/common ~/.config/opencode/skills
 ln -s ~/Code/kk-ai/opencode-agents/common ~/.config/opencode/agents
 ln -s ~/Code/kk-ai/opencode-commands/common ~/.config/opencode/commands
-ln -s ~/Code/kk-ai/pi-extensions/common ~/.pi/agent/extensions
 
 # 查看
 ls ~/.config/opencode/skills/
 ls ~/.config/opencode/agents/
 ls ~/.config/opencode/commands/
-ls ~/.pi/agent/extensions/
 ```
 
 ### 全局代理规则
@@ -135,31 +126,18 @@ ln -s ~/Code/kk-ai/opencode-agents/shared/xxx-agent.md .opencode/agents/xxx-agen
 
 更新方式：告诉 AI "请更新外部 skill"，AI 将自动执行更新流程。
 
-### Pi Extensions - Common（Pi 通用扩展，已链接到 ~/.pi/agent/extensions/）
+### Pi Extensions - Common（目录索引）
 
-| Extension | 来源 | 说明 |
-|-----------|------|------|
-| `pi-agent-switcher` | self-developed | Pi Agent 角色切换扩展 |
-| `pi-k-subagent` | self-developed | Pi 子代理（subagent）扩展，支持单/并行隔离执行 |
-
-### Pi Extensions 使用方式
-
-Pi 扩展是 TypeScript 模块，存放在 `pi-extensions/` 目录。`common/` 目录已通过目录级符号链接到 `~/.pi/agent/extensions/`，所有项目自动加载。
-
-- **通用扩展**（`common/`）：放入即可全局生效，无需额外操作
-- **共享扩展**（`shared/`）：按需链接到项目的 `.pi/extensions/` 目录
-
-```bash
-# 链接共享扩展到项目
-~/Code/kk-ai/scripts/link-skills.sh pi-extension <extension-name> /path/to/project
-```
+| Extension | 目录 |
+|-----------|------|
+| `pi-agent-switcher` | `pi-extensions/common/pi-agent-switcher/` |
+| `pi-k-subagent` | `pi-extensions/common/pi-k-subagent/` |
 
 ## 相关目录
 
 - **统一仓库**：`~/Code/kk-ai/`
 - **上游追踪**：`~/Code/GitHub-Skills/`
 - **全局配置（OpenCode）**：`~/.config/opencode/`
-- **全局配置（Pi Extensions）**：`~/.pi/agent/extensions/`
 
 ## 相关文档
 

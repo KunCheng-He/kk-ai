@@ -14,7 +14,7 @@ version: 2.0.0
 从 `~/Code/kk-ai/README.md` 读取可用的 shared 资源清单：
 
 - **Skills - Shared** 章节：读取 `skills/shared/` 下的可用 skill
-- **Agents - Shared** 章节：读取 `opencode-agents/shared/` 下的可用 agent
+- **OpenCode Agents - Shared** 章节：读取 `opencode-agents/shared/` 下的可用 agent
 
 解析 README 中的表格，提取名称和说明，作为推荐依据。
 
@@ -37,7 +37,7 @@ version: 2.0.0
 |-------|------|------|
 | `skill-name` | ... | 说明文字 |
 
-### Agents - Shared（共享，项目按需链接）
+### OpenCode Agents - Shared（OpenCode 共享，项目按需链接）
 
 | Agent | 说明 |
 |-------|------|
@@ -51,9 +51,9 @@ version: 2.0.0
 | 项目类型 | 推荐 Skills | 推荐 Agents |
 |----------|-------------|-------------|
 | 内容创作/知识管理 | ob_* 系列 | Knowledge Co-Creator |
-| 产品调研 | xhs-k-search, zhihu-k-search, douban-k-search, research-workflow | ResearchReporter |
+| 产品调研 | research-workflow | ResearchReporter |
 | 前端/Web 开发 | frontend-design | - |
-| 社交媒体运营 | xhs-k-search | - |
+| 社交媒体运营 | gzh-workflow | - |
 | 需要图像素材 | image-prompt | - |
 
 ### 4. 展示计划并确认
