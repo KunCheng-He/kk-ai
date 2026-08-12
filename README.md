@@ -51,6 +51,7 @@ kk-ai/
 | `research-workflow` | self-developed | 产品调研工作流（识别类型→并行收集→报告生成→蓝图后处理） |
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
 | `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
+| `pptx-generator` | [MiniMax-AI/skills](https://github.com/MiniMax-AI/skills) | PowerPoint 演示文稿的生成、编辑与内容提取 |
 
 ### Commands - Common（OpenCode 通用，已链接到全局）
 
