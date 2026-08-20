@@ -1,0 +1,8 @@
+{
+  "source": "marketplace",
+  "marketplace": "workbuddy-skillhub",
+  "skillId": "skill_2087461242486198272",
+  "version": "1.0.0",
+  "installedAt": "2026-08-20",
+  "description": "关键词搜索公众号文章，终端表格展示，自动导出CSV并生成交互式HTML报告"
+}

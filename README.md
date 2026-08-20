@@ -47,6 +47,7 @@ kk-ai/
 | `ob_capture_insight` | self-developed | 捕捉洞察、结晶原子化知识卡片（苏格拉底引导 + 事实验证 + 原子卡片模板，kk-brain） |
 | `ob_refine_card` | self-developed | 骨架→卡片全流程：框架确认→内容填充→交叉引用审计（含 author_voice 人格注入 + style_guide 风格审计） |
 | `gzh-workflow` | self-developed | 公众号运营全流程工作流（调研→写作→配图→审查→发布） |
+| `gzh-search-crawler` | marketplace (workbuddy) | 关键词搜索公众号文章，终端表格展示，导出CSV并生成HTML报告 |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `research-workflow` | self-developed | 产品调研工作流（识别类型→并行收集→报告生成→蓝图后处理） |
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |

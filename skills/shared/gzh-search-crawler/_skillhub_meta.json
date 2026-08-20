@@ -1,0 +1,12 @@
+{
+  "name": "公众号搜索爬虫",
+  "installedAt": 1787202982271,
+  "source": "marketplace",
+  "version": "1.0.0",
+  "skillId": "skill_2087461242486198272",
+  "description_zh": "关键词搜索公众号文章，终端表格展示，自动导出CSV并生成交互式HTML报告",
+  "description_en": "Search WeChat official account articles with CSV export and HTML report.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/9f40ec1e-e8c9-4dca-ace6-b634b3c73991/avatar/skill/au_d7a7b551-dc7.svg",
+  "iconLocalPath": "/Users/hkc/.workbuddy/skills/gzh-search-crawler/_icon.svg",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/9f40ec1e-e8c9-4dca-ace6-b634b3c73991/avatar/skill/au_d7a7b551-dc7.svg"
+}
