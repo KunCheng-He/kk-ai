@@ -15,11 +15,14 @@ import { DynamicBorder } from "@earendil-works/pi-coding-agent";
 import { Container, Key, type SelectItem, SelectList, Text, Box } from "@earendil-works/pi-tui";
 import { AgentStateManager } from "./agent-state";
 import { discoverAgents, resolveAgent } from "./agents";
+import { createTranslator } from "./i18n";
 
 let stateManager: AgentStateManager;
+let t: (key: string, params?: Record<string, string | number>) => string = (key) => key;
 
 export default function agentSwitcherExtension(pi: ExtensionAPI) {
   stateManager = new AgentStateManager();
+  t = createTranslator(pi);
 
   // ============================================================
   // Event: before_agent_start — modify system prompt & tools
@@ -55,7 +58,7 @@ export default function agentSwitcherExtension(pi: ExtensionAPI) {
           const success = await pi.setModel(model);
           if (!success) {
             ctx.ui.notify(
-              `Agent "${agent.name}": 无法切换到模型 ${agent.model}`,
+              t("modelSwitchFailed", { name: agent.name, model: agent.model }),
               "warning",
             );
           }
@@ -105,7 +108,7 @@ export default function agentSwitcherExtension(pi: ExtensionAPI) {
   // Shortcut: Alt+A — open agent switcher
   // ============================================================
   pi.registerShortcut(Key.alt("a"), {
-    description: "切换主 agent 角色",
+    description: t("switchCommand"),
     handler: async (ctx) => {
       if (!ctx.isIdle()) return;
       await openAgentSwitcher(pi, stateManager, ctx);
@@ -116,7 +119,7 @@ export default function agentSwitcherExtension(pi: ExtensionAPI) {
   // Command: /agent <name> — switch or open selector
   // ============================================================
   pi.registerCommand("agent", {
-    description: "切换主 agent 角色",
+    description: t("switchCommand"),
     getArgumentCompletions(prefix: string) {
       const discovery = discoverAgents(process.cwd(), "both");
       return discovery.agents
@@ -141,18 +144,21 @@ export default function agentSwitcherExtension(pi: ExtensionAPI) {
   // Command: /agents — list all available agents
   // ============================================================
   pi.registerCommand("agents", {
-    description: "列出所有可用 agent 角色",
+    description: t("listCommand"),
     handler: async (_args, ctx) => {
       const discovery = discoverAgents(ctx.cwd, "both");
       const currentAgent = stateManager.getCurrentAgent();
       const lines = discovery.agents.map((a) => {
         const marker = a.name === currentAgent ? "→ " : "  ";
-        const scopeTag = a.source === "project" ? " [项目]" : "";
+        const scopeTag = a.source === "project" ? t("projectTag") : "";
         const modelTag = a.model ? ` (${a.model})` : "";
         return `${marker}${a.name}: ${a.description}${modelTag}${scopeTag}`;
       });
       ctx.ui.notify(
-        `当前: ${currentAgent || "默认"}\n\n${lines.join("\n")}`,
+        t("currentAgents", {
+          agent: currentAgent || t("default"),
+          agents: lines.join("\n"),
+        }),
         "info",
       );
     },
@@ -191,7 +197,7 @@ async function openAgentSwitcher(
   if (projectAgents.length > 0) {
     items.push({
       value: "__separator__",
-      label: "── 项目 Agent ──",
+      label: t("projectAgents"),
       description: "",
     });
     for (const a of projectAgents) {
@@ -199,8 +205,8 @@ async function openAgentSwitcher(
         value: a.name,
         label:
           a.name === currentAgent
-            ? `✓ ${a.name} [项目]`
-            : `  ${a.name} [项目]`,
+            ? `✓ ${a.name}${t("projectTag")}`
+            : `  ${a.name}${t("projectTag")}`,
         description: a.description + (a.model ? ` (${a.model})` : ""),
       });
     }
@@ -209,8 +215,8 @@ async function openAgentSwitcher(
   // Reset option
   items.push({
     value: "__reset__",
-    label: "↩ 重置为默认",
-    description: "恢复 Pi 默认行为",
+    label: t("reset"),
+    description: t("resetDescription"),
   });
 
   // Build digit-to-value mapping for quick shortcuts (keys 1-9),
@@ -240,9 +246,12 @@ async function openAgentSwitcher(
     // Title
     box.addChild(
       new Text(
-        theme.fg("accent", theme.bold("🤖 切换主 Agent")) +
+        theme.fg("accent", theme.bold(t("selectorTitle"))) +
           " " +
-          theme.fg("dim", `(当前: ${currentAgent || "默认"})`),
+          theme.fg(
+            "dim",
+            t("currentAgent", { agent: currentAgent || t("default") }),
+          ),
         1,
         0,
       ),
@@ -263,7 +272,7 @@ async function openAgentSwitcher(
     // Help text
     box.addChild(
       new Text(
-        theme.fg("dim", "↑↓ 导航 • 1-9 快捷选择 • enter 选择 • esc 取消 • 输入过滤"),
+        theme.fg("dim", t("selectorHelp")),
         1,
         0,
       ),
@@ -317,7 +326,7 @@ async function performSwitch(
   if (!agent) {
     const available = discovery.agents.map((a) => a.name).join(", ");
     ctx.ui.notify(
-      `未知 agent: "${agentName}"。可用: ${available}`,
+      t("unknownAgent", { name: agentName, agents: available }),
       "error",
     );
     return;
@@ -333,8 +342,8 @@ async function performSwitch(
   pi.setSessionName(`🤖 ${agent.name}`);
 
   // Notify user
-  const prevLabel = previousAgent || "默认";
-  ctx.ui.notify(`Agent 切换: ${prevLabel} → ${agent.name}`, "info");
+  const prevLabel = previousAgent || t("default");
+  ctx.ui.notify(t("switched", { previous: prevLabel, current: agent.name }), "info");
 }
 
 // ============================================================
@@ -347,7 +356,7 @@ async function resetToDefault(
 ): Promise<void> {
   const previousAgent = stateManager.getCurrentAgent();
   if (!previousAgent) {
-    ctx.ui.notify("当前已是默认 agent", "info");
+    ctx.ui.notify(t("alreadyDefault"), "info");
     return;
   }
 
@@ -360,5 +369,5 @@ async function resetToDefault(
   pi.setSessionName("");
 
   // Notify user
-  ctx.ui.notify(`Agent 重置: ${previousAgent} → 默认`, "info");
+  ctx.ui.notify(t("resetDone", { previous: previousAgent }), "info");
 }

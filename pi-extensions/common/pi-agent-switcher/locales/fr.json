@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "namespace": "ext.pi-agent-switcher",
+  "locale": "fr",
+  "messages": {
+    "modelSwitchFailed": "Agent \"{name}\" : impossible de basculer vers le modèle {model}",
+    "switchCommand": "Changer le rôle de l’agent principal",
+    "listCommand": "Lister les rôles d’agent disponibles",
+    "projectTag": " [projet]",
+    "currentAgents": "Actuel : {agent}\n\n{agents}",
+    "currentAgent": "Actuel : {agent}",
+    "default": "par défaut",
+    "projectAgents": "── Agents du projet ──",
+    "reset": "↩ Réinitialiser par défaut",
+    "resetDescription": "Rétablir le comportement par défaut de Pi",
+    "selectorTitle": "🤖 Changer l’agent principal",
+    "selectorHelp": "↑↓ naviguer • 1-9 choix rapide • entrée choisir • échap annuler • saisir pour filtrer",
+    "unknownAgent": "Agent inconnu : \"{name}\". Disponibles : {agents}",
+    "switched": "Agent changé : {previous} → {current}",
+    "alreadyDefault": "L’agent par défaut est déjà actif",
+    "resetDone": "Agent réinitialisé : {previous} → par défaut"
+  }
+}

@@ -1,148 +1,157 @@
 # pi-agent-switcher
 
-Pi 扩展：通过 Markdown 定义的 Agent 文件，在主会话中手动切换 Agent 角色。
+A Pi extension for manually switching the primary agent role in a session from Markdown-defined agent files.
 
-每个 Agent 拥有独立的系统提示词、工具集、模型和思考级别。Agent 定义为简单的 Markdown 文件 + YAML frontmatter。
+Each agent can have its own system prompt, tool set, model, and thinking level. Agent definitions are simple Markdown files with YAML frontmatter.
 
-## 功能特性
+## Features
 
-- **Markdown 定义 Agent** — 用 `.md` 文件 + YAML frontmatter 定义 Agent 角色
-- **两级作用域** — 全局 Agent（`~/.pi/agent/k-priagent/`）和项目 Agent（`.pi/k-priagent/`）
-- **项目覆盖全局** — 同名项目 Agent 优先于全局 Agent
-- **与 subagent 分离** — 本扩展只管主会话角色（primary agent），读取 `k-priagent/`；`~/.pi/agent/agents/` 留给 [@agwab/pi-subagent](https://github.com/AgwaB/pi-subagent) 等子代理运行时独占，互不干扰
-- **系统提示词切换** — Agent 身份前置，Pi 内置上下文包裹在 `<environment_context>` 中
-- **工具集切换** — 按 Agent 限制可用工具
-- **模型切换** — 按 Agent 切换模型/提供商（如 `anthropic/claude-sonnet-4-20250514`）
-- **思考级别切换** — 按 Agent 设置思考级别（`off` / `low` / `medium` / `high`）
-- **会话持久化** — Agent 状态在会话分支间持久保存
-- **交互式选择器 UI** — 搜索、导航、数字快捷选择
+- **Markdown-defined agents** — define roles with `.md` files and YAML frontmatter
+- **Two scopes** — user agents (`~/.pi/agent/k-priagent/`) and project agents (`.pi/k-priagent/`)
+- **Project overrides user** — a project agent with the same name takes precedence
+- **Separate from subagents** — this extension manages primary session roles from `k-priagent/`; `~/.pi/agent/agents/` remains available to subagent runtimes such as [@agwab/pi-subagent](https://github.com/AgwaB/pi-subagent)
+- **System-prompt switching** — the agent identity is prepended; Pi's built-in context remains inside `<environment_context>`
+- **Tool, model, and thinking switching** — optionally restrict tools or select a model and thinking level per agent
+- **Session persistence** — the selected agent survives session branches and reloads
+- **Interactive picker** — search, keyboard navigation, and number shortcuts
+- **Optional French UI** — uses [pi-i18n](https://github.com/jerryfan/pi-i18n) when installed; otherwise the UI is English
 
-## 安装
+## Install
 
 ```bash
 pi install npm:pi-agent-switcher
 ```
 
-## 使用方式
+Optional French UI:
 
-### 命令
+```bash
+pi install npm:pi-i18n
+# Restart Pi, then run:
+/lang fr
+```
 
-| 命令            | 说明                    |
-| --------------- | ----------------------- |
-| `/agent <name>` | 切换到指定 Agent        |
-| `/agent`        | 打开交互式 Agent 选择器 |
-| `/agent reset`  | 重置为 Pi 默认行为      |
-| `/agents`       | 列出所有可用 Agent      |
+`pi-i18n` is not required: without it, pi-agent-switcher stays fully functional in English.
 
-### 快捷键
+## Usage
 
-| 按键    | 动作                    |
-| ------- | ----------------------- |
-| `Alt+A` | 打开交互式 Agent 选择器 |
+### Commands
 
-### 交互式选择器
+| Command | Description |
+| --- | --- |
+| `/agent <name>` | Switch to an agent |
+| `/agent` | Open the interactive agent picker |
+| `/agent reset` | Restore Pi's default behavior |
+| `/agents` | List available agents |
 
-选择器 UI 支持：
+### Shortcut
 
-- **↑↓ 方向键** — 列表导航
-- **1-9 数字键** — 快捷选择
-- **Enter** — 确认选择
-- **Esc** — 取消
-- **输入过滤** — 按名称/描述模糊搜索
+| Key | Action |
+| --- | --- |
+| `Alt+A` | Open the interactive agent picker |
 
-## 定义 Agent
+### Interactive picker
 
-在以下目录创建 `.md` 文件：
+- **Arrow keys** — navigate the list
+- **1–9** — select an item directly
+- **Enter** — confirm
+- **Esc** — cancel
+- **Type** — filter by name or description
 
-- **全局 Agent**：`~/.pi/agent/k-priagent/` — 所有项目可用
-- **项目 Agent**：`.pi/k-priagent/` — 仅当前项目可用
+## Define an agent
 
-### Agent 文件格式
+Create a `.md` file in either directory:
+
+- **User**: `~/.pi/agent/k-priagent/` — available in every project
+- **Project**: `.pi/k-priagent/` — available only in the current project
+
+### Agent file format
 
 ```markdown
 ---
 name: my-agent
-description: 简短描述此 Agent 的职责
+description: A short description of this agent's role
 tools: read,write,bash,edit
 model: anthropic/claude-sonnet-4-20250514
 thinking: medium
 ---
 
-你是一个专注于 [特定任务] 的专业 Agent。
+You are a specialist for [a specific task].
 
-你的职责：
+Your responsibilities:
 
 - ...
 - ...
 
-规范：
+Rules:
 
 - ...
 ```
 
-### Frontmatter 字段
+### Frontmatter fields
 
-| 字段          | 必需 | 说明                                                                       |
-| ------------- | ---- | -------------------------------------------------------------------------- |
-| `name`        | ✅   | Agent 唯一标识（用于 `/agent <name>`）                                     |
-| `description` | ✅   | 简短描述，显示在 Agent 列表中                                              |
-| `tools`       | ❌   | 逗号分隔的允许工具列表（如 `read,write,bash,edit`）                        |
-| `model`       | ❌   | 模型，格式为 `provider/modelId`（如 `anthropic/claude-sonnet-4-20250514`） |
-| `thinking`    | ❌   | 思考级别：`off`、`low`、`medium`、`high`                                   |
+| Field | Required | Description |
+| --- | --- | --- |
+| `name` | Yes | Unique identifier used by `/agent <name>` |
+| `description` | Yes | Short label shown in agent lists |
+| `tools` | No | Comma-separated allowed tools, such as `read,write,bash,edit` |
+| `model` | No | `provider/modelId`, such as `anthropic/claude-sonnet-4-20250514` |
+| `thinking` | No | `off`, `low`, `medium`, or `high` |
 
-Markdown 正文（frontmatter 之后的内容）即为 Agent 的系统提示词。
+The Markdown body after the frontmatter is the agent system prompt.
 
-### 示例 Agent
+### Example: code reviewer
 
-**代码审查员**（`~/.pi/agent/k-priagent/code-reviewer.md`）：
+`~/.pi/agent/k-priagent/code-reviewer.md`
 
 ```markdown
 ---
 name: code-reviewer
-description: 专注于代码审查和质量
+description: Reviews code quality and correctness
 tools: read,bash
 thinking: high
 ---
 
-你是一位资深代码审查员。关注以下方面：
+You are a senior code reviewer. Focus on:
 
-- 代码正确性与边界情况
-- 性能影响
-- 安全漏洞
-- 可读性与可维护性
+- Correctness and edge cases
+- Performance impact
+- Security vulnerabilities
+- Readability and maintainability
 
-始终提供可操作的建议和具体代码示例。
+Always give actionable advice and concrete code examples.
 ```
 
-**前端开发**（`.pi/k-priagent/frontend.md`）：
+### Example: frontend developer
+
+`.pi/k-priagent/frontend.md`
 
 ```markdown
 ---
 name: frontend
-description: 前端专家，精通 React/Vue
+description: Frontend specialist for React and Vue
 model: anthropic/claude-sonnet-4-20250514
 tools: read,write,bash,edit
 ---
 
-你是一位前端开发专家，精通 React、Vue 和现代 CSS。
-偏好组件化架构，遵循无障碍最佳实践。
+You are a frontend developer specializing in React, Vue, and modern CSS.
+Prefer component-oriented designs and accessibility best practices.
 ```
 
-## 工作原理
+## How it works
 
-当 Agent 激活时，扩展通过 `before_agent_start` 事件修改 Pi 的行为：
+When an agent is active, the extension handles Pi's `before_agent_start` event:
 
-1. **系统提示词**：Agent 的系统提示词前置（高注意力位置），Pi 内置上下文包裹在 `<environment_context>` 标签中
-2. **工具**：若 Agent 定义了 `tools` 列表，则仅启用这些工具
-3. **模型**：若 Agent 定义了 `model`，Pi 切换到该模型
-4. **思考级别**：若 Agent 定义了 `thinking`，Pi 使用该思考配置
+1. **System prompt** — prepends the agent system prompt and wraps Pi's built-in context in `<environment_context>`
+2. **Tools** — activates only the configured tools when the agent defines `tools`
+3. **Model** — switches to the configured model when available
+4. **Thinking level** — applies the configured thinking level
 
-会话启动时，扩展从会话历史中恢复上次激活的 Agent。
+On session start, the extension restores the most recently active agent from session history.
 
-## 调试
+## Debugging
 
-如果想查看 Agent 切换后最终拼装出的完整系统提示词（Agent 身份 + `<environment_context>`），可以使用 [pi-message-capture](https://github.com/KunCheng-He/pi-message-capture)，它能捕获并展示每次发送给模型的完整消息内容。
+To inspect the complete assembled system prompt after an agent switch (agent identity plus `<environment_context>`), use [pi-message-capture](https://github.com/KunCheng-He/pi-message-capture).
 
-## 许可证
+## License
 
 MIT
