@@ -27,7 +27,7 @@ description: |
 
 - **explorer** subagent 为只读权限，不能加载 skill
 - **general** 和 **browser-researcher** subagent 可以加载 skill
-- GZH-Writer 和 ResearchReporter 为自定义 subagent，已内嵌所需规范，无需加载 skill
+- woaile-gzh-writer 和 ResearchReporter 为自定义 subagent，已内嵌所需规范，无需加载 skill
 
 ---
 
@@ -80,24 +80,24 @@ description: |
 
 ## Phase 3: DRAFTING — 写作
 
-**使用 GZH-Writer subagent 隔离长文上下文。**
+**使用 woaile-gzh-writer subagent 隔离长文上下文。**
 
 ### 步骤 3a：生成大纲
 
-派 GZH-Writer subagent（task_id 避免冲突）：
+派 woaile-gzh-writer subagent（task_id 避免冲突）：
 - 子指令必须包含：`指令类型=outline；工作目录={工作目录绝对路径}；调研报告={工作目录绝对路径}/调研报告.md；只生成文章大纲，不要写全文；禁止创建或改用其他工作目录`
 - 如果工作目录存在 `作者事实.md`，将其绝对路径作为内部写作约束一并传入；未提供时明确告知 subagent：没有可直接使用的个人经历事实。作者事实只用于防止虚构，不要求在成稿中逐条解释。
-- GZH-Writer 已内嵌全部写作规范（风格、格式），无需加载其他 skill
+- woaile-gzh-writer 已内嵌全部写作规范（风格、格式），无需加载其他 skill
 - 返回：文章大纲（含标题、文章核心判断，以及每章的本章主旨、回答问题、支撑要点和不展开内容）
 
 主 Agent 将大纲展示给用户，询问是否满意。收到明确确认后进入步骤 3b；此关口在自动模式下也不可跳过。
 
 ### 步骤 3b：撰写成文
 
-派 GZH-Writer subagent（新一轮 task）：
+派 woaile-gzh-writer subagent（新一轮 task）：
 - 子指令必须包含：`指令类型=write；工作目录={工作目录绝对路径}；调研报告={工作目录绝对路径}/调研报告.md；目标文件={工作目录绝对路径}/成稿.md；基于已确认大纲撰写完整文章；禁止创建或改用其他工作目录`，并附上已确认大纲和作者事实文件路径（如有）
 - 若未提供作者事实，要求 subagent 保持自然的第一人称判断和建议，但不得虚构作者做过的实践、测试、阅读、耗时或结果。
-- GZH-Writer 已内嵌全部写作规范，成文后会自动执行风格自查
+- woaile-gzh-writer 已内嵌全部写作规范，成文后会自动执行风格自查
 
 ### 验证检查点 2
 
@@ -151,6 +151,7 @@ description: |
 - 口语化程度（是否过于书面）
 - 段落长度（2-4 行，手机友好）
 - 金句密度（是否有粗体突出的关键观点）
+- 斜体金句校验（斜体是否仅用于章节金句：每章 ≤1 句、独立成段、不叠粗体；全篇是否存在非金句斜体，如英文术语、文件名、普通强调误用斜体）
 - 第一人称经历是否有作者事实文件或用户明确提供的原文依据；判断型第一人称是否自然且没有伪装成体验
 - 是否存在 GitHub/Obsidian Alert 格式（如 `> [!NOTE]`）
 - 是否存在为了证明观点合理而堆叠的因果连接和解释
@@ -244,7 +245,7 @@ cd "{woaile-gzh-publisher scripts 目录}" && uv run main.py publish "{成稿.md
 |----------|------|------|----------|
 | explorer (内置) | 只读信息收集 | 只读 | RESEARCH (via research-workflow) |
 | ResearchReporter | 调研报告生成 | 写工作区 | RESEARCH (via research-workflow) |
-| GZH-Writer | 调研→成稿 | 写工作区 | DRAFTING |
+| woaile-gzh-writer | 调研→成稿 | 写工作区 | DRAFTING |
 
 ### Skills
 
@@ -259,7 +260,7 @@ cd "{woaile-gzh-publisher scripts 目录}" && uv run main.py publish "{成稿.md
 ## 反模式提醒
 
 以下行为**严格禁止**：
-- ❌ 主 Agent 亲自写长文（应派 GZH-Writer subagent）
+- ❌ 主 Agent 亲自写长文（应派 woaile-gzh-writer subagent）
 - ❌ 跳过审查直接发布
 - ❌ 直接修改成稿个别字句后发布（必须完整重跑 DRAFTING）
 - ❌ 未经用户确认自动发布

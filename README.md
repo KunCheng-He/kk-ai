@@ -71,7 +71,7 @@ kk-ai/
 
 | Agent | 说明 |
 |-------|------|
-| `GZH-Writer.md` | 公众号文章写作 subagent（写作规范已内嵌，隔离长文上下文，只返回文件路径和摘要） |
+| `woaile-gzh-writer.md` | 「我AI了」公众号文章写作 subagent（写作规范已内嵌，隔离长文上下文，只返回文件路径和摘要） |
 | `Knowledge Co-Creator.md` | 知识共建者主 agent（识别思维阶段 + 质量门禁 + Skill 调度，hkc 第一人称视角，kk-brain） |
 | `ResearchReporter.md` | 产品调研报告生成 subagent（接收结论摘要，按调用方指定路径生成报告） |
 | `universal-translator.md` | 通用翻译 agent（多语言翻译成英语） |
