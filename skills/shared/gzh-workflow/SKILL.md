@@ -188,13 +188,13 @@ description: |
 
 1. 再次执行正文图片门禁：不存在 `[需配图：`，所有本地图片和 `素材/封面.png` 均存在
 2. 确认封面和正文图片为 jpg/png，单文件小于 1 MB
-3. 调用 `wechat-gzh-skill` 检查配置：
+3. 调用 `woaile-gzh-publisher` 检查配置：
    ```bash
-   cd "{wechat-gzh-skill scripts 目录}" && uv run main.py config check
+   cd "{woaile-gzh-publisher scripts 目录}" && uv run main.py config check
    ```
 4. 执行转换预检：
    ```bash
-   cd "{wechat-gzh-skill scripts 目录}" && uv run main.py publish "{成稿.md 绝对路径}" --cover "{素材/封面.png 绝对路径}" --dry-run
+   cd "{woaile-gzh-publisher scripts 目录}" && uv run main.py publish "{成稿.md 绝对路径}" --cover "{素材/封面.png 绝对路径}" --dry-run
    ```
 5. 只有返回 `success: true`、标题非空、无 Markdown 表格且转换后内容未超限，才算预检通过
 6. 向用户展示标题、摘要、主题、HTML 字符数、图片数量和封面路径，询问是否发布到草稿箱
@@ -203,10 +203,10 @@ description: |
 
 ### 真实发布
 
-收到用户本次明确确认后，调用 `wechat-gzh-skill`：
+收到用户本次明确确认后，调用 `woaile-gzh-publisher`：
 
 ```bash
-cd "{wechat-gzh-skill scripts 目录}" && uv run main.py publish "{成稿.md 绝对路径}" --cover "{素材/封面.png 绝对路径}"
+cd "{woaile-gzh-publisher scripts 目录}" && uv run main.py publish "{成稿.md 绝对路径}" --cover "{素材/封面.png 绝对路径}"
 ```
 
 真实发布命令只执行一次。失败后报告错误码和失败阶段，不得自动重试；修复问题并重新完成预检后，必须再次取得用户确认，避免重复上传素材。
@@ -253,7 +253,7 @@ cd "{wechat-gzh-skill scripts 目录}" && uv run main.py publish "{成稿.md 绝
 | research-workflow | 产品调研编排（4-phase 并行） | 主 Agent | RESEARCH |
 
 | image-prompt | 生图提示词生成 | 主 Agent | IMAGE_GEN |
-| wechat-gzh-skill | Markdown→发布草稿箱 | 主 Agent | PUBLISH |
+| woaile-gzh-publisher | Markdown→发布草稿箱 | 主 Agent | PUBLISH |
 
 ---
 

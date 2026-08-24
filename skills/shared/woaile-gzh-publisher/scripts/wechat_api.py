@@ -85,6 +85,18 @@ class WechatAPI:
         self.token_cache = TokenCache(config.appid)
         self._access_token: Optional[str] = None
 
+    def _safe_request(self, method: str, url: str, **kwargs):
+        try:
+            return requests.request(method, url, **kwargs)
+        except requests.RequestException:
+            raise WechatAPIError(-1, "网络请求失败：无法连接微信 API（详情已脱敏，避免密钥泄漏）")
+
+    def _safe_json(self, resp) -> dict:
+        try:
+            return resp.json()
+        except ValueError:
+            raise WechatAPIError(-1, "微信 API 返回非 JSON 响应")
+
     def get_access_token(self) -> str:
         cached = self.token_cache.get()
         if cached:
@@ -97,8 +109,8 @@ class WechatAPI:
             "secret": self.config.secret,
         }
 
-        resp = requests.get(url, params=params, timeout=10)
-        data = resp.json()
+        resp = self._safe_request("GET", url, params=params, timeout=10)
+        data = self._safe_json(resp)
 
         if "errcode" in data and data["errcode"] != 0:
             raise WechatAPIError(data["errcode"], data.get("errmsg", "获取 access_token 失败"))
@@ -116,9 +128,9 @@ class WechatAPI:
 
         data, filename, mime = self._read_image(file_path)
         files = {"media": (filename, io.BytesIO(data), mime)}
-        resp = requests.post(url, params=params, files=files, timeout=30)
+        resp = self._safe_request("POST", url, params=params, files=files, timeout=30)
 
-        data = resp.json()
+        data = self._safe_json(resp)
 
         if "errcode" in data and data["errcode"] != 0:
             raise WechatAPIError(data["errcode"], data.get("errmsg", "上传图片失败"))
@@ -138,9 +150,9 @@ class WechatAPI:
 
         data, filename, mime = self._read_image(file_path)
         files = {"media": (filename, io.BytesIO(data), mime)}
-        resp = requests.post(url, params=params, files=files, timeout=30)
+        resp = self._safe_request("POST", url, params=params, files=files, timeout=30)
 
-        data = resp.json()
+        data = self._safe_json(resp)
 
         if "errcode" in data and data["errcode"] != 0:
             raise WechatAPIError(data["errcode"], data.get("errmsg", "上传素材失败"))
@@ -180,8 +192,8 @@ class WechatAPI:
 
         headers = {"Content-Type": "application/json"}
         json_data = json.dumps(payload, ensure_ascii=False)
-        resp = requests.post(url, params=params, data=json_data.encode("utf-8"), headers=headers, timeout=30)
-        data = resp.json()
+        resp = self._safe_request("POST", url, params=params, data=json_data.encode("utf-8"), headers=headers, timeout=30)
+        data = self._safe_json(resp)
 
         if "errcode" in data and data["errcode"] != 0:
             raise WechatAPIError(data["errcode"], data.get("errmsg", "创建草稿失败"))

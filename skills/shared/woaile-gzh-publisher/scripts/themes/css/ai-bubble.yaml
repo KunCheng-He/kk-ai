@@ -1,0 +1,13 @@
+name: ai-bubble
+description: AI 对话气泡，极简公众号风，标题使用「我AI了」Logo 同款气泡轮廓（手绘感不对称圆角 + 左下弯钩尾巴），纯白底 + 藏蓝品牌色。适合 AI 工具介绍、普通人 AI 实践分享、技术教程。
+sticker:
+  top_decoration: chat_bubble
+  top_decoration_color: "#2d3773"
+  top_decoration_size: 28
+  bottom_divider: true
+  bottom_divider_color: "#2d3773"
+h2_bubble:
+  enabled: true
+  border_color: "#2d3773"
+  text_color: "#2d3773"
+  tail_position: "left"

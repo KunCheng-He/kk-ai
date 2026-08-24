@@ -21,7 +21,7 @@ class ArticleMetadata:
     author: str = ""
     digest: str = ""
     cover: str = ""
-    theme: str = "default"
+    theme: str = "ai-bubble"
 
 
 @dataclass
@@ -122,7 +122,7 @@ def parse_markdown(file_path: str) -> ParsedArticle:
     author = frontmatter.get("author", "")
     digest = frontmatter.get("digest", "") or extract_digest(body)
     cover = frontmatter.get("cover", "")
-    theme = frontmatter.get("theme", "default")
+    theme = frontmatter.get("theme", "ai-bubble")
 
     metadata = ArticleMetadata(
         title=title,
@@ -159,7 +159,7 @@ def parse_markdown_content(content: str) -> ParsedArticle:
     author = frontmatter.get("author", "")
     digest = frontmatter.get("digest", "") or extract_digest(body)
     cover = frontmatter.get("cover", "")
-    theme = frontmatter.get("theme", "default")
+    theme = frontmatter.get("theme", "ai-bubble")
 
     metadata = ArticleMetadata(
         title=title,

@@ -13,19 +13,19 @@ class WechatConfig:
 
     @classmethod
     def from_env(cls) -> "WechatConfig":
-        appid = os.getenv("WECHAT_GZH_APPID")
-        secret = os.getenv("WECHAT_GZH_SECRET")
+        appid = os.getenv("WOAILE_GZH_APPID")
+        secret = os.getenv("WOAILE_GZH_SECRET")
 
         if not appid:
-            raise ValueError("环境变量 WECHAT_GZH_APPID 未设置")
+            raise ValueError("环境变量 WOAILE_GZH_APPID 未设置")
         if not secret:
-            raise ValueError("环境变量 WECHAT_GZH_SECRET 未设置")
+            raise ValueError("环境变量 WOAILE_GZH_SECRET 未设置")
 
         return cls(appid=appid, secret=secret)
 
 
 class TokenCache:
-    CACHE_DIR = Path.home() / ".cache" / "wechat-gzh-skill"
+    CACHE_DIR = Path.home() / ".cache" / "woaile-gzh-publisher"
     CACHE_FILE = CACHE_DIR / "token.json"
 
     def __init__(self, appid: str):

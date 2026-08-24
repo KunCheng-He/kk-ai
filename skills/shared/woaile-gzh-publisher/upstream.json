@@ -1,0 +1,12 @@
+{
+  "source": "self-developed",
+  "description": "「我AI了」微信公众号定制发布工具，自开发 skill（原名 wechat-gzh-skill，因严格定制适配「我AI了」公众号而更名）",
+  "created_at": "2026-05-14",
+  "version": "0.6.2",
+  "last_update": "2026-08-24",
+  "changes": [
+    "密钥防泄漏加固：config check 输出脱敏之外，新增 SKILL.md 密钥安全规则（禁止 Agent 用 echo/env/读 shell 配置验证密钥）；API 网络异常统一包装为不含 URL 的错误；main.py 对异常信息二次脱敏（sanitize_error）",
+    "SKILL 更名为 woaile-gzh-publisher：工具已严格定制适用于「我AI了」公众号；环境变量同步改为 WOAILE_GZH_APPID/SECRET",
+    "0.6.0: SKILL 渐进式披露重构：443 行拆分为 149 行核心文档 + 4 个按需加载的 references 模块（theme-development / publishing-fallback / writing-syntax / troubleshooting）"
+  ]
+}

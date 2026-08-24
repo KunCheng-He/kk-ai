@@ -1,7 +1,7 @@
 [project]
-name = "wechat-gzh-skill"
+name = "woaile-gzh-publisher"
 version = "0.1.0"
-description = "微信公众号草稿发布工具 - Markdown 转公众号格式并发布到草稿箱"
+description = "「我AI了」公众号定制发布工具 - Markdown 转公众号格式并发布到草稿箱"
 requires-python = ">=3.10"
 dependencies = [
     "requests>=2.31.0",
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-wechat-gzh = "main:main"
+woaile-gzh = "main:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["."]

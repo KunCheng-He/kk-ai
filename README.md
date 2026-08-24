@@ -51,7 +51,7 @@ kk-ai/
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `research-workflow` | self-developed | 产品调研工作流（识别类型→并行收集→报告生成→蓝图后处理） |
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
-| `wechat-gzh-skill` | self-developed | 微信公众号草稿发布工具 |
+| `woaile-gzh-publisher` | self-developed | 「我AI了」公众号定制发布工具（Markdown→公众号草稿箱） |
 
 ### Commands - Common（OpenCode 通用，已链接到全局）
 

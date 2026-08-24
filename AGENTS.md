@@ -69,7 +69,7 @@ ln -s ~/Code/kk-ai/opencode-commands/common ~/.config/opencode/commands
 
 ## Python 项目约定
 
-部分 skill（如 `wechat-gzh-skill`）包含 Python 脚本：
+部分 skill（如 `woaile-gzh-publisher`）包含 Python 脚本：
 - 代码放在 `scripts/` 子目录
 - 使用 `uv` 作为包管理器
 - 详见各 skill 目录下的 `AGENTS.md`

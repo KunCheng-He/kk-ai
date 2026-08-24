@@ -10,6 +10,18 @@ from themes import list_themes
 from wechat_api import WechatAPI, WechatAPIError
 
 
+def sanitize_error(message: str) -> str:
+    try:
+        config = load_config()
+    except ValueError:
+        return message
+    if config.secret:
+        message = message.replace(config.secret, "***")
+    if config.appid:
+        message = message.replace(config.appid, config.appid[:4] + "***")
+    return message
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="微信公众号草稿发布工具",
@@ -19,14 +31,14 @@ def main():
 
     publish_parser = subparsers.add_parser("publish", help="转换 Markdown 并发布到草稿箱")
     publish_parser.add_argument("file", help="Markdown 文件路径")
-    publish_parser.add_argument("--theme", default="default", help="主题名称")
+    publish_parser.add_argument("--theme", default=None, help="主题名称（默认使用 Markdown frontmatter 中的 theme）")
     publish_parser.add_argument("--cover", help="封面图路径（可选）")
     publish_parser.add_argument("--dry-run", action="store_true", help="仅转换不发布")
-    publish_parser.add_argument("--force", action="store_true", help="跳过表格确认，直接发布")
+    publish_parser.add_argument("--force", action="store_true", help="跳过代码块/表格转图片确认，直接发布")
 
     convert_parser = subparsers.add_parser("convert", help="仅转换 Markdown 为 HTML")
     convert_parser.add_argument("file", help="Markdown 文件路径")
-    convert_parser.add_argument("--theme", default="default", help="主题名称")
+    convert_parser.add_argument("--theme", default=None, help="主题名称（默认使用 Markdown frontmatter 中的 theme）")
     convert_parser.add_argument("--output", help="输出文件路径（可选）")
 
     themes_parser = subparsers.add_parser("themes", help="列出可用主题")
@@ -62,32 +74,26 @@ def main():
             theme = args.theme or article.metadata.theme
             html, converter = convert_article(article, theme)
 
-            if converter.has_tables:
+            if args.output:
+                Path(args.output).write_text(html, encoding="utf-8")
                 result = {
                     "success": True,
-                    "warning": "文档包含表格，在手机端可能显示不全。建议先将表格转换为图片再发布。",
+                    "output": args.output,
                     "title": article.metadata.title,
                     "theme": theme,
                     "content_length": len(html),
                 }
             else:
-                if args.output:
-                    Path(args.output).write_text(html, encoding="utf-8")
-                    result = {
-                        "success": True,
-                        "output": args.output,
-                        "title": article.metadata.title,
-                        "theme": theme,
-                        "content_length": len(html),
-                    }
-                else:
-                    result = {
-                        "success": True,
-                        "html": html,
-                        "title": article.metadata.title,
-                        "theme": theme,
-                        "content_length": len(html),
-                    }
+                result = {
+                    "success": True,
+                    "html": html,
+                    "title": article.metadata.title,
+                    "theme": theme,
+                    "content_length": len(html),
+                }
+
+            if converter.has_tables:
+                result["warning"] = "文档包含表格，在手机端可能显示不全。建议先将表格转换为图片再发布。"
 
             print(json.dumps(result, ensure_ascii=False, indent=2))
         except FileNotFoundError as e:
@@ -95,7 +101,7 @@ def main():
             print(json.dumps(result, ensure_ascii=False, indent=2))
             sys.exit(1)
         except Exception as e:
-            result = {"success": False, "error": str(e)}
+            result = {"success": False, "error": sanitize_error(str(e))}
             print(json.dumps(result, ensure_ascii=False, indent=2))
             sys.exit(1)
         return
@@ -111,11 +117,23 @@ def main():
             converter = MarkdownConverter(theme)
             html = converter.convert(article)
 
-            if converter.has_tables and not args.force:
+            if (converter.has_tables or converter.has_code_blocks) and not args.force:
+                needs_confirm = []
+                if converter.has_tables:
+                    needs_confirm.append({
+                        "type": "table",
+                        "warning": "文档包含表格，在手机端可能显示不全。建议先将表格转换为图片再发布。",
+                    })
+                if converter.has_code_blocks:
+                    needs_confirm.append({
+                        "type": "code_block",
+                        "warning": "文档包含代码块，字符占用大且移动端可读性差。建议先将代码块转换为图片再发布。",
+                    })
                 result = {
                     "success": False,
                     "needs_confirmation": True,
-                    "warning": "文档包含表格，在手机端可能显示不全。建议先将表格转换为图片再发布。如确认直接发布，请使用 --force 参数。",
+                    "confirmations": needs_confirm,
+                    "warning": "文档包含需要确认的内容。请询问用户是否将代码块/表格转换为图片，由用户决定。如确认直接发布，请使用 --force 参数。",
                     "title": article.metadata.title,
                     "theme": theme,
                     "content_length": len(html),
@@ -132,6 +150,7 @@ def main():
                     "content_length": len(html),
                     "images": len(article.images),
                     "has_tables": converter.has_tables,
+                    "has_code_blocks": converter.has_code_blocks,
                 }
                 print(json.dumps(result, ensure_ascii=False, indent=2))
                 return
@@ -179,6 +198,7 @@ def main():
                 "theme": theme,
                 "images_uploaded": len(uploaded_images),
                 "has_tables": converter.has_tables,
+                "has_code_blocks": converter.has_code_blocks,
                 "content_length": len(html),
             }
             print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -192,7 +212,7 @@ def main():
             print(json.dumps(result, ensure_ascii=False, indent=2))
             sys.exit(1)
         except Exception as e:
-            result = {"success": False, "error": str(e)}
+            result = {"success": False, "error": sanitize_error(str(e))}
             print(json.dumps(result, ensure_ascii=False, indent=2))
             sys.exit(1)
         return

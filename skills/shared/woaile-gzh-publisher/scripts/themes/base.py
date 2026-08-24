@@ -9,6 +9,10 @@ from stickers.stickers import get_sticker_html, get_section_divider
 
 _THEMES_DIR = Path(__file__).parent / "css"
 
+# 公众号网页编辑器中的可编辑空行（空段落），用于在装饰贴图前后
+# 留出光标可定位的编辑位置
+EMPTY_LINE_HTML = "<section><br/></section>"
+
 
 @dataclass
 class CardConfig:
@@ -26,12 +30,21 @@ class StickerConfig:
 
 
 @dataclass
+class BubbleConfig:
+    enabled: bool = False
+    border_color: str = "#2d3773"
+    text_color: str = "#2d3773"
+    tail_position: str = "left"  # "left" | "center" | "right"
+
+
+@dataclass
 class Theme:
     name: str
     description: str
     css: str
     card: CardConfig = field(default_factory=CardConfig)
     sticker: StickerConfig = field(default_factory=StickerConfig)
+    h2_bubble: BubbleConfig = field(default_factory=BubbleConfig)
 
     def wrap_content(self, inner_html: str, container_style_str: str = "") -> str:
         parts = []
@@ -39,6 +52,9 @@ class Theme:
         if self.sticker.top_decoration:
             color = self.sticker.top_decoration_color or "#999"
             size = self.sticker.top_decoration_size
+            # 顶部装饰前留一个可编辑空行，方便在公众号网页编辑器中
+            # 将光标定位到装饰之前插入内容（如公众号名片）
+            parts.append(EMPTY_LINE_HTML)
             parts.append(get_sticker_html(self.sticker.top_decoration, color, size, "block", "10px auto"))
 
         if self.card.enabled:
@@ -51,7 +67,11 @@ class Theme:
 
         if self.sticker.bottom_divider:
             color = self.sticker.bottom_divider_color or "#999"
+            # 底部分隔线前后各留一个可编辑空行，方便在公众号网页编辑器中
+            # 手工插入内容（如二维码、关注引导）
+            parts.append(EMPTY_LINE_HTML)
             parts.append(get_section_divider(color))
+            parts.append(EMPTY_LINE_HTML)
 
         wrapped_inner = "\n".join(parts)
 
@@ -109,12 +129,21 @@ def get_theme(theme_name: str) -> Theme:
         sticker_config.bottom_divider = sticker_data.get("bottom_divider", False)
         sticker_config.bottom_divider_color = sticker_data.get("bottom_divider_color")
 
+    bubble_config = BubbleConfig()
+    bubble_data = meta.get("h2_bubble")
+    if bubble_data and bubble_data.get("enabled"):
+        bubble_config.enabled = True
+        bubble_config.border_color = bubble_data.get("border_color", "#2d3773")
+        bubble_config.text_color = bubble_data.get("text_color", "#2d3773")
+        bubble_config.tail_position = bubble_data.get("tail_position", "left")
+
     return Theme(
         name=meta.get("name", theme_name),
         description=meta.get("description", theme_name),
         css=css,
         card=card_config,
         sticker=sticker_config,
+        h2_bubble=bubble_config,
     )
 
 

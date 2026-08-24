@@ -183,10 +183,10 @@ STICKERS: Dict[str, Dict] = {
     "chat_bubble": {
         "name": "对话气泡",
         "category": "special",
-        "svg": '''<svg width="32" height="28" viewBox="0 0 32 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 4H28V20H18L12 26V20H4V4Z" fill="currentColor"/>
+        "svg": '''<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M3.463 15.642a.4.4 0 0 0-.039-.24a18 18 0 0 1-.642-1.561c-.18-.517-.38-1.2-.407-1.862c-.2-5.056 4.019-9.076 9.09-9.277s9.595 3.471 9.796 8.527s-4.019 9.076-9.09 9.277a10 10 0 0 1-2.854-.296l-2.769 1.138c-1.992.818-4.087-.925-3.645-3.033zm1.958.411a2.4 2.4 0 0 0-.181-1.49c-.39-.844-.838-1.95-.866-2.663c-.152-3.813 3.058-7.036 7.17-7.2c4.111-.163 7.567 2.796 7.718 6.609c.152 3.813-3.058 7.036-7.17 7.2a8 8 0 0 1-2.558-.313a.97.97 0 0 0-.643.027l-3.103 1.275a.683.683 0 0 1-.928-.772l.56-2.673Z"/>
         </svg>''',
-        "default_color": "#3498DB"
+        "default_color": "#2d3773"
     },
     
     "music_note": {
@@ -274,7 +274,9 @@ def get_sticker_html(sticker_id: str, color: str = None, size: int = 24,
     svg_content = ' '.join(svg_content.split())
     
     if position == "block":
-        return f'<div style="text-align: center; margin: {margin};">{svg_content}</div>'
+        # 使用 <section> 而非 <div>：微信公众号后台编辑器会剥离 div 的
+        # text-align 等内联样式，导致装饰图标失去居中
+        return f'<section style="text-align: center; margin: {margin};">{svg_content}</section>'
     elif position == "absolute":
         return f'<span style="position: absolute; display: inline-block; margin: {margin};">{svg_content}</span>'
     else:
@@ -318,7 +320,9 @@ def get_section_divider(color: str = "#7BC4A0") -> str:
     """获取章节分隔线装饰"""
     leaf_left = get_sticker_html("leaf", color, 20)
     leaf_right = get_sticker_html("leaf", color, 20)
-    return f'<div style="text-align: center; margin: 20px 0; opacity: 0.6;">{leaf_left}<span style="margin: 0 10px; color: {color}; font-size: 14px;">✦ ✦ ✦</span>{leaf_right}</div>'
+    # 使用 <section> 而非 <div>：微信公众号后台编辑器会剥离 div 的
+    # text-align 等内联样式，导致分隔线失去居中
+    return f'<section style="text-align: center; margin: 20px 0; opacity: 0.6;">{leaf_left}<span style="margin: 0 10px; color: {color}; font-size: 14px;">✦ ✦ ✦</span>{leaf_right}</section>'
 
 
 def get_tip_box_icon(color: str = "#FFD93D") -> str:

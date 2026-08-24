@@ -1,0 +1,231 @@
+/*
+ * Theme: ai-bubble
+ * Description: AI 对话气泡，藏蓝主 + 钴蓝/青绿/珊瑚红点缀，灵感取自「我AI了」公众号 logo 的对话气泡造型。极简公众号风：纯白背景，无卡片嵌套，无阴影，以标题气泡轮廓、引用边线和 strong 颜色体现品牌。适合 AI 工具介绍、普通人 AI 实践分享、技术教程。
+ *
+ * 配色（来自 logo 取色）：
+ *   藏蓝 #2d3773  钴蓝 #2A6FF0  青绿 #1FC8C8  珊瑚红 #FF5060
+ *   正文深灰 rgb(63,63,63)  辅助中灰 #888888  分隔线 rgba(0,0,0,.12)
+ *
+ * 设计哲学（参考公众号阅读体验）：
+ *   - 背景纯白，零阴影零渐变，仅留圆角小角
+ *   - 品牌色只出现在三类元素：标题气泡、引用左线、strong
+ *   - 正文深灰 + 衬线字 + 宽字距 + 26px 行高，节奏舒展
+ *   - 标题居中，并用 Logo 同款左下尾巴的气泡轮廓圈住
+ *   - 大留白：标题上下 60/30px、段后 1em
+ */
+
+.article-content {
+    padding: 30px 12px;
+    background-color: #ffffff;
+    color: rgb(63, 63, 63);
+    font-family: Optima-Regular, Optima, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei UI', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 15px;
+    line-height: 26px;
+    letter-spacing: 0.05em;
+    text-align: left;
+}
+
+.article-content h1 {
+    display: none;
+}
+
+.article-content h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2d3773;
+    line-height: 1.5;
+    letter-spacing: 0.1em;
+    text-align: center;
+}
+
+.article-content h3 {
+    font-size: 17px;
+    font-weight: bold;
+    color: #2A6FF0;
+    line-height: 1.5;
+    margin: 40px 0 16px;
+    padding: 0 0 6px;
+    text-align: left;
+    border-bottom: 2px solid #2A6FF0;
+    width: fit-content;
+}
+
+.article-content h4 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #1F8F8F;
+    line-height: 1.5;
+    margin: 28px 0 12px;
+    padding-left: 10px;
+    border-left: 3px solid #1FC8C8;
+}
+
+.article-content h5 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #2d3773;
+    margin: 22px 0 10px;
+}
+
+.article-content h6 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #888888;
+    margin: 20px 0 8px;
+}
+
+.article-content p {
+    margin: 0;
+    padding-bottom: 1em;
+    color: rgb(63, 63, 63);
+    line-height: 26px;
+    letter-spacing: 0.05em;
+    text-align: left;
+}
+
+.article-content blockquote {
+    background-color: #f5f5f5;
+    border-left: 3px solid #2d3773;
+    color: rgb(63, 63, 63);
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 0;
+    font-size: 14px;
+    line-height: 24px;
+    letter-spacing: 0.05em;
+}
+
+.article-content blockquote strong {
+    color: #2d3773;
+    font-weight: bold;
+}
+
+.article-content pre {
+    background-color: #fafafa;
+    padding: 14px 16px;
+    margin: 20px 0;
+    border-radius: 8px;
+    border: 1px solid rgba(45, 55, 115, 0.18);
+    overflow-x: auto;
+    font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    letter-spacing: 0;
+    color: rgb(63, 63, 63);
+}
+
+.article-content code {
+    padding: 1px 6px;
+    margin: 0 2px;
+    background-color: rgba(42, 111, 240, 0.08);
+    border-radius: 3px;
+    font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+    font-size: 13px;
+    color: #2A6FF0;
+    letter-spacing: 0;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto !important;
+    display: inline-block;
+    margin: 20px 0;
+    border-radius: 6px;
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 8px 0;
+    padding-left: 22px;
+    line-height: 26px;
+}
+
+.article-content li {
+    margin: 6px 0;
+    color: rgb(63, 63, 63);
+}
+
+.article-content table {
+    width: 100%;
+    margin: 20px 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 2px solid #2d3773;
+    border-radius: 12px;
+}
+
+.article-content td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(45, 55, 115, 0.10);
+    text-align: center;
+}
+
+.article-content th {
+    padding: 10px 12px;
+    border-bottom: 2px solid #2d3773;
+    font-weight: bold;
+    color: #2d3773;
+    text-align: center;
+    background-color: #E9ECF7;
+}
+
+.article-content hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #2d3773, transparent);
+    margin: 40px 0;
+    opacity: 0.3;
+}
+
+.article-content strong {
+    font-weight: bold;
+    color: #2d3773;
+}
+
+.article-content em {
+    font-style: italic;
+    color: #FF5060;
+}
+
+.article-content a {
+    color: #2A6FF0;
+    text-decoration: none;
+    border-bottom: 1px solid #2A6FF0;
+}
+
+/* 参考文献列表：视觉上弱于正文（更小字号、辅助灰）。
+   用法：在有序列表后一行写 {: .references}（依赖 attr_list 扩展） */
+.article-content .references {
+    font-size: 13px;
+    line-height: 22px;
+    letter-spacing: 0.05em;
+    color: #888888;
+}
+
+.article-content .references li {
+    margin: 4px 0;
+    color: #888888;
+    font-size: 13px;
+    line-height: 22px;
+    letter-spacing: 0.05em;
+}
+
+.article-content .references strong {
+    color: #888888;
+    font-weight: normal;
+}
+
+.article-content .references em {
+    font-style: normal;
+    color: #888888;
+}
+
+.article-content .references a {
+    color: #999999;
+    border-bottom: none;
+}
+
+.article-content .references code {
+    background-color: transparent;
+    color: #888888;
+}
