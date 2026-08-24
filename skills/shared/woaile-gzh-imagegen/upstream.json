@@ -1,0 +1,10 @@
+{
+  "source": "self-developed",
+  "description": "「我AI了」公众号专属风格生图工具，自开发 skill。基于公众号 Logo（手绘对话气泡+藏蓝描边）与 ai-bubble 主题沉淀品牌视觉系统：四色体系、吉祥物「小爱」、封面标题内嵌、品牌化表格",
+  "created_at": "2026-08-24",
+  "version": "0.1.0",
+  "last_update": "2026-08-24",
+  "changes": [
+    "0.1.0 初始沉淀：经历 5 轮用户实测迭代完成。核心产出：references/style-guide.md（品牌风格唯一权威定义，含小爱造型 DNA、高级感手法、品牌化表格规范、提示词骨架）+ assets/xiaoai-reference.jpeg（小爱定妆照）。流程为「AI 出提示词 → 用户浏览器生图 → 质检迭代 → 定稿归档」，不直接生图"
+  ]
+}

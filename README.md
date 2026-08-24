@@ -52,6 +52,7 @@ kk-ai/
 | `research-workflow` | self-developed | 产品调研工作流（识别类型→并行收集→报告生成→蓝图后处理） |
 | `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
 | `woaile-gzh-publisher` | self-developed | 「我AI了」公众号定制发布工具（Markdown→公众号草稿箱） |
+| `woaile-gzh-imagegen` | self-developed | 「我AI了」公众号专属风格生图工具（品牌四色+吉祥物「小爱」+封面标题内嵌+品牌化表格，输出提示词供用户浏览器生图） |
 
 ### Commands - Common（OpenCode 通用，已链接到全局）
 

@@ -125,9 +125,9 @@ description: |
 ### 正文配图和内容转图
 
 1. 扫描 `成稿.md`，汇总以下项目：`[需配图：文件名.png｜说明]`、不存在的本地图片、Markdown 表格和长代码块
-2. 为每个项目确定唯一的目标文件名（包含 `.png` 扩展名），目标路径为 `素材/{文件名}`，逐个调用 `image-prompt` skill 生成提示词；**表格转图同样走 image-prompt 手动生图，禁止程序化生成（py 脚本、matplotlib 等）**
+2. 为每个项目确定唯一的目标文件名（包含 `.png` 扩展名），目标路径为 `素材/{文件名}`，逐个调用 `woaile-gzh-imagegen` skill 生成提示词；**表格转图同样走 woaile-gzh-imagegen 手动生图，禁止程序化生成（py 脚本、matplotlib 等）**
 3. 保存提示词到 `素材/{不含扩展名的文件名}-prompt.md`；表格和代码块的提示词必须包含完整原始内容，不能只写概述
-4. 暂停并提示用户手动生图，粘贴到网页版 AI（Gemini/ChatGPT）
+4. 暂停并提示用户手动生图，粘贴到网页版 AI（**表格图用 Nano Banana，封面/插画用豆包或 Nano Banana**）
 5. 用户确认后逐一验证对应 PNG 文件存在
 6. 将配图占位符、表格和代码块替换为 `![描述](素材/{文件名})`；已有但缺失的图片链接在图片生成后也必须改写到实际目标路径
 7. 执行正文图片门禁：`成稿.md` 中不存在 `[需配图：`，所有本地 Markdown 图片都能相对成稿目录解析到真实文件，待转图的表格和长代码块已全部替换
@@ -135,7 +135,7 @@ description: |
 
 ### 封面图（Phase 5 通过后执行）
 
-1. 调用 `image-prompt` skill 生成封面提示词
+1. 调用 `woaile-gzh-imagegen` skill 生成封面提示词（标题内嵌，直接渲染进画面）
 2. 保存到 `素材/封面-prompt.md`
 3. 暂停并提示用户手动生图（推荐 900x383，比例 2.35:1）
 4. 用户确认后验证 `素材/封面.png` 存在
@@ -251,8 +251,7 @@ cd "{woaile-gzh-publisher scripts 目录}" && uv run main.py publish "{成稿.md
 | Skill | 用途 | 加载方 | 使用阶段 |
 |-------|------|--------|----------|
 | research-workflow | 产品调研编排（4-phase 并行） | 主 Agent | RESEARCH |
-
-| image-prompt | 生图提示词生成 | 主 Agent | IMAGE_GEN |
+| woaile-gzh-imagegen | 「我AI了」品牌风格生图提示词生成 | 主 Agent | IMAGE_GEN |
 | woaile-gzh-publisher | Markdown→发布草稿箱 | 主 Agent | PUBLISH |
 
 ---
