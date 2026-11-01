@@ -30,7 +30,7 @@ kk-ai/
 | Skill | 来源 | 说明 |
 |-------|------|------|
 | `mermaid` | self-developed | Mermaid 图表生成（mmdc CLI，渲染 SVG/PNG/PDF） |
-| `project-init` | self-developed | OpenCode 项目初始化工具 |
+| `project-init` | self-developed | 多 harness 项目初始化（DSH / OpenCode / Claude Code / Codex / Gemini CLI / Cursor / 通用） |
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程捕获为 skill |
 | `herdr` | [open-herdr/herdr](https://github.com/open-herdr/herdr) | herdr 终端 agent 多路复用器控制（手动更新） |
@@ -96,12 +96,27 @@ ls ~/.config/opencode/commands/
 
 ### 全局代理规则
 
-AGENTS.global.md 通过文件级符号链接服务于 OpenCode，为所有项目提供统一的代理行为规则：
+AGENTS.global.md 通过文件级符号链接服务于各 harness，为所有项目提供统一的代理行为规则：
 
 ```bash
 # OpenCode
 ln -sf ~/Code/kk-ai/AGENTS.global.md ~/.config/opencode/AGENTS.md
+
+# DSH（DeepSeek Harness）
+ln -sf ~/Code/kk-ai/AGENTS.global.md ~/.dsh/AGENTS.md
 ```
+
+### 其他 harness 的全局位置
+
+各 harness 的全局 skill 目录与指令文件对照见
+[project-init/references/harnesses.md](skills/common/project-init/references/harnesses.md)：
+
+| harness | 全局 skill 目录 | 全局指令文件 |
+|---|---|---|
+| OpenCode | `~/.config/opencode/skills` | `~/.config/opencode/AGENTS.md` |
+| DSH | `~/.dsh/skills` | `~/.dsh/AGENTS.md` |
+| Claude Code | `~/.claude/skills` | `~/.claude/CLAUDE.md` |
+| Codex / Gemini CLI / Cursor | `~/.agents/skills` | `~/.agents/AGENTS.md` |
 
 ### 共享 Skill/Agent
 
@@ -121,6 +136,33 @@ ln -s ~/Code/kk-ai/opencode-agents/shared/xxx-agent.md .opencode/agents/xxx-agen
 ~/Code/kk-ai/scripts/link-skills.sh shared xxx-skill /path/to/project
 ~/Code/kk-ai/scripts/link-skills.sh opencode-agent xxx-agent.md /path/to/project
 ```
+
+### 项目初始化（多 harness）
+
+新建项目或给现有项目接入某个 harness 时，用 `project-init` 的驱动脚本一次搞定
+（建目录 → 链接 skill/agent → 写指令文件清单 → `.gitignore` → `git init`）：
+
+```bash
+PI=~/Code/kk-ai/skills/common/project-init/scripts/init.sh
+
+$PI list                          # 可用 harness / skill / agent
+$PI plan  ~/Code/my-proj --harness dsh,opencode --skill research-workflow --type python   # 预览
+$PI init  ~/Code/my-proj --harness dsh,opencode --skill research-workflow --type python   # 执行
+```
+
+支持的 harness：`dsh` `opencode` `claude-code` `codex` `gemini-cli` `cursor` `generic`（或 `all`）。
+
+| harness | 项目级 skill | 项目级 agent | 指令文件 |
+|---|---|---|---|
+| `dsh` | `.dsh/skills/` | —（无文件式 agent） | `AGENTS.md` |
+| `opencode` | `.opencode/skills/` | `.opencode/agents/` | `AGENTS.md` |
+| `claude-code` | `.claude/skills/` | `.claude/agents/` | `CLAUDE.md` |
+| `codex` | `.agents/skills/`（便携） | — | `AGENTS.md` |
+| `gemini-cli` | `.agents/skills/`（便携） | — | `GEMINI.md` |
+| `cursor` | `.agents/skills/`（便携） | — | `.cursor/rules/project-init.mdc` |
+| `generic` | `.agents/skills/` | — | `AGENTS.md` |
+
+细节与验证状态：[project-init](skills/common/project-init/SKILL.md)。
 
 ## 外部 Skill 更新
 

@@ -1,7 +1,28 @@
 {
   "source": "self-developed",
   "created_at": "2026-04-28",
-  "updated_at": "2026-07-20",
-  "version": "2.0.0",
-  "description": "OpenCode 项目初始化工具，根据需求智能推荐并配置 skill 和 agent"
+  "updated_at": "2026-11-01",
+  "version": "3.0.0",
+  "description": "多 harness 项目初始化工具：按目标 harness（DSH/OpenCode/Claude Code/Codex/Gemini CLI/Cursor/通用）创建项目级 skill、agent 链接、指令文件清单与 .gitignore",
+  "supported_harnesses": [
+    "dsh",
+    "opencode",
+    "claude-code",
+    "codex",
+    "gemini-cli",
+    "cursor",
+    "generic"
+  ],
+  "verified_harnesses": [
+    "dsh",
+    "opencode",
+    "generic"
+  ],
+  "entrypoint": "scripts/init.sh",
+  "changes_v3": [
+    "harness 注册表驱动，新增 harness 只改一处",
+    "新增 scripts/init.sh：plan/init/list 三个子命令，幂等、预检、不覆盖真实文件",
+    "指令文件（AGENTS.md/CLAUDE.md/GEMINI.md/.cursor/rules）写入受管区块",
+    ".gitignore 只忽略链接目录，指令文件入库"
+  ]
 }

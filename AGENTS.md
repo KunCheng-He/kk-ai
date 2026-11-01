@@ -25,6 +25,11 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 
 # 更新所有外部 skill（从上游仓库拉取）
 ~/Code/kk-ai/scripts/update-external-skills.sh
+
+# 多 harness 项目初始化（建目录 + 链接 skill/agent + 指令文件 + .gitignore + git init）
+~/Code/kk-ai/skills/common/project-init/scripts/init.sh list
+~/Code/kk-ai/skills/common/project-init/scripts/init.sh plan <项目> --harness dsh,opencode --skill <skill>
+~/Code/kk-ai/skills/common/project-init/scripts/init.sh init <项目> --harness dsh,opencode --skill <skill>
 ```
 
 ## 全局链接
@@ -36,7 +41,16 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 ln -s ~/Code/kk-ai/skills/common ~/.config/opencode/skills
 ln -s ~/Code/kk-ai/opencode-agents/common ~/.config/opencode/agents
 ln -s ~/Code/kk-ai/opencode-commands/common ~/.config/opencode/commands
+
+# DSH（DeepSeek Harness）：同样目录级链接，新增 common skill 自动可见
+ln -s ~/Code/kk-ai/skills/common ~/.dsh/skills
 ```
+
+DSH 的全局规则文件（可选，尚未建立）：`ln -sf ~/Code/kk-ai/AGENTS.global.md ~/.dsh/AGENTS.md`
+
+其他 harness 的全局位置（DSH：`~/.dsh/skills`、`~/.dsh/AGENTS.md`；Claude Code：`~/.claude/...`；
+Codex/Gemini CLI/Cursor：`~/.agents/...`）见
+`skills/common/project-init/references/harnesses.md`。
 
 ## Skill 结构规范
 
@@ -56,6 +70,9 @@ ln -s ~/Code/kk-ai/opencode-commands/common ~/.config/opencode/commands
 
 - 通用 skill/agent/command 放入 `skills/common/`、`opencode-agents/common/` 或 `opencode-commands/common/`，自动生效（全局目录已链接）
 - 共享 skill/agent 放入 `skills/shared/` 或 `opencode-agents/shared/`，按需链接到项目
+- **跨 harness 支持**：harness 差异只登记在 `skills/common/project-init/scripts/init.sh` 的
+  `harness_spec()` 与 `skills/common/project-init/references/harnesses.md`；新增 harness 时两处同步，
+  并在真机验证后把该文档的「验证状态」改为 ✅
 
 ## 完成后自动更新文档
 
