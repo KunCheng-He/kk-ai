@@ -34,7 +34,7 @@ OpenCode Skills & Agents 统一管理仓库开发指南。
 
 ## 全局链接
 
-通用 skills/agents/commands 通过目录级符号链接到全局：
+通用 skills/agents/commands 通过符号链接到全局：
 
 ```bash
 # 一次性设置（已完成）
@@ -42,9 +42,16 @@ ln -s ~/Code/kk-ai/skills/common ~/.config/opencode/skills
 ln -s ~/Code/kk-ai/opencode-agents/common ~/.config/opencode/agents
 ln -s ~/Code/kk-ai/opencode-commands/common ~/.config/opencode/commands
 
-# DSH（DeepSeek Harness）：同样目录级链接，新增 common skill 自动可见
-ln -s ~/Code/kk-ai/skills/common ~/.dsh/skills
+# DSH（DeepSeek Harness）：逐 skill 链接，不整体链接 common
+mkdir -p ~/.dsh/skills
+for s in mermaid project-init skillify workflow-designer; do
+  ln -s ~/Code/kk-ai/skills/common/$s ~/.dsh/skills/$s
+done
 ```
+
+DSH 采用**逐 skill 链接**：新增 common skill 不会自动出现在 DSH，需要显式补一条
+`ln -s ~/Code/kk-ai/skills/common/<skill> ~/.dsh/skills/<skill>`；项目级用
+`init.sh` 链接到 `<projectRoot>/.dsh/skills` 的不受此限。
 
 DSH 的全局规则文件（可选，尚未建立）：`ln -sf ~/Code/kk-ai/AGENTS.global.md ~/.dsh/AGENTS.md`
 

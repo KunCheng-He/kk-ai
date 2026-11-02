@@ -94,16 +94,16 @@
 
 ## 全局（用户级）安装对照
 
-项目级是"按需链接"，全局是一次性链接整个 `common` 目录。各 harness 的全局位置：
+项目级是"按需链接"；全局除 DSH 外整体链接 `common` 目录，DSH 采用逐 skill 链接。各 harness 的全局位置：
 
 | harness | 全局 skill 链接 | 全局指令文件链接 |
 |---|---|---|
 | opencode | `~/.config/opencode/skills` → `~/Code/kk-ai/skills/common` | `~/.config/opencode/AGENTS.md` → `AGENTS.global.md` |
-| dsh | `~/.dsh/skills` → `~/Code/kk-ai/skills/common` | `~/.dsh/AGENTS.md` → `AGENTS.global.md` |
+| dsh | 逐 skill：`~/.dsh/skills/<skill>` → `~/Code/kk-ai/skills/common/<skill>` | `~/.dsh/AGENTS.md` → `AGENTS.global.md` |
 | claude-code | `~/.claude/skills` → `~/Code/kk-ai/skills/common` | `~/.claude/CLAUDE.md` → `AGENTS.global.md` |
 | codex / gemini-cli / cursor | `~/.agents/skills` → `~/Code/kk-ai/skills/common` | `~/.agents/AGENTS.md` → `AGENTS.global.md` |
 
-注意：`ln -s` 目录级链接要求目标位置**不存在**同名目录；`~/.dsh/skills` 目前是真实目录（内含单个 `mermaid` 链接），改成整体链接前需先移走。
+注意：`ln -s` 目录级链接要求目标位置**不存在**同名目录。DSH 不使用目录级链接——`~/.dsh/skills` 是真实目录，里面逐 skill 建链接（当前为 `mermaid`、`project-init`、`skillify`、`workflow-designer`）。新增 common skill 后若不补链接，DSH 侧不会出现该 skill。
 
 ## 新增一个 harness
 
