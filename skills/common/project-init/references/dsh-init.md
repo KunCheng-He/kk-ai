@@ -75,18 +75,21 @@ test -d ~/Code/my-proj/.git && echo "git ok"      # DSH 项目根判定
 
 ## 全局（用户级）配置
 
-让 `skills/common` 与全局规则对**所有** DSH 项目生效：
+让**指定的** `common` skill 对所有 DSH 项目生效。DSH 采用**逐 skill 链接**（不整体链接 `common`），
+只暴露明确要用的那几个：
 
 ```bash
-# 目录级链接：目标位置需先不存在
-mv ~/.dsh/skills ~/.dsh/skills.bak          # 现存真实目录（内含 mermaid 单链接）
-ln -s ~/Code/kk-ai/skills/common ~/.dsh/skills
+mkdir -p ~/.dsh/skills
+for s in mermaid project-init skillify workflow-designer; do
+  ln -s ~/Code/kk-ai/skills/common/$s ~/.dsh/skills/$s
+done
 
-# 全局代理规则
+# 全局代理规则（可选）
 ln -sf ~/Code/kk-ai/AGENTS.global.md ~/.dsh/AGENTS.md
 ```
 
-`ln -s` 目录级链接一旦建立，新增 `common` skill 自动可见，无需再动 DSH 配置。
+新增 `common` skill 后必须手动补一条链接，否则 DSH 看不到。早期做法是目录级链接
+（`~/.dsh/skills` → `common`）——已废弃：它会把所有 `common` skill 都暴露给 DSH，且新增 skill 无法选择性排除。
 
 ## 常见问题
 
