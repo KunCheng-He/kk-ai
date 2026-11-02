@@ -94,14 +94,14 @@
 
 ## 全局（用户级）安装对照
 
-项目级是"按需链接"；全局除 DSH 外整体链接 `common` 目录，DSH 采用逐 skill 链接。各 harness 的全局位置：
+项目级是"按需链接"。全局的目标位置如下；**「本机状态」列记录真实安装情况**，不要把"应该链接到哪"当成"已经链接好"：
 
-| harness | 全局 skill 链接 | 全局指令文件链接 |
-|---|---|---|
-| opencode | `~/.config/opencode/skills` → `~/Code/kk-ai/skills/common` | `~/.config/opencode/AGENTS.md` → `AGENTS.global.md` |
-| dsh | 逐 skill：`~/.dsh/skills/<skill>` → `~/Code/kk-ai/skills/common/<skill>` | `~/.dsh/AGENTS.md` → `AGENTS.global.md` |
-| claude-code | `~/.claude/skills` → `~/Code/kk-ai/skills/common` | `~/.claude/CLAUDE.md` → `AGENTS.global.md` |
-| codex / gemini-cli / cursor | `~/.agents/skills` → `~/Code/kk-ai/skills/common` | `~/.agents/AGENTS.md` → `AGENTS.global.md` |
+| harness | 全局 skill 链接 | 全局指令文件链接 | 本机状态（2026-11-02 核对） |
+|---|---|---|---|
+| opencode | `~/.config/opencode/skills` → `~/Code/kk-ai/skills/common` | `~/.config/opencode/AGENTS.md` → `AGENTS.global.md` | ✅ 两者均已建立 |
+| dsh | 逐 skill：`~/.dsh/skills/<skill>` → `~/Code/kk-ai/skills/common/<skill>` | `~/.dsh/AGENTS.md` → `AGENTS.global.md` | skill ✅（仅 `mermaid`、`project-init`、`skillify`、`workflow-designer`）；AGENTS.md ❌ 未建立 |
+| claude-code | `~/.claude/skills` → `~/Code/kk-ai/skills/common` | `~/.claude/CLAUDE.md` → `AGENTS.global.md` | ❌ 均未建立（`~/.claude` 目录不存在） |
+| codex / gemini-cli / cursor | `~/.agents/skills` → `~/Code/kk-ai/skills/common` | `~/.agents/AGENTS.md` → `AGENTS.global.md` | ❌ 未链接 common（该目录目前只放 `ego-browser`、`open-kimi-ppt`） |
 
 注意：`ln -s` 目录级链接要求目标位置**不存在**同名目录。DSH 不使用目录级链接——`~/.dsh/skills` 是真实目录，里面逐 skill 建链接（当前为 `mermaid`、`project-init`、`skillify`、`workflow-designer`）。新增 common skill 后若不补链接，DSH 侧不会出现该 skill。
 

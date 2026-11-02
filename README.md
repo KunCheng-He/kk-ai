@@ -94,15 +94,19 @@ ls ~/.config/opencode/agents/
 ls ~/.config/opencode/commands/
 ```
 
+> **DSH 例外**：`~/.dsh/skills` 是真实目录，只**逐 skill** 链接（当前为 `mermaid`、`project-init`、
+> `skillify`、`workflow-designer`）。新增 common skill 不会自动出现在 DSH，需显式补
+> `ln -s ~/Code/kk-ai/skills/common/<skill> ~/.dsh/skills/<skill>`。
+
 ### 全局代理规则
 
 AGENTS.global.md 通过文件级符号链接服务于各 harness，为所有项目提供统一的代理行为规则：
 
 ```bash
-# OpenCode
+# OpenCode（已建立）
 ln -sf ~/Code/kk-ai/AGENTS.global.md ~/.config/opencode/AGENTS.md
 
-# DSH（DeepSeek Harness）
+# DSH（DeepSeek Harness，可选，尚未建立）
 ln -sf ~/Code/kk-ai/AGENTS.global.md ~/.dsh/AGENTS.md
 ```
 
@@ -114,9 +118,11 @@ ln -sf ~/Code/kk-ai/AGENTS.global.md ~/.dsh/AGENTS.md
 | harness | 全局 skill 目录 | 全局指令文件 |
 |---|---|---|
 | OpenCode | `~/.config/opencode/skills` | `~/.config/opencode/AGENTS.md` |
-| DSH | `~/.dsh/skills` | `~/.dsh/AGENTS.md` |
+| DSH | `~/.dsh/skills`（逐 skill 链接） | `~/.dsh/AGENTS.md`（尚未建立） |
 | Claude Code | `~/.claude/skills` | `~/.claude/CLAUDE.md` |
 | Codex / Gemini CLI / Cursor | `~/.agents/skills` | `~/.agents/AGENTS.md` |
+
+> 上表是**位置对照**，不代表已经安装。本机实际状态见 harnesses.md 的「本机状态」列。
 
 ### 共享 Skill/Agent
 
