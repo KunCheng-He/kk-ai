@@ -1,7 +1,8 @@
 {
   "source": "self-developed",
   "path": "",
-  "last_update": "2026-04-18",
+  "last_update": "2026-11-02",
+  "version": "1.2.0",
   "tracking_dir": "",
-  "notes": "自开发技能"
+  "notes": "自开发技能；harness 平级：先询问目标平台（DSH / OpenCode / Claude Code / 便携 .agents），再按该平台目录与工具名落盘，不设默认平台"
 }

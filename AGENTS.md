@@ -74,6 +74,15 @@ Codex/Gemini CLI/Cursor：`~/.agents/...`）见
   `harness_spec()` 与 `skills/common/project-init/references/harnesses.md`；新增 harness 时两处同步，
   并在真机验证后把该文档的「验证状态」改为 ✅
 
+### 跨 harness 平级原则
+
+`skills/common/` 会同时被 DSH、OpenCode、Claude Code 等 harness 发现，**不存在默认平台**：
+
+- 平台差异（工具名、目录、权限模型）对称呈现，不要以某个 harness 为主线、把其余写成"适配"
+- 内容确实依赖平台时，在 skill 运行期询问用户要适配哪个平台（或明确标注"仅适用于 X"），不要替用户预设
+- 只有项目级、单平台专属的 skill 才可以把该平台写进主线；common 里的 skill 不适用
+- 无法确认某平台的工具名/字段时，标注"以该平台文档为准"或询问用户，不臆造
+
 ## 完成后自动更新文档
 
 **重要**：新增或修改 Skill/Agent 后，必须在用户确认开发完成后自动执行以下操作：
