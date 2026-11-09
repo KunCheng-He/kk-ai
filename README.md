@@ -50,7 +50,7 @@ kk-ai/
 | `gzh-search-crawler` | marketplace (workbuddy) | 关键词搜索公众号文章，终端表格展示，导出CSV并生成HTML报告 |
 | `research-to-blueprint` | self-developed | 调研报告转视觉蓝图 |
 | `research-workflow` | self-developed | 产品调研工作流（识别类型→并行收集→报告生成→蓝图后处理） |
-| `image-prompt` | self-developed | AI 图像生成提示词生成器，适用于任何模型 |
+| `image-prompt` | self-developed | AI 图像生成提示词生成器：正向 + 负向两段式输出，按模型自适应负向承载方式（SD/Flux 独立框、MJ `--no`、DALL·E 正向改写）；含风格族系速查与负向词库 |
 | `woaile-gzh-publisher` | self-developed | 「我AI了」公众号定制发布工具（Markdown→公众号草稿箱） |
 | `woaile-gzh-imagegen` | self-developed | 「我AI了」公众号专属风格生图工具（品牌四色+吉祥物「小爱」+封面标题内嵌+品牌化表格+手绘笔记本风知识科普图解，输出提示词供用户浏览器生图） |
 

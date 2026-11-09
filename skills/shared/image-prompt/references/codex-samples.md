@@ -2,6 +2,8 @@
 
 这些模板是完整食谱——适用时可以直接复用，但不意味着每次请求都要添加同等级别的细节。具体请遵循 `codex-prompting.md` 中的特异性策略。
 
+> **字段说明**：下列模板沿用英文模板惯用的单段写法，`Constraints` 里的 `no watermark`、`Avoid` 等属于负向意图。**实际输出时按两段式拆分**——把这些内容移到独立的负向段（或按目标模型改写为正向约束），正向段只保留"要什么"和"保持不变"的声明。拆分方法见 `negative-prompt.md`。
+
 ## Generate（生成）
 
 ### photorealistic-natural
@@ -286,4 +288,14 @@ Use case: sketch-to-render
 Input images: Image 1: drawing
 Primary request: turn the drawing into a photorealistic image
 Constraints: preserve layout, proportions, and perspective; choose realistic materials and lighting; do not add new elements or text
+```
+
+### background-extraction
+```
+Use case: background-extraction
+Input images: Image 1: subject to cut out
+Primary request: isolate the subject on a flat solid background
+Scene/backdrop: plain uniform color, no gradient, no texture
+Style/medium: clean cutout, sharp edges
+Constraints: keep the subject's original proportions, colors, and orientation; clear crisp silhouette; even margin around the subject; no cast shadow, no glow, no halo
 ```

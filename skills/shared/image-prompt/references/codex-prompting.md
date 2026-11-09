@@ -8,6 +8,7 @@
 - [Allowed and disallowed augmentation](#allowed-and-disallowed-augmentation)
 - [Composition and layout](#composition-and-layout)
 - [Constraints and invariants](#constraints-and-invariants)
+- [Negative prompts](#negative-prompts)
 - [Text in images](#text-in-images)
 - [Input images and references](#input-images-and-references)
 - [Iterate deliberately](#iterate-deliberately)
@@ -15,7 +16,7 @@
 
 ## Structure
 
-- 使用一致的顺序：场景/背景 → 主体 → 关键细节 → 约束条件 → 输出意图。
+- 使用一致的顺序：用途分类 → 主体 → 场景/背景 → 关键细节 → 约束条件（与 `SKILL.md` § 正向提示词结构 一致）。
 - 包含用途说明（广告、UI 模型、信息图）以确定精致度。
 - 复杂请求使用短标签行，而不是长段落。
 
@@ -52,6 +53,19 @@
 
 - 明确说明什么不能改变（`保持背景不变`）。
 - 对于编辑类请求，使用 `仅修改 X；保持 Y 不变` 并在每次迭代中重复。
+
+## Negative prompts
+
+正向描述"要什么"，负向描述"不要什么"，两者是独立通道，最终输出必须分成两段。
+
+- **承载方式随模型变化**：SD 系有独立 negative 输入框；Flux（guidance 蒸馏）负向近乎无效、只留 3–6 个画质词；Midjourney 用 `--no` 参数；DALL·E / Gemini 无负向通道，需改写为正向约束句。详见 `negative-prompt.md` § 模型承载方式对照。
+- **写特征，不写否定**：`watermark, signature` 而非 `no watermark`。负向通道本身已是否定语义。
+- **按类别分组**：画质缺陷 → 解剖结构 → 文字水印 → 风格污染 → 场景污染。
+- **与正向做冲突检查**：负向词若在描述"你想要的画面"，必须删除。
+- **编辑场景双锁定**：`保持 Y 不变` + 负向 `changed Y` 同时使用，比单靠一边可靠。
+- **CFG 前提**：`CFG = 1` 或蒸馏极速模型上负向无效，改为把约束写进正向（Flux 可留少量画质词兜底）。
+
+> 完整分类词表、场景预设与两段式示例见 `negative-prompt.md`。
 
 ## Text in images
 
