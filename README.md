@@ -34,7 +34,7 @@ kk-ai/
 | `skill-creator` | [anthropics/skills](https://github.com/anthropics/skills) | 创建新 skill |
 | `skillify` | self-developed | 将会话过程固化为 skill（harness 平级：DSH / OpenCode / Claude Code / 便携 `.agents`，运行时先问目标平台） |
 | `herdr` | [open-herdr/herdr](https://github.com/open-herdr/herdr) | herdr 终端 agent 多路复用器控制（手动更新） |
-| `workflow-designer` | self-developed | 工作流设计（四层架构 + 五项原则，harness 平级：DSH / OpenCode / Claude Code，运行时先问目标平台） |
+| `workflow-designer` | self-developed | AI agent 工作流设计与评估（决策框架跨平台复用；按目标 Harness 核实委派、上下文、权限与编排语义） |
 | `loop-by-herdr` | self-developed | Herdr 驱动的迭代优化循环（执行→审查→优化→重试），适用于任何需要反复验证的迭代任务 |
 
 ### Skills - Shared（共享，项目按需链接）
