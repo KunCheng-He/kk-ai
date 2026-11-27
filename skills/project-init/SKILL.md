@@ -63,7 +63,7 @@ version: 3.0.0
 
 | 项目类型 | 推荐 Skills | 推荐 Agents |
 |----------|-------------|-------------|
-| 内容创作/知识管理 | `ob_architect_structure` / `ob_capture_insight` / `ob_refine_card` | `Knowledge Co-Creator` |
+| 内容创作/知识管理（Obsidian 笔记，kk-brain） | `kk-obsidian` | — |
 | 产品调研 | `research-workflow` | `ResearchReporter` |
 | 前端/Web 开发 | `frontend-design` | — |
 | 公众号运营（仅「我AI了」） | `woaile-gzh`（单入口，含调研/写作/审稿/配图/发布） | — |
