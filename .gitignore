@@ -37,6 +37,9 @@ __pycache__/
 venv/
 ENV/
 
+# uv 本地安装器可在 skills/ 下重建 .venv，路径用 `uv sync` 还原，不入库
+# （`.venv/` 已覆盖 skills/woaile-gzh/scripts/publisher/.venv，用 `uv sync` 重建）
+
 # Node
 node_modules/
 npm-debug.log*

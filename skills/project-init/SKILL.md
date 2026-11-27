@@ -66,8 +66,8 @@ version: 3.0.0
 | 内容创作/知识管理 | `ob_architect_structure` / `ob_capture_insight` / `ob_refine_card` | `Knowledge Co-Creator` |
 | 产品调研 | `research-workflow` | `ResearchReporter` |
 | 前端/Web 开发 | `frontend-design` | — |
-| 社交媒体运营 | `gzh-workflow` / `woaile-gzh-publisher` | `woaile-gzh-writer` |
-| 需要图像素材 | `image-prompt` / `woaile-gzh-imagegen` | — |
+| 公众号运营（仅「我AI了」） | `woaile-gzh`（单入口，含调研/写作/审稿/配图/发布） | — |
+| 需要图像素材 | `image-prompt` | — |
 | 需要图表 | `mermaid` | — |
 | 需要翻译 | — | `universal-translator` |
 
