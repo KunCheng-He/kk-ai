@@ -1,0 +1,19 @@
+{
+  "source": "self-developed",
+  "created_at": "2026-11-25",
+  "last_update": "2026-11-27",
+  "version": "0.1.0",
+  "description": "证据驱动的调研工作流包：方法层（SKILL.md + references/）、类型模板、角色契约、harness 适配层与两个零依赖门禁脚本。方法层不写工具名与项目路径，平台差异收敛到 harness/",
+  "path": "",
+  "tracking_dir": "",
+  "entrypoint": "SKILL.md",
+  "requires": {
+    "node": ">=18",
+    "third_party_packages": false
+  },
+  "gates": {
+    "evidence_freeze": "scripts/check-evidence.mjs <证据文件...>",
+    "report_final": "scripts/check-report.mjs <报告文件> [--evidence <证据文件...>] [--strict]"
+  },
+  "notes": "从 research-workflow 仓库迁入（.dsh/skills/research-workflow）。替换旧的 skills-old/shared/research-workflow 与 ResearchReporter、browser-researcher 两个 agent；harness/dsh.md 的派生/续接描述尚未按 DSH 0.2.2-rc.5 实况复核，项目约定（AGENTS.md）待补"
+}
