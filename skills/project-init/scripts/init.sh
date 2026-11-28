@@ -1,27 +1,34 @@
 #!/usr/bin/env bash
-# project-init.sh — 多 harness 项目初始化驱动脚本
+# init.sh — 多 harness 项目初始化驱动脚本（project-init）
+#
+# 仓库模型（kk-ai）：
+#   skills/<name>/              通用 skill 源，任何 harness 都能用
+#   <harness>/                  harness 专属资源（opencode/、pi/ …），只对该工具有效
+#                               └── harness_meta.json  声明该 harness 的项目级目录约定
+#   项目引用的方式只有一个：ln 符号链接。全局链接哪些、项目链接哪些，都由调用方决定。
 #
 # 用法：
-#   ./init.sh init  <项目路径> --harness dsh,opencode --skill a,b --agent x.md --type python
-#   ./init.sh plan  <项目路径> --harness all --skill research-workflow   # 只打印，不落盘
-#   ./init.sh list                                                        # 列出 harness / skill / agent
+#   ./init.sh index                        列出本仓库的 skill 与各 harness 的专属资源
+#   ./init.sh discover <项目路径>          巡检目标项目现有的 harness 配置
+#   ./init.sh plan <项目路径> [选项]       只打印计划，不写任何文件
+#   ./init.sh init <项目路径> [选项]       落实目录、链接、指令文件、.gitignore、git
 #
 # 设计原则：
-#   1. harness 约定集中在本文件的 harness_spec() 中，新增 harness 只改一处
-#   2. 幂等：已存在的链接默认跳过，--force 才重建
-#   3. 链接用绝对路径符号链接，便于统一更新
-#   4. 指令文件中的清单写入受管区块（<!-- project-init:begin/end -->），可重复执行
+#   1. skill 只有一份源（skills/），不区分 shared/common
+#   2. harness 差异写在 <harness>/harness_meta.json，新增 harness 不用改脚本
+#   3. 幂等：已就绪的链接跳过，受管区块原地刷新；--force 只重建链接
+#   4. 绝不覆盖目标位置的真实文件/目录
 
 set -euo pipefail
 
-# macOS 自带 bash 3.2 + awk/sed 需要 UTF-8 locale 才能正确按字符切分中文
+# macOS 自带 bash 3.2 + BSD awk/sed 需要 UTF-8 locale 才能正确处理中文
 if [ -z "${LC_ALL:-}" ] && [ -z "${LANG:-}" ]; then
   export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-DFT_REPO_ROOT="$(cd "$SKILL_DIR/../../.." && pwd)"
+DFT_REPO_ROOT="$(cd "$SKILL_DIR/../.." && pwd)"
 REPO_ROOT="${KK_AI_ROOT:-$DFT_REPO_ROOT}"
 
 BLOCK_BEGIN='<!-- project-init:begin 由 project-init 生成，请勿手动编辑本区块 -->'
@@ -37,111 +44,140 @@ hdr()  { printf '\n%s\n' "$*"; }
 usage() {
   cat <<'EOF'
 用法：
-  init.sh init <项目路径> [选项]     创建多 harness 项目配置
-  init.sh plan <项目路径> [选项]     同 init，但不写任何文件（dry-run）
-  init.sh list [harness|skill|agent] 列出内置清单
+  init.sh index                       列出仓库内容（skill + 各 harness 专属资源）
+  init.sh discover <项目路径>         巡检项目现有配置（只读）
+  init.sh plan  <项目路径> [选项]     打印计划，不写文件
+  init.sh init  <项目路径> [选项]     执行初始化
 
 选项：
-  --harness <列表>   目标 harness，逗号/空格分隔，或 all
-                     可用：dsh opencode claude-code codex gemini-cli cursor generic
-                     默认：自动探测（当前会话的 harness）
-  --skill <列表>     要链接的 skill（skills/shared，缺失时回退 skills/common）
-  --agent <列表>     要链接的 agent（opencode-agents/shared），.md 可省略
+  --harness <列表>   目标 harness，逗号/空格分隔
+                     可用：脚本按 <repo>/<harness>/harness_meta.json 自动发现
+                     默认：探测当前会话的 harness
+  --skill <列表>     通用 skill 名（<repo>/skills/<name>），可省略 .md
+  --agent <列表>     harness 专属 agent，可带前缀：opencode/诸葛亮 或裸名 诸葛亮
+  --command <列表>   指令文件里要提及的 command（不建链接）
   --type <类型>      .gitignore 模板：node|python|go|rust|java|universal（默认 universal）
-  --repo-root <路径> kk-ai 仓库根（默认自动推断）
+  --repo-root <路径> kk-ai 仓库根（默认由脚本位置推断，也可用 KK_AI_ROOT）
   --no-git           跳过 git init / commit
   --no-commit        只 git init，不创建初始提交
   --force            已存在的链接重建为目标路径
-  --dry-run          等价于 plan
   -h, --help         帮助
 
 示例：
-  # 在 DSH 与 OpenCode 双开的新项目里挂载调研工作流
-  init.sh init ~/Code/my-project --harness dsh,opencode \
-      --skill research-workflow --agent ResearchReporter --type python
-
-  # 只给 DSH 用，并先预览
-  init.sh plan ~/Code/demo --harness dsh --skill mermaid
+  init.sh index
+  init.sh discover ~/Code/my-app
+  init.sh plan ~/Code/my-app --harness opencode --skill research-workflow --agent 诸葛亮 --type python
+  init.sh init ~/Code/my-app --harness opencode,pi --skill mermaid --agent opencode/诸葛亮
 EOF
 }
 
 # ---------------------------------------------------------------- harness 注册表
-# 改动这里 = 支持新 harness；references/harnesses.md 需同步文档
-harness_spec() {
-  H_SKILLS=""        # 项目级 skill 目录
-  H_AGENTS=""        # 项目级 agent 目录（空=不支持文件式 agent）
-  H_DOC=""           # 指令文件
-  H_DOC_TITLE=""     # 指令文件写区块时的标题前缀
-  case "$1" in
-    dsh)
-      H_SKILLS=".dsh/skills"; H_AGENTS=""; H_DOC="AGENTS.md" ;;
-    opencode)
-      H_SKILLS=".opencode/skills"; H_AGENTS=".opencode/agents"; H_DOC="AGENTS.md" ;;
-    claude-code)
-      H_SKILLS=".claude/skills"; H_AGENTS=".claude/agents"; H_DOC="CLAUDE.md" ;;
-    codex)
-      H_SKILLS=".agents/skills"; H_AGENTS=""; H_DOC="AGENTS.md" ;;
-    gemini-cli)
-      H_SKILLS=".agents/skills"; H_AGENTS=""; H_DOC="GEMINI.md" ;;
-    cursor)
-      H_SKILLS=".agents/skills"; H_AGENTS=""; H_DOC=".cursor/rules/project-init.mdc" ;;
-    generic)
-      H_SKILLS=".agents/skills"; H_AGENTS=""; H_DOC="AGENTS.md" ;;
-    *) return 1 ;;
-  esac
-  return 0
+# 每个 harness = 仓库根下一个带 harness_meta.json 的目录。
+# 字段（全部可选，缺省即「不支持」）：
+#   label              展示名
+#   skills_dir         项目级 skill 目录
+#   agents [].dir      项目级 agent 目录；ext 为源文件扩展名
+#   source_dir         仓库内 harness 资源目录（相对仓库根，默认 = harness 目录名）
+#   instructions       项目级指令文件
+#   instructions_mode  block（写受管区块）| mdc（带 frontmatter 的规则文件）
+#   skills_verified    true/false —— skill 目录是否核实过
+#   agents_verified    true/false —— agent 目录是否核实过
+#   status             一句话说明已核实到什么程度
+#   notes              给使用者的补充说明
+
+HARNESSES=""
+
+load_harnesses() {
+  local d name
+  HARNESSES=""
+  for d in "$REPO_ROOT"/*/; do
+    [ -f "$d/harness_meta.json" ] || continue
+    name="$(basename "$d")"
+    HARNESSES="$HARNESSES $name"
+  done
+  HARNESSES="$(echo "$HARNESSES" | sed -e 's/^ *//' -e 's/ *$//')"
 }
 
-ALL_HARNESSES="dsh opencode claude-code codex gemini-cli cursor generic"
+meta() {
+  local name="$1" path="$REPO_ROOT/$1/harness_meta.json"
+  if [ ! -f "$path" ]; then err "未知 harness：${name}（${path} 不存在）"; return 1; fi
+  python3 -c 'import json,sys
+try:
+    v = json.load(open(sys.argv[2], encoding="utf-8"))[sys.argv[1]]
+except (KeyError, TypeError):
+    v = ""
+if v is True: v = "true"
+elif v is False: v = "false"
+elif v is None: v = ""
+print(v)' "$2" "$path"
+}
 
-harness_desc() {
-  case "$1" in
-    dsh)         echo "DeepSeek Harness（.dsh/skills + AGENTS.md，无文件式 agent）" ;;
-    opencode)    echo "OpenCode（.opencode/skills + .opencode/agents + AGENTS.md）" ;;
-    claude-code) echo "Claude Code（.claude/skills + .claude/agents + CLAUDE.md）" ;;
-    codex)       echo "Codex CLI（AGENTS.md；skill 走 .agents/skills 便携目录）" ;;
-    gemini-cli)  echo "Gemini CLI（GEMINI.md；skill 走 .agents/skills 便携目录）" ;;
-    cursor)      echo "Cursor（.cursor/rules + AGENTS.md；skill 走 .agents/skills）" ;;
-    generic)     echo "通用/未知 harness（.agents/skills + AGENTS.md）" ;;
-    *) return 1 ;;
-  esac
+harness_label()    { local v; v="$(meta "$1" label    || true)"; echo "${v:-$1}"; }
+h_skills_dir()     { meta "$1" skills_dir       || true; }
+h_instructions()   { meta "$1" instructions     || true; }
+h_instructions_mode() { local v; v="$(meta "$1" instructions_mode || true)"; echo "${v:-block}"; }
+h_source_dir()     { local v; v="$(meta "$1" source_dir || true)"; echo "${v:-$1}"; }
+h_skills_verified(){ local v; v="$(meta "$1" skills_verified || true)"; echo "${v:-false}"; }
+
+# 可用 agent 目录，每行一个（去掉末尾 /）
+h_agent_dirs() {
+  local name="$1" path="$REPO_ROOT/$1/harness_meta.json"
+  [ -f "$path" ] || return 0
+  python3 -c 'import json,sys
+try:
+    agents = json.load(open(sys.argv[1], encoding="utf-8")).get("agents") or []
+except Exception:
+    agents = []
+for a in agents:
+    if isinstance(a, dict) and a.get("dir"):
+        print(a["dir"].rstrip("/"))' "$path"
+}
+
+h_agent_ext() {
+  local name="$1" dir="$2" path="$REPO_ROOT/$1/harness_meta.json"
+  python3 -c 'import json,sys
+try:
+    agents = json.load(open(sys.argv[1], encoding="utf-8")).get("agents") or []
+except Exception:
+    agents = []
+for a in agents:
+    if isinstance(a, dict) and a.get("dir") and a["dir"].rstrip("/") == sys.argv[2]:
+        print(a.get("ext") or ".md"); break
+else:
+    print(".md")' "$path" "$dir"
 }
 
 detect_harness() {
   if [ -n "${DSH_SESSION_ID:-}${DSH_HOME:-}" ]; then echo dsh; return 0; fi
   if [ -n "${CLAUDECODE:-}${CLAUDE_CODE_ENTRYPOINT:-}" ]; then echo claude-code; return 0; fi
-  case "${OPENCODE:-}" in ""|0) ;; *) echo opencode; return 0 ;; esac
+  case "${OPENCODE:-}" in ""|0) ;; *) echo opencode; return 0; ;; esac
   if [ -n "${GEMINI_CLI:-}${GEMINI_SESSION_ID:-}" ]; then echo gemini-cli; return 0; fi
+  if [ -n "${PI_SESSION_ID:-}${PI_HOME:-}" ]; then echo pi; return 0; fi
   if [ -d "$PWD/.opencode" ]; then echo opencode; return 0; fi
+  if [ -d "$PWD/.pi" ]; then echo pi; return 0; fi
   if [ -d "$PWD/.claude" ]; then echo claude-code; return 0; fi
   if [ -d "$PWD/.dsh" ]; then echo dsh; return 0; fi
   echo generic
 }
 
 # ---------------------------------------------------------------- 资源解析
-# 输出 skill 源目录（shared 优先，回退 common）；找不到则空
-skill_src() {
-  local name="$1"
-  if [ -d "$REPO_ROOT/skills/shared/$name" ]; then
-    echo "$REPO_ROOT/skills/shared/$name"
-  elif [ -d "$REPO_ROOT/skills/common/$name" ]; then
-    echo "$REPO_ROOT/skills/common/$name"
-  else
-    echo ""
+# 解析 skill 名。返回 "<kind>\t<源目录>"，kind = shared（通用）| harness
+#   research-workflow        → skills/research-workflow            （通用）
+#   opencode/herdr           → opencode/skills/herdr               （harness 专属）
+resolve_skill() {
+  local n="$1" h s
+  if has_slash "$n"; then
+    h="${n%%/*}"; s="${n#*/}"
+    if in_list "$h" "$HARNESSES" && [ -d "$REPO_ROOT/$h/skills/$s" ]; then
+      printf 'harness\t%s\n' "$REPO_ROOT/$h/skills/$s"; return 0
+    fi
+    return 1
   fi
+  [ -d "$REPO_ROOT/skills/$n" ] && { printf 'shared\t%s\n' "$REPO_ROOT/skills/$n"; return 0; }
+  return 1
 }
 
-skill_origin() {
-  if [ -d "$REPO_ROOT/skills/shared/$1" ]; then
-    echo "shared"
-  elif [ -d "$REPO_ROOT/skills/common/$1" ]; then
-    echo "common"
-  else
-    echo ""
-  fi
-}
-
-# SKILL.md front-matter 的 description，压成一行（不截断，避免切坏中文）
+# SKILL.md front-matter 的 description，压成一行
 skill_desc() {
   local dir="$1" f d
   f="$dir/SKILL.md"
@@ -159,60 +195,146 @@ skill_desc() {
     multi { print buf; exit }
     END { if (multi && buf != "") print buf }
   ' "$f" 2>/dev/null | head -1)"
-  d="$(printf '%s' "$d" | sed -e 's/[[:space:]]\+/ /g' -e 's/^ //' -e 's/ $//')"
+  d="$(printf '%s' "$d" | sed -e 's/[[:space:]]\+/ /g' -e 's/^ //' -e 's/ $//' -e 's/^["'\'']//' -e 's/["'\'']$//')"
   [ -z "$d" ] && d="（无描述）"
   printf '%s' "$d"
 }
 
-agent_src() {
-  local name="$1" base="${1%.md}"
-  if [ -f "$REPO_ROOT/opencode-agents/shared/$base.md" ]; then
-    echo "$REPO_ROOT/opencode-agents/shared/$base.md"
-  else
-    echo ""
-  fi
+# 仓库内某 harness 目录下按约定可链接的资源（相对路径）：
+#   <harness>/agents/ → --agent 的源（单数 agent/ 也认）
+#   <harness>/cmds/   → command（只写进清单，脚本不建链接；单数 cmd/ 也认）
+#   <harness>/skills/ → 该 harness 专属 skill
+AGENT_SUBDIRS="agents agent"
+CMD_SUBDIRS="cmds cmd"
+harness_agent_files() {
+  local h="$1" src d
+  src="$REPO_ROOT/$(h_source_dir "$h")"
+  for d in $AGENT_SUBDIRS $CMD_SUBDIRS skills; do
+    [ -d "$src/$d" ] || continue
+    find "$src/$d" \( -name '*.md' -o -name 'SKILL.md' \) -not -path '*/node_modules/*' \
+      | sed "s|^$src/||" | sort
+  done
+}
+
+# 解析 --agent 实参：支持 opencode/xxx、xxx.md、xxx
+resolve_agent() {
+  local raw="$1" q="${1%.md}" h sub src only=""
+  local found_h="" found_rel="" found_src=""
+  # 允许前缀：opencode/诸葛亮
+  if has_slash "$q"; then only="${q%%/*}"; q="${q#*/}"; fi
+  for h in $ALL_HARNESSES_NONEMPTY; do
+    [ -n "$only" ] && [ "$h" != "$only" ] && continue
+    for sub in $AGENT_SUBDIRS; do
+      src="$REPO_ROOT/$(h_source_dir "$h")/$sub"
+      [ -f "$src/$q.md" ] && { found_h="$h"; found_rel="$q.md"; found_src="$src/$q.md"; break; }
+      [ -f "$src/$q" ]   && { found_h="$h"; found_rel="$q";    found_src="$src/$q";    break; }
+    done
+    [ -n "$found_h" ] && break
+  done
+  [ -z "$found_h" ] && return 1
+  printf '%s\t%s\t%s\n' "$found_h" "$found_rel" "$found_src"
 }
 
 agent_desc() {
   local f="$1" d
   [ -f "$f" ] || { echo ""; return 0; }
   d="$(grep -m1 '^description:' "$f" 2>/dev/null | sed -e 's/^description:[[:space:]]*//' || true)"
-  [ -z "$d" ] && d="（无描述）"
+  [ -z "$d" ] && d="$(basename "$f")"
   printf '%s' "$d"
 }
 
+ALL_HARNESSES_NONEMPTY=""
+
+# ---------------------------------------------------------------- index
 list_all() {
-  local what="${1:-all}" h s a
+  local what="${1:-all}" h s d src
   if [ "$what" = "all" ] || [ "$what" = "harness" ]; then
-    hdr "Harnesses（kk-ai 仓库：${REPO_ROOT}）"
-    for h in $ALL_HARNESSES; do
-      harness_spec "$h"
-      printf '  %-12s %s\n' "$h" "$(harness_desc "$h")"
-      printf '  %-12s   skills=%s  agents=%s  instructions=%s\n' "" \
-        "${H_SKILLS:--}" "${H_AGENTS:--}" "${H_DOC:--}"
-    done
-  fi
-  if [ "$what" = "all" ] || [ "$what" = "skill" ]; then
-    hdr "Skills - shared（项目按需链接）"
-    for s in "$REPO_ROOT"/skills/shared/*/; do
+    hdr "通用 Skills（${REPO_ROOT}/skills/ —— 任何 harness 都可链接）"
+    for s in "$REPO_ROOT"/skills/*/; do
       [ -d "$s" ] || continue
       s="$(basename "$s")"
-      printf '  %-26s %s\n' "$s" "$(skill_desc "$REPO_ROOT/skills/shared/$s")"
-    done
-    hdr "Skills - common（已全局生效，一般无需链接）"
-    for s in "$REPO_ROOT"/skills/common/*/; do
-      [ -d "$s" ] || continue
-      s="$(basename "$s")"
-      printf '  %-26s %s\n' "$s" "$(skill_desc "$REPO_ROOT/skills/common/$s")"
+      printf '  %-24s %s\n' "$s" "$(skill_desc "$REPO_ROOT/skills/$s")"
     done
   fi
-  if [ "$what" = "all" ] || [ "$what" = "agent" ]; then
-    hdr "Agents - shared（OpenCode 格式，仅 opencode/claude-code 可链接）"
-    for a in "$REPO_ROOT"/opencode-agents/shared/*.md; do
-      [ -f "$a" ] || continue
-      printf '  %-26s %s\n' "$(basename "$a")" "$(agent_desc "$a")"
+  if [ "$what" = "all" ] || [ "$what" = "harness" ]; then
+    hdr "Harness 专属资源（${REPO_ROOT}/<harness>/ —— 只对该工具有效）"
+    for h in $ALL_HARNESSES_NONEMPTY; do
+      src="$REPO_ROOT/$(h_source_dir "$h")"
+      printf '\n  %-14s %s\n' "$h" "$(harness_label "$h")"
+      printf '  %-14s status: %s\n' "" "$(meta "$h" status || true)"
+      d="$(h_skills_dir "$h")"
+      if [ -n "$d" ]; then
+        if [ "$(h_skills_verified "$h")" = "true" ]; then
+          printf '  %-14s skill 目录 %s（已核实，链接 skills/<name>）\n' "" "$d"
+        else
+          printf '  %-14s skill 目录 %s（⚠️ 未核实）\n' "" "$d"
+        fi
+      fi
+      while IFS= read -r d; do
+        [ -n "$d" ] || continue
+        printf '  %-14s agent 目录 %s\n' "" "$d"
+      done < <(h_agent_dirs "$h")
+      printf '  %-14s 指令文件 %s\n' "" "$(h_instructions "$h")"
+      [ -d "$src" ] || continue
+      while IFS= read -r s; do
+        [ -n "$s" ] || continue
+        printf '  %-14s 资源 %s\n' "" "$s"
+      done < <(harness_agent_files "$h")
     done
+    if [ -z "$ALL_HARNESSES_NONEMPTY" ]; then
+      info "未发现任何 harness（在 ${REPO_ROOT}/<name>/harness_meta.json 声明后才能使用）"
+    fi
   fi
+}
+
+# ---------------------------------------------------------------- discover
+discover_project() {
+  local proj="$1" h d n hit first=1 tgt
+  hdr "🔍 巡检现有配置：${proj}"
+  if [ ! -d "$proj" ]; then info "目录不存在（全新项目）"; return 0; fi
+  if [ -d "$proj/.git" ]; then info "git 仓库：是"; else info "git 仓库：否"; fi
+  for h in $ALL_HARNESSES_NONEMPTY; do
+    hit=0; d=""
+    :
+    [ -n "$(h_skills_dir "$h")" ] && [ -d "$proj/$(h_skills_dir "$h")" ] && hit=1
+    while IFS= read -r d; do [ -n "$d" ] && [ -d "$proj/$d" ] && hit=1; done < <(h_agent_dirs "$h")
+    [ "$hit" -eq 0 ] && continue
+    [ "$first" -eq 0 ] && echo
+    first=0
+    printf '%s（%s）\n' "$h" "$(harness_label "$h")"
+    for d in $(h_skills_dir "$h") $(h_agent_dirs "$h"); do
+      [ -n "$d" ] || continue
+      [ -d "$proj/$d" ] || continue
+      printf '  %s/\n' "$d"
+      for n in "$proj/$d"/*; do
+        [ -e "$n" ] || [ -L "$n" ] || continue
+        if [ -L "$n" ]; then
+          tgt="$(readlink "$n")"
+          case "$tgt" in
+            "$REPO_ROOT"/*) printf '    · %s → kk-ai/%s（仓库链接）\n' "$(basename "$n")" "${tgt#"$REPO_ROOT"/}" ;;
+            *)              printf '    · %s → %s\n' "$(basename "$n")" "$tgt" ;;
+          esac
+        else
+          printf '    · %s（真实文件/目录，脚本不会改动）\n' "$(basename "$n")"
+        fi
+      done
+    done
+  done
+  # 指令文件单独汇报：多个 harness 共用同一个 AGENTS.md 时只报一次
+  local seen=""
+  for h in $ALL_HARNESSES_NONEMPTY; do
+    d="$(h_instructions "$h")"
+    [ -n "$d" ] || continue
+    [ -f "$proj/$d" ] || continue
+    # 多个 harness 共用同一个指令文件时只报一次
+    printf '%s\n' "$seen" | grep -qxF -- "$d" && continue
+    seen="$seen $d"
+    if grep -q 'project-init:begin' "$proj/$d" 2>/dev/null; then
+      printf '\n指令文件 %s（含 project-init 受管区块，重跑会原地刷新）\n' "$d"
+    else
+      printf '\n指令文件 %s（无受管区块，重跑只追加区块，原有内容保留）\n' "$d"
+    fi
+  done
 }
 
 # ---------------------------------------------------------------- 工具函数
@@ -220,47 +342,51 @@ run() {
   if [ "$DRY_RUN" -eq 1 ]; then printf '  [plan] %s\n' "$*"; else "$@"; fi
 }
 
+has_slash() { [[ "$1" == */* ]]; }
+
 uniq_words() { echo "$*" | tr ' ' '\n' | awk 'NF && !seen[$0]++' | tr '\n' ' ' | sed 's/ $//'; }
 
 in_list() { case " $2 " in *" $1 "*) return 0;; esac; return 1; }
 
 link_path() {
-  local src="$1" dst="$2"
-  if [ -L "$dst" ]; then
-    if [ "$(readlink "$dst")" = "$src" ]; then
-      info "已就绪：$(basename "$dst") → $src"
+  # 形参名带下划线前缀，避免与调用方的 src/dst/base 等同名变量互相覆盖
+  local _src="$1" _dst="$2"
+  [ -n "$_dst" ] || return 1
+  if [ -L "$_dst" ]; then
+    if [ "$(readlink "$_dst")" = "$_src" ]; then
+      info "已就绪：$_dst → $_src"
       return 0
     fi
     if [ "$FORCE" -eq 1 ]; then
-      run rm -f "$dst"
+      run rm -f "$_dst"
     else
-      warn "已存在不同链接，跳过（--force 可覆盖）：$dst"
+      warn "已存在不同链接，跳过（--force 可重建）：$_dst → $(readlink "$_dst")"
       return 1
     fi
-  elif [ -e "$dst" ]; then
-    warn "已存在真实文件/目录，跳过（不动用户内容）：$dst"
+  elif [ -e "$_dst" ]; then
+    warn "已存在真实文件/目录，跳过（不动用户内容）：$_dst"
     return 1
   fi
-  run ln -s "$src" "$dst"
+  run ln -s "$_src" "$_dst"
   if [ "$DRY_RUN" -eq 0 ]; then
-    if [ -e "$dst" ]; then ok "链接 $(basename "$dst") → $src"
-    else err "链接失败（源不存在？）：$src"; return 1; fi
+    if [ -e "$_dst" ]; then ok "链接 $_dst → $_src"
+    else err "链接失败（源不存在？）：$_src"; return 1; fi
   fi
   return 0
 }
 
 # 受管区块写入/替换
 write_block() {
-  local file="$1" block="$2"
+  local file="$1" block="$2" mode="$3"
   if [ "$DRY_RUN" -eq 1 ]; then
     printf '  [plan] 写入受管区块 %s（%s 行）\n' "$file" "$(wc -l < "$block" | tr -d ' ')"
     return 0
   fi
   mkdir -p "$(dirname "$file")"
   if [ ! -f "$file" ]; then
-    case "$file" in
-      *.mdc) { printf -- '---\ndescription: 项目规则（project-init 生成）\nglobs: **/*\nalwaysApply: true\n---\n\n'; cat "$block"; } > "$file" ;;
-      *)     cat "$block" > "$file" ;;
+    case "$mode" in
+      mdc|MDC) { printf -- '---\ndescription: 项目规则（project-init 生成）\nglobs: **/*\nalwaysApply: true\n---\n\n'; cat "$block"; } > "$file" ;;
+      *)   cat "$block" > "$file" ;;
     esac
     ok "创建指令文件 $file"
     return 0
@@ -278,7 +404,6 @@ write_block() {
   fi
 }
 
-# 从 stdin 读取逐行规则，去重后追加
 append_gitignore() {
   local proj="$1"
   local gi="$proj/.gitignore" line n=0
@@ -296,7 +421,7 @@ append_gitignore() {
 
 gitignore_lines() {
   local type="$1"
-  printf '%s\n' "# project-init: harness 链接目录（机器本地，不入库）"
+  printf '%s\n' "# project-init: harness 链接目录（机器本地链接，不入库）"
   case "$type" in
     node)      printf '%s\n' "node_modules/" "dist/" ".env" "*.log" ;;
     python)    printf '%s\n' "__pycache__/" "*.pyc" ".venv/" ".env" ;;
@@ -309,16 +434,19 @@ gitignore_lines() {
 }
 
 # ---------------------------------------------------------------- 主流程
-CMD="init"; DRY_RUN=0; DRY_RUN_SUFFIX=""; FORCE=0; DO_GIT=1; DO_COMMIT=1; PROJ_TYPE="universal"; PROJECT=""
-HARNESSES=""; SKILLS=""; AGENTS=""
+CMD="init"; DRY_RUN=0; FORCE=0; DO_GIT=1; DO_COMMIT=1; PROJ_TYPE="universal"; PROJECT=""
+TARGET_HARNESSES=""; SKILLS=""; AGENTS=""; COMMANDS=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    init|plan)      CMD="$1"; [ "$1" = plan ] && DRY_RUN=1; shift ;;
-    list)           CMD="list"; shift ;;
-    --harness)      HARNESSES="$HARNESSES $(echo "${2:-}" | tr ',' ' ')"; shift 2 ;;
+    index|list)     CMD="index"; shift ;;
+    discover)       CMD="discover"; shift ;;
+    plan)           CMD="plan"; DRY_RUN=1; shift ;;
+    init)           CMD="init"; shift ;;
+    --harness)      TARGET_HARNESSES="$TARGET_HARNESSES $(echo "${2:-}" | tr ',' ' ')"; shift 2 ;;
     --skill)        SKILLS="$SKILLS $(echo "${2:-}" | tr ',' ' ')"; shift 2 ;;
     --agent)        AGENTS="$AGENTS $(echo "${2:-}" | tr ',' ' ')"; shift 2 ;;
+    --command)      COMMANDS="$COMMANDS $(echo "${2:-}" | tr ',' ' ')"; shift 2 ;;
     --type)         PROJ_TYPE="${2:-universal}"; shift 2 ;;
     --repo-root)    REPO_ROOT="${2:?}"; shift 2 ;;
     --no-git)       DO_GIT=0; shift ;;
@@ -331,8 +459,16 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ "$CMD" = "list" ]; then list_all "${PROJECT:-all}"; exit 0; fi
-[ "$DRY_RUN" -eq 1 ] && DRY_RUN_SUFFIX=", 仅预览"
+load_harnesses
+ALL_HARNESSES_NONEMPTY="$HARNESSES"
+
+case "$CMD" in
+  index) list_all "${PROJECT:-all}"; exit 0 ;;
+  discover)
+    [ -n "$PROJECT" ] || { err "缺少项目路径"; usage; exit 2; }
+    discover_project "$PROJECT"; exit 0 ;;
+esac
+
 [ -n "$PROJECT" ] || { err "缺少项目路径"; usage; exit 2; }
 
 # 解析项目路径（允许尚不存在）
@@ -345,59 +481,87 @@ if [ -d "$PROJECT" ]; then
 else
   case "$PROJECT" in /*) : ;; *) PROJECT="$PWD/$PROJECT" ;; esac
 fi
-PROJECT_NAME="$(basename "$PROJECT")"
 
-# 归一化 harness 列表
-HARNESSES="$(uniq_words "${HARNESSES:-}")"
-if [ -z "$HARNESSES" ]; then
-  HARNESSES="$(detect_harness)"
-  info "未指定 harness，自动探测为：$HARNESSES"
+TARGET_HARNESSES="$(uniq_words "${TARGET_HARNESSES:-}")"
+if [ -z "$TARGET_HARNESSES" ]; then
+  TARGET_HARNESSES="$(detect_harness)"
+  info "未指定 harness，自动探测为：$TARGET_HARNESSES"
 fi
-if in_list "all" "$HARNESSES"; then
-  HARNESSES="$(uniq_words "$ALL_HARNESSES")"
-  info "--harness all：$HARNESSES"
-fi
-for h in $HARNESSES; do
-  harness_spec "$h" || { err "未知 harness：${h}（可用：${ALL_HARNESSES}）"; exit 2; }
+for h in $TARGET_HARNESSES; do
+  if ! in_list "$h" "$HARNESSES"; then
+    err "未知 harness：${h}（当前仓库可用：${HARNESSES:-无}）"
+    exit 2
+  fi
 done
 
 SKILLS="$(uniq_words "${SKILLS:-}")"
 AGENTS="$(uniq_words "${AGENTS:-}")"
+COMMANDS="$(uniq_words "${COMMANDS:-}")"
 
-hdr "📋 初始化计划（${CMD}${DRY_RUN_SUFFIX}）"
+hdr "📋 初始化计划（${CMD}$([ "$DRY_RUN" -eq 1 ] && echo '，仅预览')）"
 info "项目路径：$PROJECT"
-info "harness ：$HARNESSES"
-[ -n "$SKILLS" ] && info "skills  ：$SKILLS"
-[ -n "$AGENTS" ] && info "agents  ：$AGENTS"
-info "gitignore 类型：$PROJ_TYPE"
+info "harness ：$TARGET_HARNESSES"
+[ -n "$SKILLS" ]   && info "skills  ：$SKILLS"
+[ -n "$AGENTS" ]   && info "agents  ：$AGENTS"
+[ -n "$COMMANDS" ] && info "commands：${COMMANDS}（仅写入清单）"
+info ".gitignore 类型：$PROJ_TYPE"
 
-# 0) 预检：资源不存在就不要留下半成品目录
-if [ -n "$SKILLS" ] || [ -n "$AGENTS" ]; then
-  missing=0
-  for s in $SKILLS; do
-    if [ -z "$(skill_src "$s")" ]; then
-      err "skill 不存在：${s}（查 ${REPO_ROOT}/skills/{shared,common}/）"; missing=1
+# 0) 预检：资源不存在就不留半成品目录
+missing=0
+linkable_skills=""         # 通用 skill（落到每个有 skill 目录的 harness）
+harness_skills=""          # harness 专属 skill，每行：harness<TAB>名字<TAB>源目录
+for s in $SKILLS; do
+  s="${s%.md}"
+  if res="$(resolve_skill "$s")"; then
+    kind="${res%%$(printf '\t')*}"; src="${res#*$(printf '\t')}"
+    if [ "$kind" = "harness" ]; then
+      harness_skills="$harness_skills
+${s%%/*}$(printf '\t')${s#*/}$(printf '\t')$src"
+    else
+      linkable_skills="$linkable_skills $s"
     fi
-  done
-  for a in $AGENTS; do
-    if [ -z "$(agent_src "$a")" ]; then
-      err "agent 不存在：${a}（查 ${REPO_ROOT}/opencode-agents/shared/）"; missing=1
-    fi
-  done
-  if [ "$missing" -eq 1 ]; then
-    err "预检失败：未创建任何文件。用 list 子命令查看可用资源"
-    exit 3
+  else
+    err "skill 不存在：${s}（查 ${REPO_ROOT}/skills/，或 ${REPO_ROOT}/<harness>/skills/）"; missing=1
   fi
+done
+AGENT_OWNERS=""       # 空格分隔，与 AGENT_SRCS 一一对应
+AGENT_SRCS=""
+TAB_CHAR="$(printf '\t')"
+for a in $AGENTS; do
+  if res="$(resolve_agent "$a")"; then
+    AGENT_OWNERS="$AGENT_OWNERS ${res%%"$TAB_CHAR"*}"
+    tmp="${res#*"$TAB_CHAR"}"          # 去掉首段后：相对路径<TAB>源路径
+    AGENT_SRCS="$AGENT_SRCS ${tmp#*"$TAB_CHAR"}"   # 再去掉相对路径，只留源路径
+  else
+    err "agent 不存在：${a}（查 ${REPO_ROOT}/<harness>/agents/）"; missing=1
+  fi
+done
+if [ "$missing" -eq 1 ]; then
+  err "预检失败：未创建任何文件。用 index 子命令查看可用资源"
+  exit 3
 fi
+linkable_skills="$(uniq_words "$linkable_skills")"
+
+# 每个 skill 能落到哪些 harness
+skills_linkable=""    # 实际写出了链接的 harness
+for h in $TARGET_HARNESSES; do
+  d="$(h_skills_dir "$h")"
+  if [ -n "$d" ] && [ "$(h_skills_verified "$h")" = "true" ]; then
+    skills_linkable="$skills_linkable $h"
+  elif [ -n "$d" ]; then
+    warn "$h 的 skill 目录（${d}）未核实：默认不链接，确认后把 harness_meta.json 的 skills_verified 改为 true"
+  fi
+done
 
 # 1) 目录
 hdr "1. 创建目录结构"
 [ "$DRY_RUN" -eq 0 ] && mkdir -p "$PROJECT"
 dirs=""
-for h in $HARNESSES; do
-  harness_spec "$h"
-  [ -n "$H_SKILLS" ] && dirs="$dirs $H_SKILLS"
-  [ -n "$H_AGENTS" ] && dirs="$dirs $H_AGENTS"
+for h in $TARGET_HARNESSES; do
+  in_list "$h" "$skills_linkable" && [ -n "$linkable_skills" ] && dirs="$dirs $(h_skills_dir "$h")"
+  while IFS= read -r d; do
+    [ -n "$d" ] && dirs="$dirs $d"
+  done < <(h_agent_dirs "$h")
 done
 for d in $(uniq_words "$dirs"); do
   case "$d" in
@@ -406,107 +570,138 @@ for d in $(uniq_words "$dirs"); do
   run mkdir -p "$PROJECT/$d"; [ "$DRY_RUN" -eq 0 ] && ok "mkdir -p $d"
 done
 
-# 2) skills
-LINKED_SKILLS=""
-if [ -n "$SKILLS" ]; then
+# 2) skills（通用源，逐 harness 落到各自的 skill 目录）
+LINKED_SKILLS=""            # "名字|来源说明"
+if [ -n "$linkable_skills" ] || [ -n "$(echo "$harness_skills" | tr -d ' \n')" ]; then
   hdr "2. 链接 skills"
-  for s in $SKILLS; do
-    src="$(skill_src "$s")"
-    if [ -z "$src" ]; then
-      err "skill 不存在：${s}（查 ${REPO_ROOT}/skills/{shared,common}/）"; exit 3
-    fi
-    origin="$(skill_origin "$s")"
-    linked=0
-    for h in $HARNESSES; do
-      harness_spec "$h"
-      [ -z "$H_SKILLS" ] && continue
-      link_path "$src" "$PROJECT/$H_SKILLS/$s" && linked=1
+  if [ -z "$skills_linkable" ]; then
+    warn "所选 harness 均无已核实的 skill 目录，跳过通用 skill"
+  else
+    for s in $linkable_skills; do
+      src="$REPO_ROOT/skills/$s"
+      for h in $skills_linkable; do
+        link_path "$src" "$PROJECT/$(h_skills_dir "$h")/$s" && LINKED_SKILLS="$LINKED_SKILLS
+$s|kk-ai/skills"
+      done
+      info "${s}（通用，源 skills/${s}）"
     done
-    [ "$linked" -eq 1 ] && LINKED_SKILLS="$LINKED_SKILLS $s"
-    info "${s}（来源 ${origin}）"
-  done
+  fi
+  while IFS="$(printf '\t')" read -r hs name src; do
+    [ -n "$hs" ] || continue
+    hdir="$(h_skills_dir "$hs")"
+    if [ -z "$hdir" ] || [ "$(h_skills_verified "$hs")" != "true" ]; then
+      warn "$name 是 ${hs} 专属 skill，但 ${hs} 的 skill 目录未核实，未链接"
+      continue
+    fi
+    if in_list "$hs" "$TARGET_HARNESSES"; then
+      link_path "$src" "$PROJECT/$hdir/$name" && LINKED_SKILLS="$LINKED_SKILLS
+$name|kk-ai/$hs/skills"
+    else
+      warn "$name 是 ${hs} 专属 skill，只对 ${hs} 生效；本次 harness 为 ${TARGET_HARNESSES}"
+    fi
+  done <<EOF
+$harness_skills
+EOF
 fi
 
-# 3) agents
-LINKED_AGENTS=""
-if [ -n "$AGENTS" ]; then
+# 3) agents（harness 专属）
+LINKED_AGENTS=""      # 每行：文件名|来源harness
+if [ -n "${AGENT_SRCS// /}" ]; then
   hdr "3. 链接 agents"
-  for a in $AGENTS; do
-    src="$(agent_src "$a")"
-    base="$(basename "${a%.md}").md"
-    if [ -z "$src" ]; then
-      err "agent 不存在：${a}（查 ${REPO_ROOT}/opencode-agents/shared/）"; exit 3
-    fi
-    linked=0
-    for h in $HARNESSES; do
-      harness_spec "$h"
-      if [ -z "$H_AGENTS" ]; then continue; fi
-      link_path "$src" "$PROJECT/$H_AGENTS/$base" && linked=1
+  # 本次要落到的 (harness, 目录, 扩展名) 三元组
+  AD_H=""; AD_D=""; AD_E=""
+  for h in $TARGET_HARNESSES; do
+    for d in $(h_agent_dirs "$h"); do
+      [ -n "$d" ] || continue
+      AD_H="$AD_H $h"; AD_D="$AD_D $d"; AD_E="$AD_E $(h_agent_ext "$h" "$d")"
     done
-    if [ "$linked" -eq 0 ]; then
-      warn "agent ${base} 未链接：所选 harness 均不支持文件式 agent（${HARNESSES}）"
-      info "  建议：把该 agent 的职责写进 SKILL.md 或指令文件，或改用 opencode/claude-code"
+  done
+  i=0
+  for asrc in $AGENT_SRCS; do
+    i=$((i+1))
+    ah="$(echo $AGENT_OWNERS | cut -d' ' -f"$i")"
+    abase="$(basename "$asrc")"
+    linked_here=0
+    n=0
+    for d in $AD_D; do
+      n=$((n+1))
+      ext="$(echo $AD_E | cut -d' ' -f"$n")"
+      [ -n "$ext" ] || ext=".md"
+      case "$abase" in
+        *"$ext") dest="$PROJECT/$d/$abase" ;;
+        *)       dest="$PROJECT/$d/${abase%.md}$ext" ;;
+      esac
+      if link_path "$asrc" "$dest"; then
+        linked_here=1
+        LINKED_AGENTS="$LINKED_AGENTS
+$abase|$ah"
+      fi
+    done
+    if [ "$linked_here" -eq 0 ] && [ -z "$AD_D" ]; then
+      warn "agent ${abase} 无处可落：${TARGET_HARNESSES} 都没有 agent 目录"
     fi
-    [ "$linked" -eq 1 ] && LINKED_AGENTS="$LINKED_AGENTS $base"
+    if in_list "$ah" "$TARGET_HARNESSES"; then
+      info "${abase}（来自 ${ah}）"
+    else
+      warn "${abase} 属于 ${ah} 的约定，已按通用 frontmatter 落到本次目标目录；如需原样生效请加 --harness ${ah}"
+    fi
   done
 fi
 
 # 4) 指令文件受管区块
 hdr "4. 写入指令文件"
 docs=""
-for h in $HARNESSES; do
-  harness_spec "$h"
-  [ -n "$H_DOC" ] && docs="$docs $H_DOC"
+for h in $TARGET_HARNESSES; do
+  d="$(h_instructions "$h")"
+  [ -n "$d" ] && docs="$docs $d"
 done
 docs="$(uniq_words "$docs")"
-if [ -n "$(uniq_words "$LINKED_SKILLS$LINKED_AGENTS")" ]; then
+if [ -n "$(echo "$LINKED_SKILLS$LINKED_AGENTS" | tr -d ' \n')${COMMANDS// /}" ]; then
   blockfile="$(mktemp)"
   {
     echo "$BLOCK_BEGIN"
     echo "## 本项目的 Skill 与 Agent"
     echo
-    if [ -n "${LINKED_SKILLS// /}" ]; then
+    if [ -n "$(echo "$LINKED_SKILLS" | tr -d ' \n')" ]; then
       echo "### Skills"
       echo
-      for s in $(uniq_words "$LINKED_SKILLS"); do
-        src="$(skill_src "$s")"
-        path=""
-        for h in $HARNESSES; do
-          harness_spec "$h"; path="${H_SKILLS:-$path}"
-        done
-        echo "- \`$s\` — $(skill_desc "$src")"
-      done
+      echo "$LINKED_SKILLS" | awk -F'|' 'NF && !seen[$1]++ { printf "- `%s` — 源 %s\n", $1, $2 }'
       echo
       echo "使用方式：需要时读取对应目录下的 \`SKILL.md\` 并按其指令执行。"
     fi
-    if [ -n "${LINKED_AGENTS// /}" ]; then
+    if [ -n "$(echo "$LINKED_AGENTS" | tr -d ' \n')" ]; then
       echo
-      echo "### Agents"
+      echo "### Agents（harness 专属）"
       echo
-      for a in $(uniq_words "$LINKED_AGENTS"); do
-        echo "- \`$a\` — $(agent_desc "$REPO_ROOT/opencode-agents/shared/$a")"
-      done
+      echo "$LINKED_AGENTS" | awk -F'|' 'NF && !seen[$0]++ { printf "- `%s` — 来自 %s\n", $1, $2 }'
+    fi
+    if [ -n "${COMMANDS// /}" ]; then
+      echo
+      echo "### Commands（按需手动链接，未自动建立）"
+      echo
+      for c in $(uniq_words "$COMMANDS"); do echo "- \`$c\`"; done
     fi
     echo "$BLOCK_END"
   } > "$blockfile"
   for d in $docs; do
-    write_block "$PROJECT/$d" "$blockfile"
+    write_block "$PROJECT/$d" "$blockfile" "$(h_instructions_mode "$(for h in $TARGET_HARNESSES; do [ "$(h_instructions "$h")" = "$d" ] && { echo "$h"; break; }; done)")"
   done
   rm -f "$blockfile"
 else
   info "无 skill/agent，跳过指令文件区块"
 fi
 
-# 5) .gitignore
+# 5) .gitignore（只忽略链接目录）
 hdr "5. .gitignore"
-gi=()
-gi+=("$(gitignore_lines "$PROJ_TYPE")")
-for h in $HARNESSES; do
-  harness_spec "$h"
-  [ -n "$H_SKILLS" ] && gi+=("$H_SKILLS/")
-  [ -n "$H_AGENTS" ] && gi+=("$H_AGENTS/")
-done
-printf '%s\n' "${gi[@]}" | awk 'NF && !seen[$0]++' | append_gitignore "$PROJECT"
+{
+  gitignore_lines "$PROJ_TYPE"
+  for h in $TARGET_HARNESSES; do
+    in_list "$h" "$skills_linkable" && [ -n "$linkable_skills" ] && echo "$(h_skills_dir "$h")/"
+    while IFS= read -r d; do
+      [ -n "$d" ] && echo "$d/"
+    done < <(h_agent_dirs "$h")
+  done
+} | awk 'NF && !seen[$0]++' | append_gitignore "$PROJECT"
 
 # 6) git
 hdr "6. Git"
@@ -522,7 +717,7 @@ if [ "$DO_GIT" -eq 1 ]; then
         warn "git 未配置 user.email，跳过初始提交"
       else
         git -C "$PROJECT" add -A >/dev/null 2>&1 || true
-        if git -C "$PROJECT" commit -qm "chore: 项目初始化（project-init: ${HARNESSES}）" >/dev/null 2>&1; then
+        if git -C "$PROJECT" commit -qm "chore: 项目初始化（project-init: ${TARGET_HARNESSES}）" >/dev/null 2>&1; then
           ok "初始提交已创建"
         else
           warn "初始提交失败（可稍后手动提交）"
@@ -534,22 +729,31 @@ else
   info "已跳过 git 初始化（--no-git）"
 fi
 
-# 7) DSH 特别提示
-if in_list dsh "$HARNESSES"; then
-  if [ ! -d "$PROJECT/.git" ]; then
-    warn "DSH 以「最近含 .git 的祖先目录」为项目根来扫描 .dsh/skills；当前不是 git 仓库，请确保在项目根启动会话"
-  fi
+# 7) DSH 项目根提示
+if in_list dsh "$TARGET_HARNESSES" && [ ! -d "$PROJECT/.git" ]; then
+  warn "DSH 以「最近含 .git 的祖先目录」为项目根扫描 .dsh/skills；当前不是 git 仓库，请确保在项目根启动会话"
 fi
 
 # 8) 结果
 hdr "✅ 完成：$PROJECT"
-printf '  %s\n' "$PROJECT"
-for h in $HARNESSES; do
-  harness_spec "$h"
-  printf '   ├─ %-12s skills=%s\n' "$h" "$([ -n "$H_SKILLS" ] && echo "$H_SKILLS" || echo '(不支持)')"
-  [ -n "$H_AGENTS" ] && printf '   │  %-12s agents=%s\n' "" "$H_AGENTS"
-  printf '   │  %-12s docs=%s\n' "" "$H_DOC"
+for h in $TARGET_HARNESSES; do
+  printf '   ├─ %s\n' "$(harness_label "$h")"
+  if in_list "$h" "$skills_linkable"; then
+    printf '   │    skills → %s\n' "$(h_skills_dir "$h")"
+  elif [ -n "$(h_skills_dir "$h")" ]; then
+    printf '   │    skills → %s（未核实，未链接）\n' "$(h_skills_dir "$h")"
+  else
+    printf '   │    skills → 无\n'
+  fi
+  while IFS= read -r d; do
+    [ -n "$d" ] && printf '   │    agents → %s\n' "$d"
+  done < <(h_agent_dirs "$h")
+  printf '   │    docs   → %s\n' "$(h_instructions "$h")"
 done
-[ -n "${LINKED_SKILLS// /}" ] && printf '   ├─ skills: %s\n' "$(uniq_words "$LINKED_SKILLS")"
-[ -n "${LINKED_AGENTS// /}" ] && printf '   ├─ agents: %s\n' "$(uniq_words "$LINKED_AGENTS")"
+if [ -n "$(echo "$LINKED_SKILLS" | tr -d ' \n')" ]; then
+  printf '   ├─ skills: %s\n' "$(echo "$LINKED_SKILLS" | awk -F'|' 'NF && !seen[$1]++ { printf "%s ", $1 }')"
+fi
+if [ -n "$(echo "$LINKED_AGENTS" | tr -d ' \n')" ]; then
+  printf '   ├─ agents: %s\n' "$(echo "$LINKED_AGENTS" | awk -F'|' 'NF && !seen[$0]++ { printf "%s ", $1 }')"
+fi
 printf '   └─ 下一步：cd %s\n' "$PROJECT"

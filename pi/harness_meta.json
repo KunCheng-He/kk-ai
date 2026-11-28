@@ -1,0 +1,14 @@
+{
+  "label": "Pi",
+  "source_dir": "pi",
+  "skills_dir": "",
+  "skills_verified": false,
+  "agents": [
+    { "dir": ".pi/k-subagents", "ext": ".md", "verified": true },
+    { "dir": ".pi/k-priagent", "ext": ".md", "verified": true }
+  ],
+  "instructions": "AGENTS.md",
+  "instructions_mode": "block",
+  "status": "agent 目录来自 pi-k-subagent / pi-agent-switcher 扩展；Pi 核心是否有 skill 机制未核实",
+  "notes": "只有装了对应扩展时 agent 目录才生效；skill 机制确认前不会链接 skills/"
+}

@@ -1,72 +1,82 @@
 # Harness 适配矩阵
 
-`project-init` 用一张注册表驱动：每个 harness 只需声明 **项目级 skill 目录**、**项目级 agent 目录**、**指令文件**。
-注册表实现在 `scripts/init.sh` 的 `harness_spec()`，本文件是它的文档镜像——改一处要同步另一处。
+每个 harness 的项目级约定写在 `<harness>/harness_meta.json` 里，本文件是它的说明书。
+**改一处要同步另一处，但以 JSON 为准**——`init.sh` 只读 JSON。
+
+关于字段含义与新增 harness 的步骤，见 [repository.md](repository.md)。
 
 ## 一览
 
 | harness | skill 目录 | agent 目录 | 指令文件 | 文件式 agent | 验证状态 |
 |---|---|---|---|---|---|
-| `dsh` | `.dsh/skills/` | — | `AGENTS.md` | ❌ | ✅ DSH 源码 + 本机实测 |
-| `opencode` | `.opencode/skills/` | `.opencode/agents/` | `AGENTS.md` | ✅ | ✅ 本机已长期使用 |
-| `claude-code` | `.claude/skills/` | `.claude/agents/` | `CLAUDE.md` | ✅ | ⚠️ 公共约定，未在本机复核 |
-| `codex` | `.agents/skills/`（便携，非原生） | — | `AGENTS.md` | ❌ | ⚠️ 指令文件高置信，skill 走便携目录 |
-| `gemini-cli` | `.agents/skills/`（便携） | — | `GEMINI.md` | ❌ | ⚠️ 同上 |
-| `cursor` | `.agents/skills/`（便携） | — | `.cursor/rules/project-init.mdc` | ❌ | ⚠️ 规则文件带 frontmatter |
-| `generic` | `.agents/skills/` | — | `AGENTS.md` | ❌ | ✅ 结构通用，未知 harness 的兜底 |
+| `opencode` | `.opencode/skills/` ✅ | `.opencode/agents/` ✅ | `AGENTS.md` | ✅ | ✅ 本机长期使用 |
+| `pi` | — （待核实） | `.pi/k-subagents/`、`.pi/k-priagent/` ✅ | `AGENTS.md` | ✅（需装扩展） | ⚠️ agent 目录来自扩展 README；skill 机制未核实 |
+| `dsh` | `.dsh/skills/` ✅ | — | `AGENTS.md` | ❌ | ✅ DSH 源码 + 本机实测 |
+| `claude-code` | `.claude/skills/` ⚠️ | `.claude/agents/` ⚠️ | `CLAUDE.md` | ✅（markdown + frontmatter） | ⚠️ 公开约定，本机未复核 |
+| `codex` | `.agents/skills/` ⚠️ | — | `AGENTS.md` | ❌ | ⚠️ 指令文件高置信，skill 无原生机制 |
+| `gemini-cli` | `.agents/skills/` ⚠️ | — | `GEMINI.md` | ❌ | ⚠️ 同上 |
+| `cursor` | `.agents/skills/` ⚠️ | — | `.cursor/rules/project-init.mdc` | ❌ | — 规则文件带 frontmatter |
+
+> 只有 `opencode/` 与 `pi/` 在仓库里有 `harness_meta.json`，所以脚本**当前只能初始化这两个**。
+> 表里其余的 harness 是已确认的路径约定；要用时新建对应目录和 JSON，按 [repository.md](repository.md) 的步骤走。
 
 验证状态含义：
 
 - ✅：从该 harness 的实现源码或本机实际配置确认过
-- ⚠️：遵循公开约定，但本机没有该 CLI，**首次在真机使用时请复核**（复核方式：初始化后用该 harness 打开项目，确认它能发现 skill/agent，再回来修正本表）
+- ⚠️：遵循公开约定，但本机没有该 CLI 或没有该机制，**首次在真机使用时请复核**（复核方式：初始化后用该 harness 打开项目，确认它能发现 skill/agent，再把 `harness_meta.json` 与本文改对）
 
-## 为什么有的 harness 用 `.agents/skills`
+## 两个概念的区分
 
-`.agents/skills/` 是 agent-skills 生态的便携位置，**DSH 自己也扫描它**（见 [dsh-init.md](dsh-init.md) 的根目录表，rank 200）。
-因此对没有原生 skill 机制的 harness（codex / gemini-cli / cursor / 未知工具），策略是：
+这张表里有两个「agent」含义，别混：
 
-1. skill 实体链接到 `.agents/skills/` —— 位置稳定、可被任何支持该约定的工具读到
-2. 在该 harness 的指令文件里写一份清单区块 —— 让只读 `AGENTS.md`/`GEMINI.md` 的 agent 也能发现这些 skill
+| | 含义 | 归属 |
+|---|---|---|
+| 文件式 agent | 一份 markdown + frontmatter，定义角色、工具白名单、模型 | `<harness>/agents/` → 各工具自己的 agent 目录 |
+| 运行时子代理 | 该工具派发独立上下文执行的机制（DSH 的 `subagent`、OpenCode 的 `task`） | 平台能力，不靠文件 |
 
-这不是"假装支持"，而是**用指令文件做桥**：skill 目录本身是真实可读的，只是发现入口换成了指令文件。
+DSH 有后者没有前者。这是它唯一的结构性差异，别的地方都只是路径不同。
 
 ## 各 harness 细节
-
-### dsh（DeepSeek Harness）
-
-- 项目级 skill 根：`<projectRoot>/.dsh/skills`，**projectRoot 取最近含 `.git` 的祖先目录**；没有 `.git` 时退化为当前工作目录
-- 无文件式 agent 目录：subagent 是运行时服务，不从 `.dsh/agents` 加载
-- 指令文件：`AGENTS.md`（项目链 + `$DSH_HOME/AGENTS.md` 用户级链，`CLAUDE.md` 兼容并去重）
-- 专项说明见 [dsh-init.md](dsh-init.md)
 
 ### opencode
 
 - skill：`.opencode/skills/<name>/SKILL.md`
-- agent：`.opencode/agents/<name>.md`（frontmatter 含 `description`、`mode`、`tools` 等）
-- command：`.opencode/commands/<name>.md`（本 skill 不自动链接 command）
+- agent：`.opencode/agents/<name>.md`（frontmatter 含 `description`、`mode`、`temperature` 等）
+- command：`.opencode/commands/<name>.md`（**脚本不自动链接**，需要时手动 `ln -s`）
 - 指令文件：`AGENTS.md`
+- 仓库侧：`opencode/agents/`、`opencode/cmds/`、`opencode/skills/`
 - 专项说明见 [opencode-init.md](opencode-init.md)
+
+### pi
+
+- agent 目录有两个，用途不同：
+  - `.pi/k-subagents/` —— `pi-k-subagent` 扩展的子代理定义
+  - `.pi/k-priagent/` —— `pi-agent-switcher` 扩展的主会话角色
+- 两级作用域：项目级 `.pi/...` 或全局 `~/.pi/agent/...`
+- 指令文件：`AGENTS.md`
+- **skill 机制未核实**，所以 `skills_verified: false`，脚本不会把通用 skill 链进 Pi 项目
+- 专项说明见 [pi-init.md](pi-init.md)
+
+### dsh
+
+- 项目级 skill 根：`<项目根>/.dsh/skills`，**项目根 = 最近含 `.git` 的祖先目录**
+- 无文件式 agent 目录：subagent 是运行时服务，不扫 `.dsh/agents`
+- 指令文件：`AGENTS.md`（另兼容 `CLAUDE.md`，同名内容去重）
+- 专项说明见 [dsh-init.md](dsh-init.md)
 
 ### claude-code
 
 - skill：`.claude/skills/<name>/SKILL.md`
-- agent：`.claude/agents/<name>.md`（同样是 markdown + frontmatter，因此 kk-ai 的 OpenCode agent 可直接复用）
+- agent：`.claude/agents/<name>.md`（markdown + frontmatter，与 OpenCode 高度重合）
 - 指令文件：`CLAUDE.md`
-- 注意：Claude Code 的项目根发现基于当前目录与其配置，不要求 git 仓库
+- 项目根发现不要求 git 仓库
 
-### codex
+### codex / gemini-cli / cursor
 
-- 指令文件：`AGENTS.md`（Codex 的原生上下文文件）
-- 无原生项目级 skill 机制 → skill 走 `.agents/skills/`
-
-### gemini-cli
-
-- 指令文件：`GEMINI.md`
-- 无原生项目级 skill 机制 → skill 走 `.agents/skills/`
-
-### cursor
-
-- 指令文件：`.cursor/rules/project-init.mdc`，脚本会自动补 YAML frontmatter：
+- 都没有原生项目级 skill 机制 → 通用 skill 落到便携目录 `.agents/skills/`
+- 靠指令文件做桥：在 `AGENTS.md` / `GEMINI.md` / `.cursor/rules/*.mdc` 里写一份清单，让只读指令文件的 agent 也能发现这些 skill
+- `.agents/skills/` 是 agent-skills 生态的便携位置，DSH 自己也扫它（rank 200）
+- Cursor 的规则文件需要 YAML frontmatter，`instructions_mode: "mdc"` 会自动补：
 
   ```yaml
   ---
@@ -76,39 +86,25 @@
   ---
   ```
 
-- 无原生项目级 skill 机制 → skill 走 `.agents/skills/`
-
-### generic
-
-给不出结论的 harness 用这一档：`.agents/skills/` + `AGENTS.md`。
-先按通用结构落地，确认对方约定后再补专用 harness 条目。
-
 ## agent 跨 harness 可移植性
 
-| 源 | 可链接到 | 说明 |
+| 源 | 可落到 | 说明 |
 |---|---|---|
-| `opencode-agents/shared/*.md` | `opencode`、`claude-code` | 都是 markdown + frontmatter，字段高度重合 |
-| 同上 | `dsh` / `codex` / `gemini-cli` / `cursor` | ❌ 无文件式 agent；改写成 skill 或写进指令文件清单 |
+| `opencode/agents/*.md` | `.opencode/agents/`、`.claude/agents/` | 原生同构 |
+| `opencode/agents/*.md` | `.pi/k-subagents/`、`.pi/k-priagent/` | 格式兼容（markdown + frontmatter），但 `mode`/`temperature` 等字段 Pi 不认，需按 Pi 字段调整 |
+| 以上任一 | `.dsh/` | ❌ 无文件式 agent，改写为 skill 或写进 `AGENTS.md` |
 
-脚本对不支持 agent 的 harness 会给出警告而不是静默跳过。
+脚本对跨 harness 的 agent 会**告警但仍按其通用格式链接**，因为它只认扩展名。字段差异要自己看一遍。
 
-## 全局（用户级）安装对照
+## 全局（用户级）配置不在本技能范围
 
-项目级是"按需链接"。全局的目标位置如下；**「本机状态」列记录真实安装情况**，不要把"应该链接到哪"当成"已经链接好"：
+`project-init` 只做项目级。全局安装由手工维护，位置参考（**这是约定，不代表本机已经装好**）：
 
-| harness | 全局 skill 链接 | 全局指令文件链接 | 本机状态（2026-11-02 核对） |
-|---|---|---|---|
-| opencode | `~/.config/opencode/skills` → `~/Code/kk-ai/skills/common` | `~/.config/opencode/AGENTS.md` → `AGENTS.global.md` | ✅ 两者均已建立 |
-| dsh | 逐 skill：`~/.dsh/skills/<skill>` → `~/Code/kk-ai/skills/common/<skill>` | `~/.dsh/AGENTS.md` → `AGENTS.global.md` | skill ✅（仅 `mermaid`、`project-init`、`skillify`、`workflow-designer`）；AGENTS.md ❌ 未建立 |
-| claude-code | `~/.claude/skills` → `~/Code/kk-ai/skills/common` | `~/.claude/CLAUDE.md` → `AGENTS.global.md` | ❌ 均未建立（`~/.claude` 目录不存在） |
-| codex / gemini-cli / cursor | `~/.agents/skills` → `~/Code/kk-ai/skills/common` | `~/.agents/AGENTS.md` → `AGENTS.global.md` | ❌ 未链接 common（该目录目前只放 `ego-browser`、`open-kimi-ppt`） |
+| harness | 全局 skill 位置 | 全局指令文件 |
+|---|---|---|
+| dsh | `~/.dsh/skills/<skill>`（逐 skill 建链接，目录本身是真实的） | `~/.dsh/AGENTS.md` |
+| opencode | `~/.config/opencode/skills/<skill>` | `~/.config/opencode/AGENTS.md` |
+| claude-code | `~/.claude/skills/<skill>` | `~/.claude/CLAUDE.md` |
+| pi | `~/.pi/agent/k-subagents/`、`~/.pi/agent/k-priagent/` | — |
 
-注意：`ln -s` 目录级链接要求目标位置**不存在**同名目录。DSH 不使用目录级链接——`~/.dsh/skills` 是真实目录，里面逐 skill 建链接（当前为 `mermaid`、`project-init`、`skillify`、`workflow-designer`）。新增 common skill 后若不补链接，DSH 侧不会出现该 skill。
-
-## 新增一个 harness
-
-1. 在 `scripts/init.sh` 的 `harness_spec()` 里加分支，设置 `H_SKILLS` / `H_AGENTS` / `H_DOC`
-2. 把名字加入 `ALL_HARNESSES` 与 `harness_desc()`
-3. 在本文件表格加一行（含验证状态）
-4. `./scripts/init.sh list harness` 自检，再 `plan` 一个临时项目确认路径
-5. 真机打开项目验证能发现 skill/agent，把验证状态改成 ✅
+原则与项目级一样：只链接明确要用的那几个，**不要**把整个 `skills/` 目录链进去——那样以后新增的 skill 会无条件暴露给所有项目。
