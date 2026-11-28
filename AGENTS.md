@@ -187,7 +187,7 @@ ln -s ~/Code/kk-ai/skills/<name> <项目>/.opencode/skills/<name>    # 项目级
 
 ## 10. 注意事项
 
-1. **本仓库没有根级 README**，本文件是唯一的入口说明；新增全局性约定写在这里，但**不要往这里列清单**（见 §6.3）
+1. **根级入口有两份，分工不同**：`README.md` 面向 GitHub 上的读者（仓库是什么、怎么用），`AGENTS.md`（本文件）面向 agent（动手前该知道的规则与流程）。新增全局性约定写在这里，**不要往这里列清单**（见 §6.3）
 2. `skills/woaile-gzh` 与 `skills/kk-obsidian` 有明确适用范围限制，不要把它们的规则套到别的场景
 3. `project-init` 是其他所有 skill 进入项目的方式，改动它会波及其它项目
 4. `.venv/`、`__pycache__/` 等已被 `.gitignore` 忽略，不要提交
