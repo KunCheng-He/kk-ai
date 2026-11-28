@@ -48,32 +48,26 @@ kk-ai/
 
 因此**链接目录不进 git**，换机器重新链即可。初始化这类工作由 `skills/project-init` 负责。
 
-## 4. 现有内容一览
+## 4. 有哪些内容：用命令看，不要在这里列
 
-### 通用 skills（`skills/`）
+**本文件不列举当前有哪些 skill、哪些 agent。** 那些内容会变，写死在文档里就必然过期，还得手动维护两遍——违反「一个事实只写一处」。
 
-| skill | 用途 | 备注 |
-|---|---|---|
-| `project-init` | 多 harness 项目初始化：挑资源、建目录、建链接、写清单与 `.gitignore` | 仓库的基础设施，改动它要格外小心 |
-| `research-workflow` | 证据驱动的调研工作流 | 含 `harness/` 适配层（dsh / opencode / pi）与 `roles/` |
-| `woaile-gzh` | 「我AI了」公众号运营全流程 | 含 `harness/` 适配层；**仅限该账号** |
-| `kk-obsidian` | Obsidian 学习与记笔记工作流 | **仅限 `~/Documents/kk-brain`** |
-| `mermaid` | Mermaid 图表生成与渲染 | 运行依赖 `mmdc` |
-| `image-prompt` | AI 生图提示词生成 | 只产出提示词，不调 API |
-| `skillify` | 把会话中的可重复流程固化成技能 | — |
-| `workflow-designer` | 设计 / 评估 agent 工作流 | — |
+需要知道当前有什么，一律现查：
 
-带 `harness/` 适配层的 skill，正文写平台无关的方法，具体工具用法在 `harness/<平台>.md`。换平台只需加一个适配文件，正文不动。
+```bash
+skills/project-init/scripts/init.sh index            # 仓库现在有什么
+skills/project-init/scripts/init.sh discover <项目>   # 某个项目现在接了什么
+```
 
-### OpenCode 专属（`opencode/`）
+`index` 会列出：
 
-- `agents/`：`诸葛亮`、`universal-translator`、`woaile-gzh-writer`
-- `cmds/`：`goal`
-- `skills/`：`herdr`、`loop-by-herdr`
+- `skills/` 下每个通用 skill 及其 `description`
+- 注册表里每个 harness 的项目级目录约定与核实状态
+- 该 harness 目录下 `agents/`、`cmds/`、`skills/` 里的全部资源
 
-### Pi 专属（`pi/`）
+`<harness>/` 下的资源由**扫目录**得到，增删文件后立刻可见，不需要改任何登记文件。
 
-`extends/` 下是扩展源码，不被链接，只在初始化 Pi 项目时参考其目录约定。
+唯一的例外是 `pi/extends/` 这类扩展源码：它不参与链接，`index` 不列，需要时直接看目录。
 
 ## 5. 使用方式
 
@@ -117,17 +111,23 @@ ln -s ~/Code/kk-ai/skills/<name> <项目>/.opencode/skills/<name>    # 项目级
 - 目录约定、路径、参数说明，写在唯一的地方，别处引用而不是复制
 - 文档里出现的事实（路径、命令、开关）必须与代码实际行为一致；改了代码要同步文档
 
-### 6.3 不臆造未核实的能力
+### 6.3 会变的东西，写"怎么查"而不是"是什么"
+
+- **不在文档里列清单**：有哪些 skill、有哪些 agent、有哪些 harness、各版本号——这些都在变，写死一处就要维护两处
+- 正确做法是记录**命令或入口**：`init.sh index` 看仓库内容，`discover` 看项目现状，`ls` 看目录
+- 判断标准：**这段内容会不会因为别人正常干活而变化？** 会 → 只写怎么查；不会（结构约定、划分依据、操作步骤）→ 可以写
+
+### 6.4 不臆造未核实的能力
 
 - 没在真机上确认过的路径、字段、工具名，**不要写成确定事实**
 - 不确定就标"未核实"，或者直接问用户
 
-### 6.4 改动要可验证
+### 6.5 改动要可验证
 
 - 改 `project-init` 这类有脚本的技能，**改完必须实际跑一遍**（至少 `index` + 一个临时项目的 `plan`/`init`）
 - 提交前确认没有残留的旧路径、旧名称
 
-### 6.5 不乱动仓库以外的东西
+### 6.6 不乱动仓库以外的东西
 
 - 全局配置目录（`~/.dsh`、`~/.config/opencode`、`~/.agents`、`~/.pi`）属于用户的个人环境
 - 除非用户明确要求，不要修改、不要删除其中的链接或文件
@@ -137,9 +137,9 @@ ln -s ~/Code/kk-ai/skills/<name> <项目>/.opencode/skills/<name>    # 项目级
 1. 判断归属：`skills/` 还是 `<harness>/skills/`（按 §2 的依据）
 2. 建目录，写 `SKILL.md`，frontmatter 至少含 `name` + `description`
    - `description` 写清"做什么 + 什么时候用"，多数平台只靠它触发
-3. 加 `upstream.json` 记录来源与版本（现有 8 个 skill 都有；字段按需写，不要预先铺满）
+3. 加 `upstream.json` 记录来源与版本（与现有 skill 保持一致；字段按需写，不要预先铺满）
 4. 如果 skill 跨平台且含平台专属用法，正文用平台无关表述，另建 `harness/<平台>.md`
-5. 在 §4 的表格里补一行
+5. 确认 `init.sh index` 能看到它（不用改任何登记文件）
 6. 若要同步到某个工具，在对应项目里重新建链接
 
 ## 8. 新增一个 harness
@@ -175,7 +175,7 @@ ln -s ~/Code/kk-ai/skills/<name> <项目>/.opencode/skills/<name>    # 项目级
 
 ## 10. 注意事项
 
-1. **本仓库没有根级 README**，本文件是唯一的入口说明；新增全局性约定写在这里
+1. **本仓库没有根级 README**，本文件是唯一的入口说明；新增全局性约定写在这里，但**不要往这里列清单**（见 §6.3）
 2. `skills/woaile-gzh` 与 `skills/kk-obsidian` 有明确适用范围限制，不要把它们的规则套到别的场景
 3. `project-init` 是其他所有 skill 进入项目的方式，改动它会波及其它项目
 4. `.venv/`、`__pycache__/` 等已被 `.gitignore` 忽略，不要提交
