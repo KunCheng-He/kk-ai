@@ -14,7 +14,7 @@ Pi 在仓库里以 `pi/extends/` 的两个扩展存在，所以它的约定来�
 - **agent 是文件式的**：markdown + YAML frontmatter（`name`、`description`、`model`、`tools`、`thinking`、`systemPromptMode`）
 - **两个目录用途不同**，别混：`k-subagents` 给子代理运行时读，`k-priagent` 给主会话角色选择器读
 - 扩展没装时，这些目录存在也不会生效
-- **Pi 核心是否有 skill 目录机制尚未核实** → `pi/harness_meta.json` 里 `skills_dir` 为空、`skills_verified: false`，脚本**不会**把通用 skill 链进 Pi 项目
+- **Pi 核心是否有 skill 目录机制尚未核实** → 注册表里 `h_skills_dir` 对 Pi 返回空、`h_skills_verified` 为 `false`，脚本**不会**把通用 skill 链进 Pi 项目
 
 所以 Pi 版 `project-init` 当前只做三件事：建 agent 目录、链接 agent、写 `AGENTS.md` 清单。
 
@@ -62,7 +62,7 @@ Pi 只认 `name` / `description` / `model` / `tools` / `thinking` / `systemPromp
 核实方法：装好 Pi 后，看它是否扫描某个目录下的 `SKILL.md`（类似 `.pi/skills/` 或 `.agents/skills/`），
 能否在会话里被触发。确认后：
 
-1. 把 `pi/harness_meta.json` 的 `skills_dir` 填上真实路径，`skills_verified` 改 `true`
+1. 在 `scripts/init.sh` 的 `h_skills_dir` 给 Pi 填上真实路径，`h_skills_verified` 返回 `true`
 2. 在 [harnesses.md](harnesses.md) 更新 Pi 一行
 3. 不需要改 `init.sh`
 

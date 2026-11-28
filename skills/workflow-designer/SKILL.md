@@ -42,7 +42,7 @@ description: "用于设计、评估 AI 编码或软件交付中的 agent 工作�
 | **Claude Code** | 本仓库记录了 `.claude/agents/`、`CLAUDE.md` 等公共约定，但本机适配状态未完全复核。 | 具体调用接口与子 agent 行为须查目标版本文档。 | 不把本仓库的文件约定当作已在所有环境验证过的事实。 |
 | **Codex / Gemini CLI / Cursor / 其他** | 项目可能用便携目录或平台自己的指令文件做桥接。 | 不预设它们支持或不支持 subagent、并行或原生 workflow。 | 便携 `SKILL.md` 可被读取，不代表有原生 skill 发现、自动触发或独立执行。逐项核对。 |
 
-本仓库的验证状态维护在 [Harness 适配矩阵](../project-init/references/harnesses.md)：其中标为 ⚠️ 的条目只能作为线索，不可写成确定事实。仓库里哪些 harness 已具备可自动初始化的目录约定，以各 `<harness>/harness_meta.json` 的实际内容为准（见 [仓库结构](../project-init/references/repository.md)）。
+本仓库的验证状态维护在 [Harness 适配矩阵](../project-init/references/harnesses.md)：其中标为 ⚠️ 的条目只能作为线索，不可写成确定事实。仓库里哪些 harness 已具备可自动初始化的目录约定，以 `project-init` 脚本内注册表的实际内容为准（见 [仓库结构](../project-init/references/repository.md)）。
 
 ### DSH 特别说明
 

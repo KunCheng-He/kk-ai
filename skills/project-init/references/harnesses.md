@@ -1,7 +1,7 @@
 # Harness 适配矩阵
 
-每个 harness 的项目级约定写在 `<harness>/harness_meta.json` 里，本文件是它的说明书。
-**改一处要同步另一处，但以 JSON 为准**——`init.sh` 只读 JSON。
+每个 harness 的项目级约定写在 `scripts/init.sh` 的注册表里，本文件是它的说明书。
+**改一处要同步另一处，但以脚本为准**——运行时只读注册表。
 
 关于字段含义与新增 harness 的步骤，见 [repository.md](repository.md)。
 
@@ -17,13 +17,13 @@
 | `gemini-cli` | `.agents/skills/` ⚠️ | — | `GEMINI.md` | ❌ | ⚠️ 同上 |
 | `cursor` | `.agents/skills/` ⚠️ | — | `.cursor/rules/project-init.mdc` | ❌ | — 规则文件带 frontmatter |
 
-> 只有 `opencode/` 与 `pi/` 在仓库里有 `harness_meta.json`，所以脚本**当前只能初始化这两个**。
+> 注册表里当前只有 `opencode` 与 `pi`，所以脚本**只能初始化这两个**。
 > 表里其余的 harness 是已确认的路径约定；要用时新建对应目录和 JSON，按 [repository.md](repository.md) 的步骤走。
 
 验证状态含义：
 
 - ✅：从该 harness 的实现源码或本机实际配置确认过
-- ⚠️：遵循公开约定，但本机没有该 CLI 或没有该机制，**首次在真机使用时请复核**（复核方式：初始化后用该 harness 打开项目，确认它能发现 skill/agent，再把 `harness_meta.json` 与本文改对）
+- ⚠️：遵循公开约定，但本机没有该 CLI 或没有该机制，**首次在真机使用时请复核**（复核方式：初始化后用该 harness 打开项目，确认它能发现 skill/agent，再把注册表与本文改对）
 
 ## 两个概念的区分
 

@@ -1,7 +1,7 @@
 # OpenCode 初始化细节
 
 OpenCode 是仓库里约定最完整的目标：skill、agent、command 三类资源都有项目级目录，
-`opencode/harness_meta.json` 已核实，脚本可直接初始化。
+OpenCode 的目录约定已在注册表里核实（`h_skills_verified: true`），脚本可直接初始化。
 
 ## 目录结构
 

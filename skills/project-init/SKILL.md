@@ -20,7 +20,7 @@ kk-ai 仓库只有两层含义，判断的方法很简单：**把它单独拷给
 | `skills/<name>/` | 通用 skill（纯指令 + 可选脚本/模板） | 任何 harness |
 | `<harness>/` | 该工具专属资源，依赖该工具工作 | 只有那个工具 |
 
-`<harness>/` 目录自己用 `harness_meta.json` 声明项目级约定（skill 目录、agent 目录、指令文件），所以**新增一个 harness 不需要改脚本**。当前仓库里是 `opencode/` 和 `pi/`。
+`<harness>/` 里放该工具专属的资源（agent、command、专属 skill），**其中的文件增删不需要登记**，脚本直接扫目录。各工具的**项目级目录约定**（skill 放哪、agent 放哪、指令文件叫什么）记在 `scripts/init.sh` 的注册表里，当前支持 `opencode` 和 `pi`。
 
 ```
 kk-ai/
@@ -29,16 +29,14 @@ kk-ai/
 │   ├── mermaid/
 │   └── project-init/            # 本 skill
 ├── opencode/                    # OpenCode 专属
-│   ├── harness_meta.json
 │   ├── agents/                  # → .opencode/agents/
 │   ├── cmds/                    # → .opencode/commands/（手动按需）
 │   └── skills/                  # → .opencode/skills/（如 herdr）
 └── pi/                          # Pi 专属
-    ├── harness_meta.json
     └── extends/                 # pi-k-subagent / pi-agent-switcher 扩展
 ```
 
-完整的目录约定、字段说明、新增 harness 的步骤见 [references/repository.md](references/repository.md)。
+两层结构、注册表位置、新增 harness 的步骤见 [references/repository.md](references/repository.md)。
 
 ## 使用思路
 
@@ -161,7 +159,7 @@ kk-ai/
 - **先预检**：任一 skill/agent 不存在就直接失败，不留半成品目录
 - **幂等**：已就绪的链接跳过；指令文件的受管区块原地刷新，不重复追加
 - **不覆盖**：目标位置是真实文件/目录时只告警，`--force` 也不动它
-- **按核实状态链接**：`harness_meta.json` 里标 `skills_verified: false` 的 harness（当前是 Pi）不会收到 skill 链接，并在输出里告警
+- **按核实状态链接**：注册表里 `h_skills_verified` 为 `false` 的 harness（当前是 Pi）不会收到 skill 链接，并在输出里告警
 
 ### 7. 校验
 

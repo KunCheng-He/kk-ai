@@ -3,8 +3,8 @@
 本文的事实来自 DSH 自身实现（`dsh-skill` / `dsh-skill-filesystem` / `dsh-agent-instructions` 包），
 并已在本机 DSH 会话中实测。
 
-**注**：仓库当前没有 `dsh/harness_meta.json`，所以 `init.sh --harness dsh` 会报未知 harness。
-需要给 DSH 项目做自动初始化时，按 [repository.md](repository.md) 新建 `dsh/harness_meta.json`（内容见文末），脚本即可用。
+**注**：注册表里当前没有 `dsh`，所以 `init.sh --harness dsh` 会报未知 harness。
+需要给 DSH 项目做自动初始化时，按文末在 `scripts/init.sh` 的注册表里加几条分支即可。
 
 ## Skill 发现根与优先级
 
@@ -64,19 +64,46 @@ my-proj/
 └── .gitignore                # 忽略 .dsh/skills/
 ```
 
-## 加上 harness 声明后
+## 加进注册表
 
-在仓库根建 `dsh/harness_meta.json`：
+在 `scripts/init.sh` 的注册表段改三处（`ALL_HARNESSES` 加 `dsh`）：
 
-```json
-{
-  "label": "DeepSeek Harness",
-  "skills_dir": ".dsh/skills",
-  "skills_verified": true,
-  "agents": [],
-  "instructions": "AGENTS.md",
-  "instructions_mode": "block",
-  "status": "skill 与指令文件来自 DSH 源码 + 本机实测；无文件式 agent"
+```bash
+h_skills_dir() {
+  case "$1" in
+    opencode) echo ".opencode/skills" ;;
+    dsh)      echo ".dsh/skills" ;;
+    *)        echo "" ;;
+  esac
+}
+
+h_skills_verified() {
+  case "$1" in
+    opencode|dsh) echo "true" ;;
+    *)            echo "false" ;;
+  esac
+}
+
+h_agent_dirs() {
+  case "$1" in
+    opencode) printf '%s\n' ".opencode/agents" ;;
+    pi)       printf '%s\n' ".pi/k-subagents" ".pi/k-priagent" ;;
+    dsh)      : ;;                 # 无文件式 agent
+    *)        : ;;
+  esac
+}
+
+h_instructions() {
+  case "$1" in
+    opencode|pi|dsh) echo "AGENTS.md" ;;
+    *)               echo "" ;;
+  esac
+}
+
+harness_status() {
+  case "$1" in
+    dsh) echo "skill 与指令文件来自 DSH 源码 + 本机实测；无文件式 agent" ;;
+  esac
 }
 ```
 

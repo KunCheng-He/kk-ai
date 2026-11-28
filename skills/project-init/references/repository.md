@@ -1,6 +1,6 @@
-# 仓库结构与 harness 声明
+# 仓库结构与 harness 注册表
 
-`project-init` 不硬编码任何 harness 的路径。它读仓库现状，所以仓库怎么长,它就怎么工作。
+`project-init` 只认两件事：**仓库怎么分层**，以及**脚本里那份 harness 注册表**。没有额外的配置文件。
 
 ## 两层结构
 
@@ -13,7 +13,6 @@ kk-ai/
 │   └── upstream.json            可选，来源与版本元数据
 │
 └── <harness>/                   工具专属 —— 依赖该工具才能工作
-    ├── harness_meta.json        必需，声明项目级目录约定（见下）
     ├── agents/*.md              → 该工具的 agent 目录
     ├── cmds/*.md                → 该工具的 command 目录（脚本不自动链接）
     ├── skills/<name>/           → 该工具专属的 skill
@@ -25,63 +24,72 @@ kk-ai/
 - 能（纯指令、纯脚本、纯模板）→ `skills/`
 - 不能（用到该工具专属的目录约定、frontmatter 字段、运行时 API）→ `<harness>/`
 
-## harness_meta.json
+## 什么是「注册」、什么不是
 
-每个 harness 目录下的这份文件是**唯一**的约定来源。脚本与文档都从中读，改这里就够。
+这里有个容易混淆的点，先说清楚：
 
-```json
-{
-  "label": "OpenCode",
-  "source_dir": "opencode",
-  "skills_dir": ".opencode/skills",
-  "skills_verified": true,
-  "agents": [
-    { "dir": ".opencode/agents", "ext": ".md", "verified": true }
-  ],
-  "instructions": "AGENTS.md",
-  "instructions_mode": "block",
-  "status": "一句话说明核实到什么程度",
-  "notes": "给使用者看的补充说明"
+| | 谁负责 | 需要登记吗 |
+|---|---|---|
+| `skills/<name>/` | 通用层 | **不用**：脚本扫描目录即得 |
+| `<harness>/agents/`、`cmds/`、`skills/` **里的文件** | harness 专属资源 | **不用**：脚本扫描目录即得 |
+| `<harness>/` 对应工具的**项目级目录约定** | 工具本身的事 | **要**：写进脚本的注册表 |
+
+也就是说：往 `opencode/agents/` 里加三个 agent，什么都不用改，`index` 立刻能列出来；
+但「OpenCode 项目的 skill 应该放在 `.opencode/skills`」这条规律，脚本必须知道，否则不知道往哪儿链。
+
+## 注册表在哪
+
+就在 `scripts/init.sh` 的「harness 注册表」一段，核心是一个 case 分派：
+
+```bash
+ALL_HARNESSES="opencode pi"
+
+h_skills_dir() {
+  case "$1" in
+    opencode) echo ".opencode/skills" ;;
+    *)        echo "" ;;          # 空 = 该工具没有 skill 机制
+  esac
+}
+
+h_agent_dirs() {
+  case "$1" in
+    opencode) printf '%s\n' ".opencode/agents" ;;
+    pi)       printf '%s\n' ".pi/k-subagents" ".pi/k-priagent" ;;
+    *)        : ;;
+  esac
 }
 ```
 
-| 字段 | 必填 | 说明 |
+| 函数 | 回答什么 | 空值含义 |
 |---|---|---|
-| `label` | 否 | 展示名，缺省用目录名 |
-| `source_dir` | 否 | 仓库内该 harness 的资源目录，缺省 = 目录名 |
-| `skills_dir` | 否 | 项目级 skill 目录；**空字符串 = 该 harness 没有 skill 机制** |
-| `skills_verified` | 否 | `false` 时脚本**不会**把通用 skill 链进来，只告警。未在真机确认前一律写 `false` |
-| `agents` | 否 | 数组，每项 `{dir, ext, verified}`；可列多个目录（如 Pi 有两个 agent 目录） |
-| `instructions` | 否 | 项目级指令文件路径 |
-| `instructions_mode` | 否 | `block`（写受管区块，默认）或 `mdc`（额外补 Cursor 的 YAML frontmatter） |
-| `status` / `notes` | 否 | 给人看的说明，`index` 会打印出来 |
+| `ALL_HARNESSES` | 支持哪些 harness | — |
+| `h_skills_dir` | 项目级 skill 目录放哪 | 没有 skill 机制 |
+| `h_skills_verified` | 这条路径在真机上核实过吗 | 未核实 → 不链接通用 skill |
+| `h_agent_dirs` | 项目级 agent 目录有哪些（可多个） | 没有文件式 agent |
+| `h_instructions` | 项目级指令文件叫什么 | 不写指令文件 |
+| `h_instructions_mode` | `block`（受管区块）或 `mdc`（Cursor 带 frontmatter） | 默认 block |
+| `harness_status` | `index` 里展示的核实状态 | — |
 
-`skills_verified` 与 `agents[].verified` 是这个文件的重点：**没核实过的路径不要装作能工作。** 核实之后把它改成 `true`，并在 [harnesses.md](harnesses.md) 同步验证状态。
+`h_skills_verified` 是这个注册表里最值得留神的一项：**没核实过的路径不要装作能工作。** Pi 就是这种情况——目录写进去了，但技能机制没确认，所以 `false`，脚本不会往 Pi 项目里链 skill。
 
 ## 新增一个 harness
 
 以新增 `foo` 为例：
 
-1. 建目录 `foo/`，放好它专属的资源（`agents/`、`cmds/`、`skills/` 按需）
-2. 写 `foo/harness_meta.json`，`skills_verified` 先填 `false`
-3. `./scripts/init.sh index` — 确认新 harness 出现、路径正确
-4. `./scripts/init.sh plan /tmp/demo-foo --harness foo --skill mermaid` — 确认落点
-5. 在真机上打开项目，确认它能发现 skill/agent
-6. 核实通过后：把 `skills_verified` / `verified` 改成 `true`，在 [harnesses.md](harnesses.md) 表格补一行，验证状态标 ✅
+1. 建 `foo/`，放好它专属的资源（`agents/`、`cmds/`、`skills/` 按需）
+2. 在 `ALL_HARNESSES` 加 `foo`
+3. 补 `h_skills_dir` / `h_agent_dirs` / `h_instructions` 的分支；路径没核实就把 `h_skills_verified` 留成 `false`
+4. 补 `harness_status`
+5. `./scripts/init.sh index` — 确认新 harness 出现、路径正确
+6. `./scripts/init.sh plan /tmp/demo-foo --harness foo --skill mermaid` — 确认落点
+7. 真机打开项目，确认它能发现 skill/agent
+8. 核实通过后：`h_skills_verified` 改 `true`，在 [harnesses.md](harnesses.md) 表格补一行并标 ✅
 
-**不需要改 `scripts/init.sh`。** 脚本只认目录与这份 JSON；没有任何 harness 名字硬编码在逻辑里。
-
-## 脚本如何看仓库
-
-`init.sh` 启动时扫描仓库根下所有含 `harness_meta.json` 的一级目录，把它们当作可用 harness。所以：
-
-- 目录没有 `harness_meta.json` → 完全不被识别（比如只放文档的目录）
-- `--harness` 给了不存在的名字 → 报错并列出当前可用项
-- 仓库根由脚本位置推断（`skills/project-init/scripts/init.sh` 上三级），也可以用 `--repo-root` 或 `$KK_AI_ROOT` 覆盖
+改动只落在注册表那一段（约 60 行），主流程逻辑不用动。
 
 ## 仓库内容会变
 
-`index` 与 `discover` 子命令存在的意义就是**不要缓存记忆**：
+`index` 与 `discover` 存在的意义就是**不要缓存记忆**：
 
 ```bash
 ./scripts/init.sh index              # 当前仓库有什么

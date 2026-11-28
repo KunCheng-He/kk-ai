@@ -4,7 +4,7 @@
 # 仓库模型（kk-ai）：
 #   skills/<name>/              通用 skill 源，任何 harness 都能用
 #   <harness>/                  harness 专属资源（opencode/、pi/ …），只对该工具有效
-#                               └── harness_meta.json  声明该 harness 的项目级目录约定
+#                               └── 其项目级目录约定写在下方 harness 注册表里
 #   项目引用的方式只有一个：ln 符号链接。全局链接哪些、项目链接哪些，都由调用方决定。
 #
 # 用法：
@@ -15,7 +15,7 @@
 #
 # 设计原则：
 #   1. skill 只有一份源（skills/），不区分 shared/common
-#   2. harness 差异写在 <harness>/harness_meta.json，新增 harness 不用改脚本
+#   2. 所有 harness 差异集中在本文件的「harness 注册表」一段，新增只改那一处
 #   3. 幂等：已就绪的链接跳过，受管区块原地刷新；--force 只重建链接
 #   4. 绝不覆盖目标位置的真实文件/目录
 
@@ -51,7 +51,7 @@ usage() {
 
 选项：
   --harness <列表>   目标 harness，逗号/空格分隔
-                     可用：脚本按 <repo>/<harness>/harness_meta.json 自动发现
+                     可用：见脚本内 ALL_HARNESSES（当前 opencode pi）
                      默认：探测当前会话的 harness
   --skill <列表>     通用 skill 名（<repo>/skills/<name>），可省略 .md
   --agent <列表>     harness 专属 agent，可带前缀：opencode/诸葛亮 或裸名 诸葛亮
@@ -72,79 +72,86 @@ EOF
 }
 
 # ---------------------------------------------------------------- harness 注册表
-# 每个 harness = 仓库根下一个带 harness_meta.json 的目录。
-# 字段（全部可选，缺省即「不支持」）：
-#   label              展示名
-#   skills_dir         项目级 skill 目录
-#   agents [].dir      项目级 agent 目录；ext 为源文件扩展名
-#   source_dir         仓库内 harness 资源目录（相对仓库根，默认 = harness 目录名）
-#   instructions       项目级指令文件
-#   instructions_mode  block（写受管区块）| mdc（带 frontmatter 的规则文件）
-#   skills_verified    true/false —— skill 目录是否核实过
-#   agents_verified    true/false —— agent 目录是否核实过
-#   status             一句话说明已核实到什么程度
-#   notes              给使用者的补充说明
+# 仓库里每个 <harness>/ 目录的工具专属资源（agents/、cmds/、skills/）都是自动扫描的，
+# 不用登记。这里只登记「这个工具的项目级目录约定」——
+# 那是工具本身的事，目录里的文件增删不影响它。
+#
+# 新增一个 harness：
+#   1. ALL_HARNESSES 加名字
+#   2. 补 h_skills_dir / h_agent_dirs / h_instructions 的分支
+#   3. 补 harness_status（index 里展示的核实状态）
+#   4. 在 references/harnesses.md 表格加一行
+# 其余逻辑不用动。
 
-HARNESSES=""
+ALL_HARNESSES="opencode pi"
 
-load_harnesses() {
-  local d name
-  HARNESSES=""
-  for d in "$REPO_ROOT"/*/; do
-    [ -f "$d/harness_meta.json" ] || continue
-    name="$(basename "$d")"
-    HARNESSES="$HARNESSES $name"
-  done
-  HARNESSES="$(echo "$HARNESSES" | sed -e 's/^ *//' -e 's/ *$//')"
+# 该 harness 在仓库里的资源目录（缺省 = 名字本身）
+h_source_dir() { echo "$1"; }
+
+# 项目级 skill 目录；空 = 该 harness 没有 skill 机制
+h_skills_dir() {
+  case "$1" in
+    opencode) echo ".opencode/skills" ;;
+    *)        echo "" ;;
+  esac
 }
 
-meta() {
-  local name="$1" path="$REPO_ROOT/$1/harness_meta.json"
-  if [ ! -f "$path" ]; then err "未知 harness：${name}（${path} 不存在）"; return 1; fi
-  python3 -c 'import json,sys
-try:
-    v = json.load(open(sys.argv[2], encoding="utf-8"))[sys.argv[1]]
-except (KeyError, TypeError):
-    v = ""
-if v is True: v = "true"
-elif v is False: v = "false"
-elif v is None: v = ""
-print(v)' "$2" "$path"
+# skill 目录是否已在真机核实；未核实的不链接通用 skill
+h_skills_verified() {
+  case "$1" in
+    opencode) echo "true" ;;
+    *)        echo "false" ;;
+  esac
 }
 
-harness_label()    { local v; v="$(meta "$1" label    || true)"; echo "${v:-$1}"; }
-h_skills_dir()     { meta "$1" skills_dir       || true; }
-h_instructions()   { meta "$1" instructions     || true; }
-h_instructions_mode() { local v; v="$(meta "$1" instructions_mode || true)"; echo "${v:-block}"; }
-h_source_dir()     { local v; v="$(meta "$1" source_dir || true)"; echo "${v:-$1}"; }
-h_skills_verified(){ local v; v="$(meta "$1" skills_verified || true)"; echo "${v:-false}"; }
-
-# 可用 agent 目录，每行一个（去掉末尾 /）
+# 项目级 agent 目录，每行一个；空 = 无文件式 agent
 h_agent_dirs() {
-  local name="$1" path="$REPO_ROOT/$1/harness_meta.json"
-  [ -f "$path" ] || return 0
-  python3 -c 'import json,sys
-try:
-    agents = json.load(open(sys.argv[1], encoding="utf-8")).get("agents") or []
-except Exception:
-    agents = []
-for a in agents:
-    if isinstance(a, dict) and a.get("dir"):
-        print(a["dir"].rstrip("/"))' "$path"
+  case "$1" in
+    opencode) printf '%s\n' ".opencode/agents" ;;
+    pi)       printf '%s\n' ".pi/k-subagents" ".pi/k-priagent" ;;
+    *)        : ;;
+  esac
 }
 
+# 目标项目里 agent 文件的扩展名（按目录）
 h_agent_ext() {
-  local name="$1" dir="$2" path="$REPO_ROOT/$1/harness_meta.json"
-  python3 -c 'import json,sys
-try:
-    agents = json.load(open(sys.argv[1], encoding="utf-8")).get("agents") or []
-except Exception:
-    agents = []
-for a in agents:
-    if isinstance(a, dict) and a.get("dir") and a["dir"].rstrip("/") == sys.argv[2]:
-        print(a.get("ext") or ".md"); break
-else:
-    print(".md")' "$path" "$dir"
+  case "$2" in
+    .opencode/agents|.claude/agents|.pi/k-subagents|.pi/k-priagent) echo ".md" ;;
+    *)                                                             echo ".md" ;;
+  esac
+}
+
+# 项目级指令文件；空 = 不写
+h_instructions() {
+  case "$1" in
+    opencode|pi) echo "AGENTS.md" ;;
+    *)           echo "" ;;
+  esac
+}
+
+# 指令文件的写入方式：block（受管区块）| mdc（Cursor 规则格式，带 frontmatter）
+h_instructions_mode() {
+  case "$1" in
+    *) echo "block" ;;
+  esac
+}
+
+# 展示名
+harness_label() {
+  case "$1" in
+    opencode) echo "OpenCode" ;;
+    pi)       echo "Pi" ;;
+    *)        echo "$1" ;;
+  esac
+}
+
+# 一句话核实状态（index 会打印）
+harness_status() {
+  case "$1" in
+    opencode) echo "skill / agent / 指令文件均已在真机使用中核实；command 不自动链接" ;;
+    pi)       echo "agent 目录来自 pi-k-subagent / pi-agent-switcher 扩展；Pi 核心是否有 skill 机制未核实" ;;
+    *)        echo "" ;;
+  esac
 }
 
 detect_harness() {
@@ -168,7 +175,7 @@ resolve_skill() {
   local n="$1" h s
   if has_slash "$n"; then
     h="${n%%/*}"; s="${n#*/}"
-    if in_list "$h" "$HARNESSES" && [ -d "$REPO_ROOT/$h/skills/$s" ]; then
+    if in_list "$h" "$ALL_HARNESSES" && [ -d "$REPO_ROOT/$h/skills/$s" ]; then
       printf 'harness\t%s\n' "$REPO_ROOT/$h/skills/$s"; return 0
     fi
     return 1
@@ -222,7 +229,7 @@ resolve_agent() {
   local found_h="" found_rel="" found_src=""
   # 允许前缀：opencode/诸葛亮
   if has_slash "$q"; then only="${q%%/*}"; q="${q#*/}"; fi
-  for h in $ALL_HARNESSES_NONEMPTY; do
+  for h in $ALL_HARNESSES; do
     [ -n "$only" ] && [ "$h" != "$only" ] && continue
     for sub in $AGENT_SUBDIRS; do
       src="$REPO_ROOT/$(h_source_dir "$h")/$sub"
@@ -243,8 +250,6 @@ agent_desc() {
   printf '%s' "$d"
 }
 
-ALL_HARNESSES_NONEMPTY=""
-
 # ---------------------------------------------------------------- index
 list_all() {
   local what="${1:-all}" h s d src
@@ -258,10 +263,10 @@ list_all() {
   fi
   if [ "$what" = "all" ] || [ "$what" = "harness" ]; then
     hdr "Harness 专属资源（${REPO_ROOT}/<harness>/ —— 只对该工具有效）"
-    for h in $ALL_HARNESSES_NONEMPTY; do
+    for h in $ALL_HARNESSES; do
       src="$REPO_ROOT/$(h_source_dir "$h")"
       printf '\n  %-14s %s\n' "$h" "$(harness_label "$h")"
-      printf '  %-14s status: %s\n' "" "$(meta "$h" status || true)"
+      printf '  %-14s status: %s\n' "" "$(harness_status "$h")"
       d="$(h_skills_dir "$h")"
       if [ -n "$d" ]; then
         if [ "$(h_skills_verified "$h")" = "true" ]; then
@@ -281,8 +286,8 @@ list_all() {
         printf '  %-14s 资源 %s\n' "" "$s"
       done < <(harness_agent_files "$h")
     done
-    if [ -z "$ALL_HARNESSES_NONEMPTY" ]; then
-      info "未发现任何 harness（在 ${REPO_ROOT}/<name>/harness_meta.json 声明后才能使用）"
+    if [ -z "$ALL_HARNESSES" ]; then
+      info "未发现任何 harness（在 scripts/init.sh 的 ALL_HARNESSES 里声明）"
     fi
   fi
 }
@@ -293,7 +298,7 @@ discover_project() {
   hdr "🔍 巡检现有配置：${proj}"
   if [ ! -d "$proj" ]; then info "目录不存在（全新项目）"; return 0; fi
   if [ -d "$proj/.git" ]; then info "git 仓库：是"; else info "git 仓库：否"; fi
-  for h in $ALL_HARNESSES_NONEMPTY; do
+  for h in $ALL_HARNESSES; do
     hit=0; d=""
     :
     [ -n "$(h_skills_dir "$h")" ] && [ -d "$proj/$(h_skills_dir "$h")" ] && hit=1
@@ -322,7 +327,7 @@ discover_project() {
   done
   # 指令文件单独汇报：多个 harness 共用同一个 AGENTS.md 时只报一次
   local seen=""
-  for h in $ALL_HARNESSES_NONEMPTY; do
+  for h in $ALL_HARNESSES; do
     d="$(h_instructions "$h")"
     [ -n "$d" ] || continue
     [ -f "$proj/$d" ] || continue
@@ -459,8 +464,6 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-load_harnesses
-ALL_HARNESSES_NONEMPTY="$HARNESSES"
 
 case "$CMD" in
   index) list_all "${PROJECT:-all}"; exit 0 ;;
@@ -488,8 +491,8 @@ if [ -z "$TARGET_HARNESSES" ]; then
   info "未指定 harness，自动探测为：$TARGET_HARNESSES"
 fi
 for h in $TARGET_HARNESSES; do
-  if ! in_list "$h" "$HARNESSES"; then
-    err "未知 harness：${h}（当前仓库可用：${HARNESSES:-无}）"
+  if ! in_list "$h" "$ALL_HARNESSES"; then
+    err "未知 harness：${h}（可用：${ALL_HARNESSES}）"
     exit 2
   fi
 done
@@ -549,7 +552,7 @@ for h in $TARGET_HARNESSES; do
   if [ -n "$d" ] && [ "$(h_skills_verified "$h")" = "true" ]; then
     skills_linkable="$skills_linkable $h"
   elif [ -n "$d" ]; then
-    warn "$h 的 skill 目录（${d}）未核实：默认不链接，确认后把 harness_meta.json 的 skills_verified 改为 true"
+    warn "$h 的 skill 目录（${d}）未核实：默认不链接；核实后改 scripts/init.sh 的 h_skills_verified"
   fi
 done
 

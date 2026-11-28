@@ -59,7 +59,7 @@ __pycache__/
 
 | | v3 | v4 |
 |---|---|---|
-| harness 覆盖 | 硬编码 7 档 | 只按仓库里真实存在的 `harness_meta.json` |
+| harness 覆盖 | 硬编码 7 档 | 只按注册表 `ALL_HARNESSES` 里的条目 |
 | skill 源 | `skills/shared` + `skills/common` | 只有 `skills/` |
 | 忽略项来源 | 按 harness 名字套 | 按**实际建立的链接目录** |
 | 未核实路径 | 也照链 | 不链、也不写忽略项 |
