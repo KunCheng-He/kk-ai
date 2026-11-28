@@ -25,7 +25,7 @@ OpenCode 单次会话不支持以目标为条件的自动重试。通过 herdr �
 - 运行在 herdr 环境中（`HERDR_ENV=1`）
 - 项目中配置了 `opencode` 命令
 
-如需了解 herdr 会话管理细节（创建 tab、等待完成、读取输出等），加载 `herdr` skill。
+herdr 的会话管理细节（创建 tab、等待完成、读取输出等）以 `herdr --help` 和各子命令（`herdr agent`、`herdr pane`、`herdr tab`）为准。
 
 ## 循环流程
 
@@ -43,7 +43,7 @@ OpenCode 单次会话不支持以目标为条件的自动重试。通过 herdr �
 
 - 在独立 tab 中启动新会话（不能复用旧会话，旧会话已被上轮任务污染上下文）
 - 发送任务描述，等待会话完成
-- 具体操作用 herdr 命令完成，加载 `herdr` skill 获取操作细节
+- 具体操作用 herdr 命令完成，`herdr --help` 与相关子命令提供细节
 
 ### 3. 审查
 

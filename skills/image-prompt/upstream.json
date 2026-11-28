@@ -1,7 +1,0 @@
-{
-  "source": "self-developed",
-  "path": "",
-  "last_update": "2026-11-09",
-  "tracking_dir": "",
-  "notes": "AI 图像生成提示词生成器。v3: 正向+负向两段式输出，负向按目标模型自适应（SD/Flux 独立框、Midjourney --no、DALL·E/Gemini 正向改写）；style-keywords.md 扩为风格族系速查；新增 negative-prompt.md 负向词库"
-}

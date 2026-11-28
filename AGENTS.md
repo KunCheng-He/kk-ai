@@ -83,7 +83,7 @@ skills/project-init/scripts/init.sh plan <项目路径> --harness opencode --ski
 skills/project-init/scripts/init.sh init <项目路径> --harness opencode --skill mermaid --agent 诸葛亮
 ```
 
-参数写法：通用 skill 用 `--skill <name>`，harness 专属用 `--skill opencode/herdr`；agent 同理支持 `--agent opencode/诸葛亮`。
+参数写法：通用 skill 用 `--skill <name>`，harness 专属用 `--skill opencode/loop-by-herdr`；agent 同理支持 `--agent opencode/诸葛亮`。
 
 详细工作流见 `skills/project-init/SKILL.md`。
 

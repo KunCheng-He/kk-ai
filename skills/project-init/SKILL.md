@@ -2,7 +2,7 @@
 name: project-init
 description: |
   多 harness 项目初始化工具。当用户需要创建新项目、初始化项目、设置项目结构、接入新的 AI 编码工具时使用。按 kk-ai 仓库约定初始化：skills/ 下的通用 skill 与 <harness>/ 下的工具专属资源，通过符号链接按需进入项目。触发关键词："初始化项目"、"创建项目"、"新建项目"、"项目初始化"、"设置项目"、"init project"。即使用户未明确提及，但上下文暗示需要开始一个新项目或给项目接入新 harness 时，也应主动使用。
-version: 4.0.0
+version: 4.1.0
 ---
 
 # 项目初始化（多 harness）
@@ -31,7 +31,7 @@ kk-ai/
 ├── opencode/                    # OpenCode 专属
 │   ├── agents/                  # → .opencode/agents/
 │   ├── cmds/                    # → .opencode/commands/（手动按需）
-│   └── skills/                  # → .opencode/skills/（如 herdr）
+│   └── skills/                  # → .opencode/skills/（如 loop-by-herdr）
 └── pi/                          # Pi 专属
     └── extends/                 # pi-k-subagent / pi-agent-switcher 扩展
 ```
@@ -95,7 +95,7 @@ kk-ai/
 | 想把某段流程固化成技能 | `skillify` | 通用 `skills/` |
 | 需要设计 agent 工作流 | `workflow-designer` | 通用 `skills/` |
 | 需要切换 DSH 会话角色 | `诸葛亮`、`universal-translator` | `opencode/agents/` |
-| 需要使用 Herdr 终端复用 | `opencode/herdr` | `opencode/skills/` |
+| 需要在 herdr 里跑「执行→审查→优化」循环 | `opencode/loop-by-herdr` | `opencode/skills/` |
 
 **agent 的跨 harness 问题**：`opencode/agents/*.md` 是 markdown + frontmatter，OpenCode 与 Claude Code 原生支持；Pi 的 `k-subagents`/`k-priagent` 也读同格式，脚本会按目标目录改写扩展名。但 **DSH 没有文件式 agent**——只有 DSH 时，二选一并在计划里写明：
 
@@ -146,7 +146,7 @@ kk-ai/
 | 开关 | 作用 |
 |---|---|
 | `--harness <列表>` | 目标 harness，逗号分隔；缺省自动探测 |
-| `--skill <列表>` | 通用 skill 名；带前缀 `opencode/herdr` 表示 harness 专属 skill |
+| `--skill <列表>` | 通用 skill 名；带前缀 `opencode/loop-by-herdr` 表示 harness 专属 skill |
 | `--agent <列表>` | agent 名，可带前缀 `opencode/诸葛亮`，`.md` 可省略 |
 | `--command <列表>` | 只写进清单，不建链接（OpenCode 的 command 按需手动链） |
 | `--type <类型>` | `.gitignore` 模板，见 [references/gitignore.md](references/gitignore.md) |

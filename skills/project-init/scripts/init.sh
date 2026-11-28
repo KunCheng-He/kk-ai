@@ -170,7 +170,7 @@ detect_harness() {
 # ---------------------------------------------------------------- 资源解析
 # 解析 skill 名。返回 "<kind>\t<源目录>"，kind = shared（通用）| harness
 #   research-workflow        → skills/research-workflow            （通用）
-#   opencode/herdr           → opencode/skills/herdr               （harness 专属）
+#   opencode/loop-by-herdr  → opencode/skills/loop-by-herdr        （harness 专属）
 resolve_skill() {
   local n="$1" h s
   if has_slash "$n"; then

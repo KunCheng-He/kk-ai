@@ -60,7 +60,7 @@ ln -s ~/Code/kk-ai/opencode/cmds/{cmd}.md       {项目}/.opencode/commands/{cmd
 | agent | `opencode/agents/<name>.md` | `--agent <name>` 或 `--agent opencode/<name>.md` |
 | command | `opencode/cmds/<name>.md` | `--command <name>`（只写清单，手动链接） |
 
-**通用 skill 与专属 skill 的区别**：通用的一拷就能用；专属的用到 OpenCode 的目录约定或前端字段（例如 `herdr` 需要 `HERDR_ENV` 且按 OpenCode 的 skill 布局维护），链到别的工具里即使被读到也可能不工作。
+**通用 skill 与专属 skill 的区别**：通用的一拷就能用；专属的用到 OpenCode 的目录约定或前端字段（例如 `loop-by-herdr` 需要运行在 `HERDR_ENV=1` 的 herdr 会话里，且按 OpenCode 的 skill 布局维护），链到别的工具里即使被读到也可能不工作。
 
 ## `.gitignore`
 
