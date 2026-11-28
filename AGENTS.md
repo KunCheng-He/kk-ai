@@ -132,12 +132,24 @@ ln -s ~/Code/kk-ai/skills/<name> <项目>/.opencode/skills/<name>    # 项目级
 - 全局配置目录（`~/.dsh`、`~/.config/opencode`、`~/.agents`、`~/.pi`）属于用户的个人环境
 - 除非用户明确要求，不要修改、不要删除其中的链接或文件
 
+### 6.7 三方 skill 装进来，不抄进来
+
+**本仓库只保存自研 skill。** 三方 skill 走安装，不走复制：
+
+- 需要某个外部 skill 时，从本地源仓 `~/Code/GitHub-Skills/` 或官方渠道 `ln -s` 到 `~/.agents/skills/` 或项目目录；更新靠源仓 `git pull`
+- **不要**把它复制进 `skills/` 再靠一个元数据文件"跟踪上游"——那样必然有两份副本、两份日期，且没人会记得同步
+- 只有当你需要**修改**它时才复制进来，此时它已经变成自研，git 提交历史就是它的来源
+
+判断标准：**你会不会想改它？** 会 → 自研，进本仓库；不会 → 外部安装。
+
 ## 7. 新增一个 skill
 
 1. 判断归属：`skills/` 还是 `<harness>/skills/`（按 §2 的依据）
 2. 建目录，写 `SKILL.md`，frontmatter 至少含 `name` + `description`
    - `description` 写清"做什么 + 什么时候用"，多数平台只靠它触发
-3. 加 `upstream.json` 记录来源与版本（与现有 skill 保持一致；字段按需写，不要预先铺满）
+3. frontmatter 需要时可含 `version`
+   - 版本号只写这一处，不要在别处（README、VERSION 文件、单独的元数据文件）再写一份
+   - **不建 `upstream.json`**：本仓库里的 skill 都是自研的，来源由 git 提交历史承载。三方 skill 见 §6.7，不复制进本仓库
 4. 如果 skill 跨平台且含平台专属用法，正文用平台无关表述，另建 `harness/<平台>.md`
 5. 确认 `init.sh index` 能看到它（不用改任何登记文件）
 6. 若要同步到某个工具，在对应项目里重新建链接

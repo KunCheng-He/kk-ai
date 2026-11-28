@@ -10,7 +10,7 @@ kk-ai/
 │   ├── SKILL.md                 必需，frontmatter 含 name + description
 │   ├── references/              按需读的细则
 │   ├── scripts/                 可选，可执行脚本
-│   └── upstream.json            可选，来源与版本元数据
+│   └── （无元数据文件）          版本号写在 SKILL.md frontmatter 的 version 里
 │
 └── <harness>/                   工具专属 —— 依赖该工具才能工作
     ├── agents/*.md              → 该工具的 agent 目录

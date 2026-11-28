@@ -92,4 +92,4 @@ node ../../scripts/check-report.mjs report.md --evidence browser_results.md
 
 ## 版本
 
-`VERSION` 记录当前版本；改动方法层视为次版本变更，改动仅适配层视为补丁。
+`SKILL.md` frontmatter 的 `version` 记录当前版本；改动方法层视为次版本变更，改动仅适配层视为补丁。

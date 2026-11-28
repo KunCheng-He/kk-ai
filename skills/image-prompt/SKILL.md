@@ -1,6 +1,7 @@
 ---
 name: image-prompt
 description: "AI 图像生成提示词生成器。将粗略的生图想法细化为高质量、结构化的**正向 + 负向两段式**提示词，并按目标模型自适应负向承载方式（SD 系独立 negative 框、Flux 缩减为画质词、Midjourney `--no`、DALL·E/Gemini 正向改写），适用于 DALL·E、GPT Image、Midjourney、Stable Diffusion、Flux、Gemini、即梦等任何 AI 图像生成模型。当用户提到以下任何场景时都应使用：生图提示词、画图提示词、AI 绘图 prompt、AI 绘画 prompt、图片生成 prompt、图片提示词、负向提示词、反向提示词、negative prompt、Midjourney prompt、DALL·E prompt、Stable Diffusion prompt；以及用户想生成图片但不知道怎么描述时——如'帮我画张图'、'我想做张海报'、'生成一个封面'、'帮我设计一张图'、'做个Logo'、'帮我P一张图'、'优化这段提示词'；或涉及海报、信息图、产品图、人像写真、动漫、全景图、故事板、食谱图、城市景观、文创产品等需要视觉内容创作的场景。"
+version: 3.0.0
 ---
 
 # AI Image Prompt Generator

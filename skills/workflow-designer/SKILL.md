@@ -1,6 +1,7 @@
 ---
 name: workflow-designer
 description: "用于设计、评估 AI 编码或软件交付中的 agent 工作流：拆解任务，判断是否委派/隔离上下文、并行/批量编排，以及 skill/指令与 agent/preset 的分工。用户询问怎么拆任务、要不要 subagent/agent/skill/workflow，或比较某 Harness 的落地方式时触发；仅提及这些词的普通编码请求、与 AI agent 编排无关的一般 CI/CD 或业务流程不触发。纯概念问题无需先指定平台；需要平台专属实现且目标未说明时再询问。"
+version: 1.3.0
 ---
 
 # AI 工作流设计

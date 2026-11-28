@@ -1,6 +1,7 @@
 ---
 name: skillify
 description: 将当前会话的可重复过程捕获为可重用的技能，按目标 harness 落盘（DSH / OpenCode / Claude Code / 便携 .agents 通用）。触发场景：用户说"使其成为一个技能"、"捕获此工作流"、"技能化"、"创建技能"、"保存这个流程"时使用；出现"以后都这么做"、"固化成流程"等语义时也应主动使用。
+version: 1.2.0
 ---
 
 # Skillify（技能化）
